@@ -14,11 +14,19 @@
 
 import requests
 import jwt
+import json
+from .user import User
 
 
 class CasdoorSDK:
-
-    def __init__(self, endpoint: str, client_id: str, client_secret: str, jwt_secret: str, org_name: str):
+    def __init__(
+        self,
+        endpoint: str,
+        client_id: str,
+        client_secret: str,
+        jwt_secret: str,
+        org_name: str,
+    ):
         self.endpoint = endpoint
         self.client_id = client_id
         self.client_secret = client_secret
@@ -35,7 +43,7 @@ class CasdoorSDK:
         :param code: the code that sent from Casdoor using redirect url back to your server.
         :return: access_token
         """
-        url = self.endpoint + '/api/login/oauth/access_token'
+        url = self.endpoint + "/api/login/oauth/access_token"
         params = {
             "grant_type": self.grant_type,
             "client_id": self.client_id,
@@ -52,10 +60,12 @@ class CasdoorSDK:
         :param token: access_token
         :return: the data in dict format
         """
-        return_json = jwt.decode(token,
-                                 self.jwt_secret,
-                                 algorithms=self.algorithms,
-                                 audience=self.client_id,)
+        return_json = jwt.decode(
+            token,
+            self.jwt_secret,
+            algorithms=self.algorithms,
+            audience=self.client_id,
+        )
         return return_json
 
     def get_users(self) -> [dict]:
@@ -81,10 +91,35 @@ class CasdoorSDK:
         """
         url = self.endpoint + "/api/get-user"
         params = {
-            "id": self.org_name + "/" + user_id,
+            "id": f"{self.org_name}/{user_id}",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
         user = r.json()
         return user
+
+    def modify_user(self, method: str, user: User) -> dict:
+        url = self.endpoint + f"/api/{method}"
+        user.owner = self.org_name
+        params = {
+            "id": f"{user.owner}/{user.name}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        user_info = json.dumps(user.to_dict())
+        r = requests.post(url, params=params, data=user_info)
+        response = r.json()
+        return response
+
+    def add_user(self, user: User) -> dict:
+        response = self.modify_user("add-user", user)
+        return response
+
+    def update_user(self, user: User) -> dict:
+        response = self.modify_user("update-user", user)
+        return response
+
+    def delete_user(self, user: User) -> dict:
+        response = self.modify_user("delete-user", user)
+        return response
