@@ -12,24 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from oauth.main import CasdoorSDK
+from oauth.main import CasdoorSDK, User
 from unittest import TestCase
 
 
 class TestOAuth(TestCase):
     """
-    You should replace the get_sdk() method's content with your own Casdoor
+    You should replace the code content below and
+    the get_sdk() method's content with your own Casdoor
     instance and such if you need to. And running these tests successfully
     proves that your connection to Casdoor is good-and-working!
     """
+
+    # server returned authorization code
+    code = "6d038ac60d4e1f17e742"
 
     @staticmethod
     def get_sdk():
 
         sdk = CasdoorSDK(
-            endpoint="https://door.casbin.com",
-            client_id="0ba528121ea87b3eb54d",
-            client_secret="04f4ca22101529a3503d5a653a877b4e8403edf0",
+            endpoint="http://test.casbin.com:8000",
+            client_id="3267f876b11e7d1cb217",
+            client_secret="3f0d1f06d28d65309c8f38b505cb9dcfa487754d",
             jwt_secret="CasdoorSecret",
             org_name="built-in",
         )
@@ -37,12 +41,12 @@ class TestOAuth(TestCase):
 
     def test_get_oauth_token(self):
         sdk = self.get_sdk()
-        access_token = sdk.get_oauth_token("91a7e3c2e9aa2baef46a")
+        access_token = sdk.get_oauth_token(self.code)
         self.assertIsInstance(access_token, str)
 
     def test_parse_jwt_token(self):
         sdk = self.get_sdk()
-        access_token = sdk.get_oauth_token("91a7e3c2e9aa2baef46a")
+        access_token = sdk.get_oauth_token(self.code)
         decoded_msg = sdk.parse_jwt_token(access_token)
         self.assertIsInstance(decoded_msg, dict)
 
@@ -55,3 +59,25 @@ class TestOAuth(TestCase):
         sdk = self.get_sdk()
         user = sdk.get_user("admin")
         self.assertIsInstance(user, dict)
+
+    def test_modify_user(self):
+        sdk = self.get_sdk()
+        user = User()
+        user.name = "test_ffyuanda"
+        sdk.delete_user(user)
+
+        response = sdk.add_user(user)
+        self.assertEqual(response["data"], "Affected")
+
+        response = sdk.delete_user(user)
+        self.assertEqual(response["data"], "Affected")
+
+        response = sdk.add_user(user)
+        self.assertEqual(response["data"], "Affected")
+
+        user.phone = "phone"
+        response = sdk.update_user(user)
+        self.assertEqual(response["data"], "Affected")
+
+        self.assertIn("status", response)
+        self.assertIsInstance(response, dict)
