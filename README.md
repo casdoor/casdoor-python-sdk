@@ -25,9 +25,36 @@ sdk = CasdoorSDK(
     org_name,
 )
 ```
-## Step2. Get token and parse
+## Step2. Authorize with the Casdoor server
+At this point, we should use some ways to verify with the Casdoor server.  
 
-After casdoor verification passed, it will be redirected to your application with code and state, like `http://forum.casbin.org?code=xxx&state=yyyy`.
+To start, we want you understand clearly the verification process of Casdoor.
+The following paragraphs will mention your app that wants to use Casdoor as a means
+of verification as `APP`, and Casdoor as `Casdoor`.
+
+1. `APP` will send a request to `Casdoor`.  
+   Since `Casdoor` is a UI-based OAuth
+   provider, you cannot use request management service like Postman to send a URL
+   with parameters and get back a JSON file.  
+   
+
+2. The simplest way to try it out is to type the URL in your browser (in which JavaScript can be executed to run the UI).
+
+3. Type in the URL in your browser in this format:
+`endpoint/login/oauth/authorize?client_id=xxx&response_type=code&redirect_uri=xxx&scope=read&state=xxx`  
+In this URL the `endpoint` is your Casdoor's location, as mentioned in Step1; then the `xxx` need to be filled out by yourself.  
+
+Hints:  
+1. `redirect_uri` is the URL that your `APP` is configured to
+listen to the response from `Casdoor`. For example, if your `redirect_uri` is `https://forum.casbin.com/callback`, then Casdoor will send a request to this URL along with two parameters `code` and `state`, which will be used in later steps for authentication.   
+
+2. `state` is usually your Application's name, you can find it under the `Applications` tab in `Casdoor`, and the leftmost `Name` column gives each application's name. 
+
+3. Of course you want your `APP` to be able to send the URL. For example you should have something like a button, and it carries this URL. So when you click the button, you should be redirected to `Casdoor` for verification. For now you are typing it in the browser simply for testing.
+   
+## Step3. Get token and parse
+
+After Casdoor verification passed, it will be redirected to your application with code and state as said in Step2, like `https://forum.casbin.com/callback?code=xxx&state=yyyy`.
 
 Your web application can get the `code` and call `get_oauth_token(code)`, then parse out jwt token.
 
@@ -40,7 +67,7 @@ decoded_msg = sdk.parse_jwt_token(access_token)
 
 `decoded_msg` is the JSON data decoded from the `access_token`, which contains user info and other useful stuff.
 
-## Step3. Interact with the users
+## Step4. Interact with the users
 
 casdoor-python-sdk support basic user operations, like:
 
