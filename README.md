@@ -13,7 +13,6 @@ Initialization requires 5 parameters, which are all str type:
 | jwt_secret        | Yes  | Same as Casdoor JWT secret                         |
 | org_name | Yes  |Organization name
 
-
 ```python
 from oauth.main import CasdoorSDK
 
@@ -74,6 +73,3 @@ casdoor-python-sdk support basic user operations, like:
 - `get_user(user_id: str)`, get one user by user name.
 - `get_users()`, get all users.
 - `modify_user(method: str, user: User)/add_user(user: User)/update_user(user: User)/delete_user(user: User)`, write user to database.
-
-
-
