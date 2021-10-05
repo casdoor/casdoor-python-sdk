@@ -28,6 +28,7 @@ class CasdoorSDK:
         org_name: str,
     ):
         self.endpoint = endpoint
+        self.front_endpoint = endpoint.replace(":8000", ":7001")
         self.client_id = client_id
         self.client_secret = client_secret
         self.jwt_secret = jwt_secret
@@ -36,6 +37,18 @@ class CasdoorSDK:
         self.grant_type = "authorization_code"
 
         self.algorithms = "HS256"
+
+    def get_auth_link(self, redirect_uri: str, state: str, response_type: str = "code", scope: str = "read"):
+        url = self.front_endpoint + "/login/oauth/authorize"
+        params = {
+            "client_id": self.client_id,
+            "response_type": response_type,
+            "redirect_uri": redirect_uri,
+            "scope": scope,
+            "state": state,
+        }
+        r = requests.request("", url, params=params)
+        return r.url
 
     def get_oauth_token(self, code: str) -> str:
         """
@@ -52,6 +65,7 @@ class CasdoorSDK:
         }
         r = requests.post(url, params)
         access_token = r.json().get("access_token")
+
         return access_token
 
     def parse_jwt_token(self, token: str) -> dict:
