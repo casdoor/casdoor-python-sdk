@@ -36,7 +36,7 @@ class CasdoorSDK:
 
         self.grant_type = "authorization_code"
 
-        self.algorithms = "HS256"
+        self.algorithms = ["HS256"]
 
     def get_auth_link(self, redirect_uri: str, state: str, response_type: str = "code", scope: str = "read"):
         url = self.front_endpoint + "/login/oauth/authorize"
