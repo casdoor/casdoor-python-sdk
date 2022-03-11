@@ -3,6 +3,12 @@ Casdoor's SDK for Python will allow you to easily connect your application to th
 
 Casdoor SDK is simple to use. We will show you the steps below.
 
+Casdoor-python-sdk is available on PyPI:
+
+```console
+$ pip install casdoor
+```
+
 ## Step1. Init Config
 Initialization requires 5 parameters, which are all str type:
 | Name (in order)  | Must | Description                                         |
@@ -14,7 +20,7 @@ Initialization requires 5 parameters, which are all str type:
 | org_name | Yes  |Organization name
 
 ```python
-from oauth.main import CasdoorSDK
+from casdoor import CasdoorSDK
 
 sdk = CasdoorSDK(
     endpoint,
