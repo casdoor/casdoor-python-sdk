@@ -1,5 +1,4 @@
 # casdoor-python-sdk
-===
 
 [![GitHub Action](https://github.com/casdoor/casdoor-python-sdk/workflows/build/badge.svg?branch=master)](https://github.com/casdoor/casdoor-python-sdk/actions)
 [![Version](https://img.shields.io/pypi/v/casdoor.svg)](https://pypi.org/project/casdoor/)
