@@ -1,13 +1,21 @@
 # casdoor-python-sdk
-Casdoor's SDK for Python will allow you to easily connect your application to the Casdoor authentication system without having to implement it from scratch.
+===
 
-Casdoor SDK is simple to use. We will show you the steps below.
+[![GitHub Action](https://github.com/casdoor/casdoor-python-sdk/workflows/build/badge.svg?branch=master)](https://github.com/casdoor/casdoor-python-sdk/actions)
+[![Version](https://img.shields.io/pypi/v/casdoor.svg)](https://pypi.org/project/casdoor/)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/casdoor.svg)](https://pypi.org/project/casdoor/)
+[![Pyversions](https://img.shields.io/pypi/pyversions/casdoor.svg)](https://pypi.org/project/casdoor/)
+[![Gitter](https://badges.gitter.im/casbin/casdoor.svg)](https://gitter.im/casbin/casdoor)
+
+Casdoor's SDK for Python will allow you to easily connect your application to the Casdoor authentication system without having to implement it from scratch.
 
 Casdoor-python-sdk is available on PyPI:
 
 ```console
 $ pip install casdoor
 ```
+
+Casdoor SDK is simple to use. We will show you the steps below.
 
 ## Step1. Init Config
 Initialization requires 5 parameters, which are all str type:
