@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.1.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.0.0...v1.1.0) (2022-03-11)
+
+
+### Features
+
+* add badges ([#14](https://github.com/casdoor/casdoor-python-sdk/issues/14)) ([7cd6735](https://github.com/casdoor/casdoor-python-sdk/commit/7cd673552bdd43f4170df6ffd8384181bdcbe013))
+
 # 1.0.0 (2022-03-11)
 
 
