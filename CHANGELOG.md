@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.1.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.0...v1.1.1) (2022-03-18)
+
+
+### Bug Fixes
+
+* correct the decryption algorithm to rs256 ([#15](https://github.com/casdoor/casdoor-python-sdk/issues/15)) ([bcb0657](https://github.com/casdoor/casdoor-python-sdk/commit/bcb0657009142e10dd4fbb7c53436d92640b5c0d))
+
 # [1.1.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.0.0...v1.1.0) (2022-03-11)
 
 
