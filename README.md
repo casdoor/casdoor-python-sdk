@@ -23,17 +23,22 @@ Initialization requires 5 parameters, which are all str type:
 | endpoint         | Yes  | Casdoor Server Url, such as `http://localhost:8000` |
 | client_id         | Yes  | Application.client_id                               |
 | client_secret     | Yes  | Application.client_secret                           |
-| jwt_secret        | Yes  | Same as Casdoor JWT secret                         |
+| certificate       | Yes  | Same as Casdoor   certificate                     |
 | org_name | Yes  |Organization name
 
 ```python
 from casdoor import CasdoorSDK
 
+certificate = b'''-----BEGIN CERTIFICATE-----
+MIIE+TCCAuGgAwIBAgIDAeJAMA0GCSqGSIb3DQEBCwUAMDYxHTAbBgNVBAoTFENh
+...
+-----END CERTIFICATE-----'''
+
 sdk = CasdoorSDK(
     endpoint,
     client_id,
     client_secret,
-    jwt_secret,
+    certificate,
     org_name,
 )
 ```

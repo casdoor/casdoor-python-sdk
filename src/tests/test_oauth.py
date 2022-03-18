@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from src.oauth.main import CasdoorSDK, User
+from src.casdoor.main import CasdoorSDK, User
 from unittest import TestCase
 
 
