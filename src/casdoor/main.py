@@ -16,6 +16,9 @@ import requests
 import jwt
 import json
 from .user import User
+from typing import List
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
 
 
 class CasdoorSDK:
@@ -24,19 +27,19 @@ class CasdoorSDK:
         endpoint: str,
         client_id: str,
         client_secret: str,
-        jwt_secret: str,
+        certificate: str,
         org_name: str,
     ):
         self.endpoint = endpoint
         self.front_endpoint = endpoint.replace(":8000", ":7001")
         self.client_id = client_id
         self.client_secret = client_secret
-        self.jwt_secret = jwt_secret
+        self.certificate = certificate
         self.org_name = org_name
 
         self.grant_type = "authorization_code"
 
-        self.algorithms = "HS256"
+        self.algorithms = "RS256"
 
     def get_auth_link(self, redirect_uri: str, state: str, response_type: str = "code", scope: str = "read"):
         url = self.front_endpoint + "/login/oauth/authorize"
@@ -74,15 +77,17 @@ class CasdoorSDK:
         :param token: access_token
         :return: the data in dict format
         """
+        certificate = x509.load_pem_x509_certificate(self.certificate,default_backend())
+
         return_json = jwt.decode(
             token,
-            self.jwt_secret,
+            certificate.public_key(),
             algorithms=self.algorithms,
             audience=self.client_id,
         )
         return return_json
 
-    def get_users(self) -> [dict]:
+    def get_users(self) -> List[dict]:
         """
         Get the users from Casdoor.
         :return: a list of dicts containing user info
