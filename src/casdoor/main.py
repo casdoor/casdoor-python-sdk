@@ -29,9 +29,13 @@ class CasdoorSDK:
         client_secret: str,
         certificate: str,
         org_name: str,
+        front_endpoint: str = None
     ):
         self.endpoint = endpoint
-        self.front_endpoint = endpoint.replace(":8000", ":7001")
+        if front_endpoint:
+            self.front_endpoint = front_endpoint
+        else:
+            self.front_endpoint = endpoint.replace(":8000", ":7001")
         self.client_id = client_id
         self.client_secret = client_secret
         self.certificate = certificate
