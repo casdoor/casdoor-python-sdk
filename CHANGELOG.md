@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.1.3](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.2...v1.1.3) (2022-03-20)
+
+
+### Bug Fixes
+
+* Fix self.algorithms data type ([#17](https://github.com/casdoor/casdoor-python-sdk/issues/17)) ([5f49189](https://github.com/casdoor/casdoor-python-sdk/commit/5f4918961116325e395eeb792a5718b56af20674))
+
 ## [1.1.2](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.1...v1.1.2) (2022-03-20)
 
 
