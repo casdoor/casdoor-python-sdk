@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.1.2](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.1...v1.1.2) (2022-03-20)
+
+
+### Bug Fixes
+
+* hardcode front_endpoint ([#16](https://github.com/casdoor/casdoor-python-sdk/issues/16)) ([ef17ce6](https://github.com/casdoor/casdoor-python-sdk/commit/ef17ce6a172066b0847a109609ce0131b5765bf8))
+
 ## [1.1.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.0...v1.1.1) (2022-03-18)
 
 
