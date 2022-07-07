@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.1.4](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.3...v1.1.4) (2022-07-07)
+
+
+### Bug Fixes
+
+* certificate convert to bytes to meet algorithm need ([#21](https://github.com/casdoor/casdoor-python-sdk/issues/21)) ([7f20151](https://github.com/casdoor/casdoor-python-sdk/commit/7f20151ce5983d0ff10a56c361a5a841865f8cd0))
+
 ## [1.1.3](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.2...v1.1.3) (2022-03-20)
 
 
