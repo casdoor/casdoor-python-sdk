@@ -11,25 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import requests
-import jwt
 import json
-from .user import User
+from functools import cached_property
 from typing import List
+
+import jwt
+import requests
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+
+from .user import User
 
 
 class CasdoorSDK:
     def __init__(
-        self,
-        endpoint: str,
-        client_id: str,
-        client_secret: str,
-        certificate: str,
-        org_name: str,
-        front_endpoint: str = None
+            self,
+            endpoint: str,
+            client_id: str,
+            client_secret: str,
+            certificate: str,
+            org_name: str,
+            front_endpoint: str = None
     ):
         self.endpoint = endpoint
         if front_endpoint:
@@ -44,6 +46,13 @@ class CasdoorSDK:
         self.grant_type = "authorization_code"
 
         self.algorithms = ["RS256"]
+
+    @cached_property
+    def certification(self) -> bytes:
+        if type(self.certificate) is not str:
+            raise TypeError('certificate field required str type')
+
+        return self.certificate.encode('utf-8')
 
     def get_auth_link(self, redirect_uri: str, state: str, response_type: str = "code", scope: str = "read"):
         url = self.front_endpoint + "/login/oauth/authorize"
@@ -81,7 +90,7 @@ class CasdoorSDK:
         :param token: access_token
         :return: the data in dict format
         """
-        certificate = x509.load_pem_x509_certificate(self.certificate,default_backend())
+        certificate = x509.load_pem_x509_certificate(self.certification, default_backend())
 
         return_json = jwt.decode(
             token,
