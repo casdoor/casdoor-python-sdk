@@ -45,6 +45,13 @@ class CasdoorSDK:
 
         self.algorithms = ["RS256"]
 
+    @property
+    def certification(self) -> bytes:
+        if type(self.certificate) is not str:
+            raise TypeError('certificate field must be str type')
+
+        return self.certificate.encode('utf-8')
+
     def get_auth_link(self, redirect_uri: str, state: str, response_type: str = "code", scope: str = "read"):
         url = self.front_endpoint + "/login/oauth/authorize"
         params = {
@@ -81,7 +88,7 @@ class CasdoorSDK:
         :param token: access_token
         :return: the data in dict format
         """
-        certificate = x509.load_pem_x509_certificate(self.certificate,default_backend())
+        certificate = x509.load_pem_x509_certificate(self.certification, default_backend())
 
         return_json = jwt.decode(
             token,
