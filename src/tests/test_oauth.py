@@ -34,7 +34,7 @@ class TestOAuth(TestCase):
             endpoint="http://test.casbin.com:8000",
             client_id="3267f876b11e7d1cb217",
             client_secret="3f0d1f06d28d65309c8f38b505cb9dcfa487754d",
-            jwt_secret="CasdoorSecret",
+            certificate="CasdoorSecret",
             org_name="built-in",
         )
         return sdk
