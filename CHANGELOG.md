@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.1.5](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.4...v1.1.5) (2022-07-17)
+
+
+### Bug Fixes
+
+* modify keyword argument in get_sdk() of test_oauth.TestOAuth ([#23](https://github.com/casdoor/casdoor-python-sdk/issues/23)) ([21614c7](https://github.com/casdoor/casdoor-python-sdk/commit/21614c77a02934a8e98031373f6f3d9c200bdeda))
+
 ## [1.1.4](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.3...v1.1.4) (2022-07-07)
 
 
