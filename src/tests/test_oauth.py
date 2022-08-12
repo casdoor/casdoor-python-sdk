@@ -36,6 +36,7 @@ class TestOAuth(TestCase):
             client_secret="3f0d1f06d28d65309c8f38b505cb9dcfa487754d",
             certificate="CasdoorSecret",
             org_name="built-in",
+            application_name= "app-built-in"
         )
         return sdk
 
