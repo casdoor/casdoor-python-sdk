@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.2.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.5...v1.2.0) (2022-08-12)
+
+
+### Features
+
+* add parameter 'application_name' to init sdk ([#24](https://github.com/casdoor/casdoor-python-sdk/issues/24)) ([49b5599](https://github.com/casdoor/casdoor-python-sdk/commit/49b5599cc2d93b2c05c36aa7b20dbe26352d554a))
+
 ## [1.1.5](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.4...v1.1.5) (2022-07-17)
 
 
