@@ -29,6 +29,7 @@ class CasdoorSDK:
         client_secret: str,
         certificate: str,
         org_name: str,
+        application_name: str,
         front_endpoint: str = None
     ):
         self.endpoint = endpoint
@@ -40,7 +41,7 @@ class CasdoorSDK:
         self.client_secret = client_secret
         self.certificate = certificate
         self.org_name = org_name
-
+        self.application_name: application_name
         self.grant_type = "authorization_code"
 
         self.algorithms = ["RS256"]
@@ -52,14 +53,14 @@ class CasdoorSDK:
 
         return self.certificate.encode('utf-8')
 
-    def get_auth_link(self, redirect_uri: str, state: str, response_type: str = "code", scope: str = "read"):
+    def get_auth_link(self, redirect_uri: str, response_type: str = "code", scope: str = "read"):
         url = self.front_endpoint + "/login/oauth/authorize"
         params = {
             "client_id": self.client_id,
             "response_type": response_type,
             "redirect_uri": redirect_uri,
             "scope": scope,
-            "state": state,
+            "state": self.application_name,
         }
         r = requests.request("", url, params=params)
         return r.url
