@@ -41,7 +41,7 @@ class CasdoorSDK:
         self.client_secret = client_secret
         self.certificate = certificate
         self.org_name = org_name
-        self.application_name: application_name
+        self.application_name = application_name
         self.grant_type = "authorization_code"
 
         self.algorithms = ["RS256"]
@@ -50,7 +50,6 @@ class CasdoorSDK:
     def certification(self) -> bytes:
         if type(self.certificate) is not str:
             raise TypeError('certificate field must be str type')
-
         return self.certificate.encode('utf-8')
 
     def get_auth_link(self, redirect_uri: str, response_type: str = "code", scope: str = "read"):
