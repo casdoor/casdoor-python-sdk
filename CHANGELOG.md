@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.2.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.2.0...v1.2.1) (2022-08-19)
+
+
+### Bug Fixes
+
+* fix init syntax errer ([#25](https://github.com/casdoor/casdoor-python-sdk/issues/25)) ([d6b7952](https://github.com/casdoor/casdoor-python-sdk/commit/d6b79529d247631ca866f27fea5e9fd5745af3d1))
+
 # [1.2.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.1.5...v1.2.0) (2022-08-12)
 
 
