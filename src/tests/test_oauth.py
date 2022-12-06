@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from requests import Response
-
 from src.casdoor.main import CasdoorSDK, User
 from unittest import TestCase
 

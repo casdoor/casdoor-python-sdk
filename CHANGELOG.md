@@ -1,5 +1,3 @@
- # Change import
- 
 # Semantic Versioning Changelog
 
 # [1.3.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.2.1...v1.3.0) (2022-12-04)

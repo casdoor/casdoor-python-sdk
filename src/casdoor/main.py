@@ -15,7 +15,6 @@
 import requests
 import jwt
 import json
-
 from .user import User
 from typing import List
 from cryptography import x509
