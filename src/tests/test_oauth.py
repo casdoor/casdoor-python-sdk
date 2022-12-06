@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from requests import Response
 from src.casdoor.main import CasdoorSDK, User
 from unittest import TestCase
 
@@ -44,6 +44,25 @@ class TestOAuth(TestCase):
         sdk = self.get_sdk()
         access_token = sdk.get_oauth_token(self.code)
         self.assertIsInstance(access_token, str)
+
+    def test_oauth_token_request(self):
+        sdk = self.get_sdk()
+        response = sdk.oauth_token_request(self.code)
+        self.assertIsInstance(response, Response)
+
+    def test_refresh_token_request(self):
+        sdk = self.get_sdk()
+        response = sdk.oauth_token_request(self.code)
+        refresh_token = response.json().get("refresh_token")
+        response = sdk.refresh_token_request(refresh_token)
+        self.assertIsInstance(response, Response)
+
+    def test_get_oauth_refreshed_token(self):
+        sdk = self.get_sdk()
+        response = sdk.oauth_token_request(self.code)
+        refresh_token = response.json().get("refresh_token")
+        response = sdk.get_oauth_refreshed_token(refresh_token)
+        self.assertIsInstance(response, str)
 
     def test_parse_jwt_token(self):
         sdk = self.get_sdk()

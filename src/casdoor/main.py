@@ -15,6 +15,9 @@
 import requests
 import jwt
 import json
+
+from requests import Response
+
 from .user import User
 from typing import List
 from cryptography import x509
@@ -70,6 +73,17 @@ class CasdoorSDK:
         :param code: the code that sent from Casdoor using redirect url back to your server.
         :return: access_token
         """
+        r = self.oauth_token_request(code)
+        access_token = r.json().get("access_token")
+
+        return access_token
+
+    def oauth_token_request(self, code: str) -> Response:
+        """
+        Request the Casdoor server to get access_token.
+        :param code: the code that sent from Casdoor using redirect url back to your server.
+        :return: Response from Casdoor
+        """
         url = self.endpoint + "/api/login/oauth/access_token"
         params = {
             "grant_type": self.grant_type,
@@ -77,7 +91,33 @@ class CasdoorSDK:
             "client_secret": self.client_secret,
             "code": code,
         }
-        r = requests.post(url, params)
+        return requests.post(url, params)
+
+    def refresh_token_request(self, refresh_token: str, scope: str = "") -> Response:
+        """
+        Request the Casdoor server to get access_token.
+        :param refresh_token: refresh_token for send to Casdoor
+        :param scope: OAuth scope
+        :return: Response from Casdoor
+        """
+        url = self.endpoint + "/api/login/oauth/refresh_token"
+        params = {
+            "grant_type": self.grant_type,
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "scope": scope,
+            "refresh_token": refresh_token,
+        }
+        return requests.post(url, params)
+
+    def get_oauth_refreshed_token(self, refresh_token: str, scope: str = "") -> str:
+        """
+        Request the Casdoor server to get access_token.
+        :param refresh_token: refresh_token for send to Casdoor
+        :param scope: OAuth scope
+        :return: Response from Casdoor
+        """
+        r = self.refresh_token_request(refresh_token, scope)
         access_token = r.json().get("access_token")
 
         return access_token
