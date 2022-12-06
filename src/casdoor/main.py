@@ -16,8 +16,6 @@ import requests
 import jwt
 import json
 
-from requests import Response
-
 from .user import User
 from typing import List
 from cryptography import x509
@@ -78,7 +76,7 @@ class CasdoorSDK:
 
         return access_token
 
-    def oauth_token_request(self, code: str) -> Response:
+    def oauth_token_request(self, code: str) -> requests.Response:
         """
         Request the Casdoor server to get access_token.
         :param code: the code that sent from Casdoor using redirect url back to your server.
@@ -93,7 +91,7 @@ class CasdoorSDK:
         }
         return requests.post(url, params)
 
-    def refresh_token_request(self, refresh_token: str, scope: str = "") -> Response:
+    def refresh_token_request(self, refresh_token: str, scope: str = "") -> requests.Response:
         """
         Request the Casdoor server to get access_token.
         :param refresh_token: refresh_token for send to Casdoor
