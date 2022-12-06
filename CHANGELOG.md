@@ -6,6 +6,21 @@
 
 # Semantic Versioning Changelog
 
+# [1.3.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.2.1...v1.3.0) (2022-12-04)
+
+
+### Features
+
+* fix init imports ([#31](https://github.com/casdoor/casdoor-python-sdk/issues/31)) ([fbb2756](https://github.com/casdoor/casdoor-python-sdk/commit/fbb2756d8312efede6c5e27f16c2e6615b6e51f0))
+
+# Change import
+
+* fix init imports
+
+## [1.2.2](https://github.com/casdoor/casdoor-python-sdk/compare/v1.2.1...v1.2.2) (2022-12-02) 
+
+# Semantic Versioning Changelog
+
 ## [1.2.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.2.0...v1.2.1) (2022-08-19)
 
 
