@@ -62,7 +62,7 @@ class TestOAuth(TestCase):
         sdk = self.get_sdk()
         response = sdk.oauth_token_request(self.code)
         refresh_token = response.json().get("refresh_token")
-        response = sdk.get_oauth_refreshed_token(refresh_token)
+        response = sdk.refresh_oauth_token(refresh_token)
         self.assertIsInstance(response, str)
 
     def test_parse_jwt_token(self):

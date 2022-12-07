@@ -107,7 +107,7 @@ class CasdoorSDK:
         }
         return requests.post(url, params)
 
-    def get_oauth_refreshed_token(self, refresh_token: str, scope: str = "") -> str:
+    def refresh_oauth_token(self, refresh_token: str, scope: str = "") -> str:
         """
         Request the Casdoor server to get access_token.
         :param refresh_token: refresh_token for send to Casdoor
