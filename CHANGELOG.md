@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.4.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.3.0...v1.4.0) (2022-12-07)
+
+
+### Features
+
+* add refresh_oauth_token() API ([#32](https://github.com/casdoor/casdoor-python-sdk/issues/32)) ([352d47e](https://github.com/casdoor/casdoor-python-sdk/commit/352d47ebc69f86287364da14217acbad2c88057d))
+
 # [1.3.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.2.1...v1.3.0) (2022-12-04)
 
 
