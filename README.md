@@ -21,10 +21,10 @@ Initialization requires 5 parameters, which are all str type:
 | Name (in order)  | Must | Description                                         |
 | ---------------- | ---- | --------------------------------------------------- |
 | endpoint         | Yes  | Casdoor Server Url, such as `http://localhost:8000` |
-| client_id         | Yes  | Application.client_id                               |
-| client_secret     | Yes  | Application.client_secret                           |
-| certificate       | Yes  | Same as Casdoor   certificate                     |
-| org_name | Yes  |Organization name
+| client_id        | Yes  | Application.client_id                               |
+| client_secret    | Yes  | Application.client_secret                           |
+| certificate      | Yes  | Same as Casdoor   certificate                       |
+| org_name         | Yes  | Organization name                                   |
 
 ```python
 from casdoor import CasdoorSDK
@@ -42,6 +42,27 @@ sdk = CasdoorSDK(
     org_name,
 )
 ```
+
+OR use async version
+
+```python
+from casdoor import AsyncCasdoorSDK
+
+certificate = b'''-----BEGIN CERTIFICATE-----
+MIIE+TCCAuGgAwIBAgIDAeJAMA0GCSqGSIb3DQEBCwUAMDYxHTAbBgNVBAoTFENh
+...
+-----END CERTIFICATE-----'''
+
+sdk = AsyncCasdoorSDK(
+    endpoint,
+    client_id,
+    client_secret,
+    certificate,
+    org_name,
+)
+```
+
+
 ## Step2. Authorize with the Casdoor server
 At this point, we should use some ways to verify with the Casdoor server.  
 

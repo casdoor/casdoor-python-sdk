@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from requests import Response
-from src.casdoor.main import CasdoorSDK, User
-from unittest import TestCase
+from src.casdoor.async_main import AsyncCasdoorSDK, User
+from unittest import IsolatedAsyncioTestCase
 
 
-class TestOAuth(TestCase):
+class TestOAuth(IsolatedAsyncioTestCase):
     """
     You should replace the code content below and
     the get_sdk() method's content with your own Casdoor
@@ -31,7 +30,7 @@ class TestOAuth(TestCase):
     @staticmethod
     def get_sdk():
 
-        sdk = CasdoorSDK(
+        sdk = AsyncCasdoorSDK(
             endpoint="http://test.casbin.com:8000",
             client_id="3267f876b11e7d1cb217",
             client_secret="3f0d1f06d28d65309c8f38b505cb9dcfa487754d",
@@ -41,65 +40,67 @@ class TestOAuth(TestCase):
         )
         return sdk
 
-    def test_get_oauth_token(self):
+    async def test_get_oauth_token(self):
         sdk = self.get_sdk()
-        access_token = sdk.get_oauth_token(self.code)
+        access_token = await sdk.get_oauth_token(self.code)
         self.assertIsInstance(access_token, str)
 
-    def test_oauth_token_request(self):
+    async def test_oauth_token_request(self):
         sdk = self.get_sdk()
-        response = sdk.oauth_token_request(self.code)
-        self.assertIsInstance(response, Response)
+        response = await sdk.oauth_token_request(self.code)
+        self.assertIsInstance(response, dict)
 
-    def test_refresh_token_request(self):
+    async def test_refresh_token_request(self):
         sdk = self.get_sdk()
-        response = sdk.oauth_token_request(self.code)
-        refresh_token = response.json().get("refresh_token")
-        response = sdk.refresh_token_request(refresh_token)
-        self.assertIsInstance(response, Response)
-
-    def test_get_oauth_refreshed_token(self):
-        sdk = self.get_sdk()
-        response = sdk.oauth_token_request(self.code)
-        refresh_token = response.json().get("refresh_token")
+        response = await sdk.oauth_token_request(self.code)
+        refresh_token = response.get("refresh_token")
         sdk.grant_type = "refresh_token"
-        response = sdk.refresh_oauth_token(refresh_token)
+        response = await sdk.refresh_token_request(refresh_token)
+        sdk.grant_type = "authorization_code"
+        self.assertIsInstance(response, dict)
+
+    async def test_get_oauth_refreshed_token(self):
+        sdk = self.get_sdk()
+        response = await sdk.oauth_token_request(self.code)
+        refresh_token = response.get("refresh_token")
+        sdk.grant_type = "refresh_token"
+        response = await sdk.refresh_oauth_token(refresh_token)
         sdk.grant_type = "authorization_code"
         self.assertIsInstance(response, str)
 
-    def test_parse_jwt_token(self):
+    async def test_parse_jwt_token(self):
         sdk = self.get_sdk()
-        access_token = sdk.get_oauth_token(self.code)
+        access_token = await sdk.get_oauth_token(self.code)
         decoded_msg = sdk.parse_jwt_token(access_token)
         self.assertIsInstance(decoded_msg, dict)
 
-    def test_get_users(self):
+    async def test_get_users(self):
         sdk = self.get_sdk()
-        users = sdk.get_users()
+        users = await sdk.get_users()
         self.assertIsInstance(users, list)
 
-    def test_get_user(self):
+    async def test_get_user(self):
         sdk = self.get_sdk()
-        user = sdk.get_user("admin")
+        user = await sdk.get_user("admin")
         self.assertIsInstance(user, dict)
 
-    def test_modify_user(self):
+    async def test_modify_user(self):
         sdk = self.get_sdk()
         user = User()
         user.name = "test_ffyuanda"
-        sdk.delete_user(user)
+        await sdk.delete_user(user)
 
-        response = sdk.add_user(user)
+        response = await sdk.add_user(user)
         self.assertEqual(response["data"], "Affected")
 
-        response = sdk.delete_user(user)
+        response = await sdk.delete_user(user)
         self.assertEqual(response["data"], "Affected")
 
-        response = sdk.add_user(user)
+        response = await sdk.add_user(user)
         self.assertEqual(response["data"], "Affected")
 
         user.phone = "phone"
-        response = sdk.update_user(user)
+        response = await sdk.update_user(user)
         self.assertEqual(response["data"], "Affected")
 
         self.assertIn("status", response)
