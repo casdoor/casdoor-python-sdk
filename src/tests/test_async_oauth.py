@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from src.casdoor.async_main import AsyncCasdoorSDK, User
 from unittest import IsolatedAsyncioTestCase
+
+from src.casdoor.async_main import AsyncCasdoorSDK, User
 
 
 class TestOAuth(IsolatedAsyncioTestCase):

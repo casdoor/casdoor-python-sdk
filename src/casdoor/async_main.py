@@ -13,13 +13,17 @@
 # limitations under the License.
 
 import asyncio
-import aiohttp
-import jwt
 import json
-from .user import User
 from typing import List
+
+import aiohttp
+
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+
+import jwt
+
+from .user import User
 
 
 class AsyncCasdoorSDK:
@@ -58,7 +62,12 @@ class AsyncCasdoorSDK:
             raise TypeError('certificate field must be str type')
         return self.certificate.encode('utf-8')
 
-    async def get_auth_link(self, redirect_uri: str, response_type: str = "code", scope: str = "read"):
+    async def get_auth_link(
+            self,
+            redirect_uri: str,
+            response_type: str = "code",
+            scope: str = "read"
+    ):
         url = self.front_endpoint + "/login/oauth/authorize"
         params = {
             "client_id": self.client_id,
@@ -73,7 +82,8 @@ class AsyncCasdoorSDK:
     async def get_oauth_token(self, code: str) -> str:
         """
         Request the Casdoor server to get access_token.
-        :param code: the code that sent from Casdoor using redirect url back to your server.
+        :param code: the code that sent from Casdoor using redirect
+                     url back to your server.
         :return: access_token
         """
         r = await self.oauth_token_request(code)
@@ -83,7 +93,8 @@ class AsyncCasdoorSDK:
     async def oauth_token_request(self, code: str) -> dict:
         """
         Request the Casdoor server to get access_token.
-        :param code: the code that sent from Casdoor using redirect url back to your server.
+        :param code: the code that sent from Casdoor using redirect url
+                     back to your server.
         :return: Response from Casdoor
         """
         url = self.endpoint + "/api/login/oauth/access_token"
@@ -96,7 +107,11 @@ class AsyncCasdoorSDK:
         async with self._session.post(url, data=params) as response:
             return await response.json()
 
-    async def refresh_token_request(self, refresh_token: str, scope: str = "") -> dict:
+    async def refresh_token_request(
+            self,
+            refresh_token: str,
+            scope: str = ""
+    ) -> dict:
         """
         Request the Casdoor server to get access_token.
         :param refresh_token: refresh_token for send to Casdoor
@@ -114,7 +129,11 @@ class AsyncCasdoorSDK:
         async with self._session.post(url, data=params) as request:
             return await request.json()
 
-    async def refresh_oauth_token(self, refresh_token: str, scope: str = "") -> str:
+    async def refresh_oauth_token(
+            self,
+            refresh_token: str,
+            scope: str = ""
+    ) -> str:
         """
         Request the Casdoor server to get access_token.
         :param refresh_token: refresh_token for send to Casdoor
@@ -128,11 +147,15 @@ class AsyncCasdoorSDK:
 
     def parse_jwt_token(self, token: str) -> dict:
         """
-        Converts the returned access_token to real data using jwt (JSON Web Token) algorithms.
+        Converts the returned access_token to real data using
+        jwt (JSON Web Token) algorithms.
         :param token: access_token
         :return: the data in dict format
         """
-        certificate = x509.load_pem_x509_certificate(self.certification, default_backend())
+        certificate = x509.load_pem_x509_certificate(
+            self.certification,
+            default_backend()
+        )
 
         return_json = jwt.decode(
             token,
@@ -182,7 +205,11 @@ class AsyncCasdoorSDK:
             "clientSecret": self.client_secret,
         }
         user_info = json.dumps(user.to_dict())
-        async with self._session.post(url, params=params, data=user_info) as request:
+        async with self._session.post(
+                url,
+                params=params,
+                data=user_info
+        ) as request:
             response = await request.json()
             return response
 

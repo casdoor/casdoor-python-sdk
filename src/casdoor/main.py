@@ -12,13 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import requests
-import jwt
 import json
-from .user import User
 from typing import List
+
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+
+import jwt
+
+import requests
+
+from .user import User
 
 
 class CasdoorSDK:
@@ -52,7 +56,12 @@ class CasdoorSDK:
             raise TypeError('certificate field must be str type')
         return self.certificate.encode('utf-8')
 
-    def get_auth_link(self, redirect_uri: str, response_type: str = "code", scope: str = "read"):
+    def get_auth_link(
+            self,
+            redirect_uri: str,
+            response_type: str = "code",
+            scope: str = "read"
+    ):
         url = self.front_endpoint + "/login/oauth/authorize"
         params = {
             "client_id": self.client_id,
@@ -67,7 +76,8 @@ class CasdoorSDK:
     def get_oauth_token(self, code: str) -> str:
         """
         Request the Casdoor server to get access_token.
-        :param code: the code that sent from Casdoor using redirect url back to your server.
+        :param code: the code that sent from Casdoor using redirect
+                     url back to your server.
         :return: access_token
         """
         r = self.oauth_token_request(code)
@@ -78,7 +88,8 @@ class CasdoorSDK:
     def oauth_token_request(self, code: str) -> requests.Response:
         """
         Request the Casdoor server to get access_token.
-        :param code: the code that sent from Casdoor using redirect url back to your server.
+        :param code: the code that sent from Casdoor using redirect
+                     url back to your server.
         :return: Response from Casdoor
         """
         url = self.endpoint + "/api/login/oauth/access_token"
@@ -90,7 +101,11 @@ class CasdoorSDK:
         }
         return requests.post(url, params)
 
-    def refresh_token_request(self, refresh_token: str, scope: str = "") -> requests.Response:
+    def refresh_token_request(
+            self,
+            refresh_token: str,
+            scope: str = ""
+    ) -> requests.Response:
         """
         Request the Casdoor server to get access_token.
         :param refresh_token: refresh_token for send to Casdoor
@@ -121,11 +136,15 @@ class CasdoorSDK:
 
     def parse_jwt_token(self, token: str) -> dict:
         """
-        Converts the returned access_token to real data using jwt (JSON Web Token) algorithms.
+        Converts the returned access_token to real data using
+        jwt (JSON Web Token) algorithms.
         :param token: access_token
         :return: the data in dict format
         """
-        certificate = x509.load_pem_x509_certificate(self.certification, default_backend())
+        certificate = x509.load_pem_x509_certificate(
+            self.certification,
+            default_backend()
+        )
 
         return_json = jwt.decode(
             token,
