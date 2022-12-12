@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.5.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.4.0...v1.5.0) (2022-12-12)
+
+
+### Features
+
+* Appended asynchronous SDK version ([#33](https://github.com/casdoor/casdoor-python-sdk/issues/33)) ([92a6010](https://github.com/casdoor/casdoor-python-sdk/commit/92a601053fd3c3bea18596185ea63c013cae3642))
+
 # [1.4.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.3.0...v1.4.0) (2022-12-07)
 
 
