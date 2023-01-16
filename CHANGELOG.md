@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.5.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.5.0...v1.5.1) (2022-12-12)
+
+
+### Bug Fixes
+
+* Code-style was refactored with PEP8 standard and linter was appended ([#35](https://github.com/casdoor/casdoor-python-sdk/issues/35)) ([51a2501](https://github.com/casdoor/casdoor-python-sdk/commit/51a25015eb6854fe06c16a2bc04c58a0ed7dedd1))
+
 # [1.5.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.4.0...v1.5.0) (2022-12-12)
 
 
