@@ -75,6 +75,13 @@ class TestOAuth(IsolatedAsyncioTestCase):
         decoded_msg = sdk.parse_jwt_token(access_token)
         self.assertIsInstance(decoded_msg, dict)
 
+    async def test_enforce(self):
+        sdk = self.get_sdk()
+        status = await sdk.enforce(
+            "built-in/permission-built-in", "admin", "a", "ac"
+        )
+        self.assertIsInstance(status, bool)
+
     async def test_get_users(self):
         sdk = self.get_sdk()
         users = await sdk.get_users()
