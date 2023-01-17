@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.6.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.5.1...v1.6.0) (2023-01-17)
+
+
+### Features
+
+* Append enforce function to sdk ([#37](https://github.com/casdoor/casdoor-python-sdk/issues/37)) ([1546819](https://github.com/casdoor/casdoor-python-sdk/commit/15468198312ff310b45d99e8bb9c79287570dbd4))
+
 ## [1.5.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.5.0...v1.5.1) (2022-12-12)
 
 
