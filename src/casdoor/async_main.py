@@ -59,8 +59,8 @@ class AsyncCasdoorSDK:
     @property
     def certification(self) -> bytes:
         if type(self.certificate) is not str:
-            raise TypeError('certificate field must be str type')
-        return self.certificate.encode('utf-8')
+            raise TypeError("certificate field must be str type")
+        return self.certificate.encode("utf-8")
 
     async def get_auth_link(
             self,
