@@ -113,3 +113,4 @@ casdoor-python-sdk support basic user operations, like:
 - `get_users()`, get all users.
 - `modify_user(method: str, user: User)/add_user(user: User)/update_user(user: User)/delete_user(user: User)`, write user to database.
 - `refresh_token_request(refresh_token: str, scope: str)`, refresh access token
+- `enforce(self, permission_model_name: str, sub: str, obj: str, act: str)`, check permission from model

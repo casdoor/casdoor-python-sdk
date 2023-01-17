@@ -53,8 +53,8 @@ class CasdoorSDK:
     @property
     def certification(self) -> bytes:
         if type(self.certificate) is not str:
-            raise TypeError('certificate field must be str type')
-        return self.certificate.encode('utf-8')
+            raise TypeError("certificate field must be str type")
+        return self.certificate.encode("utf-8")
 
     def get_auth_link(
             self,
@@ -153,6 +153,38 @@ class CasdoorSDK:
             audience=self.client_id,
         )
         return return_json
+
+    def enforce(self, permission_model_name: str, sub: str, obj: str, act: str) -> bool:
+        """
+        Send data to Casdoor enforce API
+        :param permission_model_name: Name permission model
+        :param sub: sub from Casbin
+        :param obj: obj from Casbin
+        :param act: act from Casbin
+        """
+        url = self.endpoint + "/api/enforce"
+        query_params = {
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret
+        }
+        params = {
+            "id": permission_model_name,
+            "v0": sub,
+            "v1": obj,
+            "v2": act,
+        }
+        r = requests.post(url, json=params, params=query_params)
+        if r.status_code != 200 or "json" not in r.headers["content-type"]:
+            error_str = "Casdoor response error:\n" + str(r.text)
+            raise ValueError(error_str)
+
+        has_permission = r.json()
+
+        if not isinstance(has_permission, bool):
+            error_str = "Casdoor response error:\n" + r.text
+            raise ValueError(error_str)
+
+        return has_permission
 
     def get_users(self) -> List[dict]:
         """

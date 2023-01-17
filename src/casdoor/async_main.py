@@ -165,6 +165,38 @@ class AsyncCasdoorSDK:
         )
         return return_json
 
+    async def enforce(self, permission_model_name: str, sub: str, obj: str, act: str) -> bool:
+        """
+        Send data to Casdoor enforce API
+        :param permission_model_name: Name permission model
+        :param sub: sub from Casbin
+        :param obj: obj from Casbin
+        :param act: act from Casbin
+        """
+        url = self.endpoint + "/api/enforce"
+        query_params = {
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret
+        }
+        params = {
+            "id": permission_model_name,
+            "v0": sub,
+            "v1": obj,
+            "v2": act,
+        }
+        async with self._session.post(url, params=query_params, json=params) as response:
+            if response.status != 200 or "json" not in response.headers["content-type"]:
+                error_str = "Casdoor response error:\n" + str(response.text)
+                raise ValueError(error_str)
+
+            has_permission = await response.json()
+
+            if not isinstance(has_permission, bool):
+                error_str = "Casdoor response error:\n" + await response.text()
+                raise ValueError(error_str)
+
+            return has_permission
+
     async def get_users(self) -> List[dict]:
         """
         Get the users from Casdoor.
