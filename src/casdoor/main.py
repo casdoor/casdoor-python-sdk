@@ -154,7 +154,13 @@ class CasdoorSDK:
         )
         return return_json
 
-    def enforce(self, permission_model_name: str, sub: str, obj: str, act: str) -> bool:
+    def enforce(
+            self,
+            permission_model_name: str,
+            sub: str,
+            obj: str,
+            act: str
+    ) -> bool:
         """
         Send data to Casdoor enforce API
         :param permission_model_name: Name permission model

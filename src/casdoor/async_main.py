@@ -165,7 +165,13 @@ class AsyncCasdoorSDK:
         )
         return return_json
 
-    async def enforce(self, permission_model_name: str, sub: str, obj: str, act: str) -> bool:
+    async def enforce(
+            self,
+            permission_model_name: str,
+            sub: str,
+            obj: str,
+            act: str
+    ) -> bool:
         """
         Send data to Casdoor enforce API
         :param permission_model_name: Name permission model
@@ -184,8 +190,13 @@ class AsyncCasdoorSDK:
             "v1": obj,
             "v2": act,
         }
-        async with self._session.post(url, params=query_params, json=params) as response:
-            if response.status != 200 or "json" not in response.headers["content-type"]:
+        async with self._session.post(
+                url, params=query_params, json=params
+        ) as response:
+            if (
+                    response.status != 200 or
+                    "json" not in response.headers["content-type"]
+            ):
                 error_str = "Casdoor response error:\n" + str(response.text)
                 raise ValueError(error_str)
 

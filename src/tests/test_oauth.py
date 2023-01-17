@@ -77,7 +77,9 @@ class TestOAuth(TestCase):
 
     def test_enforce(self):
         sdk = self.get_sdk()
-        status = sdk.enforce("built-in/permission-built-in", "admin", "a", "ac")
+        status = sdk.enforce(
+            "built-in/permission-built-in", "admin", "a", "ac"
+        )
         self.assertIsInstance(status, bool)
 
     def test_get_users(self):
