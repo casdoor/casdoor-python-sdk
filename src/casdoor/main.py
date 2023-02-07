@@ -114,7 +114,7 @@ class CasdoorSDK:
         """
         url = self.endpoint + "/api/login/oauth/refresh_token"
         params = {
-            "grant_type": self.grant_type,
+            "grant_type": "refresh_token",
             "client_id": self.client_id,
             "client_secret": self.client_secret,
             "scope": scope,
