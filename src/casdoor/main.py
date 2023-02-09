@@ -80,8 +80,9 @@ class CasdoorSDK:
             password: Optional[str] = None
     ) -> str:
         """
-        Request the Casdoor server to get access_token. Must be set code or
-        username and password for grant type.
+        Request the Casdoor server to get access_token.
+        Must be set code or username and password for grant type.
+        If nothing is set then client credentials grant will be used.
 
         :param code: the code that sent from Casdoor using redirect url back
                      to your server.
@@ -89,12 +90,7 @@ class CasdoorSDK:
         :param password: username password
         :return: access_token: str
         """
-        payload = self._get_payload_for_access_token_request(
-            code=code,
-            username=username,
-            password=password
-        )
-        response = self._oath_token_request(payload)
+        response = self.oauth_token_request(code, username, password)
         access_token = response.json().get("access_token")
 
         return access_token
@@ -116,8 +112,7 @@ class CasdoorSDK:
                 password=password
             )
         else:
-            raise ValueError("Attributes for some grant type must be set"
-                             "(code or username and password)")
+            return self.__get_payload_for_client_credentials()
 
     def __get_payload_for_authorization_code(self, code: str) -> dict:
         """
@@ -147,23 +142,42 @@ class CasdoorSDK:
             "password": password
         }
 
-    def oauth_token_request(self, code: str) -> requests.Response:
+    def __get_payload_for_client_credentials(self) -> dict:
         """
-        Request the Casdoor server to get access_token.
-
-        :param code: the code that sent from Casdoor using redirect
-                     url back to your server.
-        :return: Response from Casdoor
+        Return payload for auth request with client credentials.
         """
-        params = {
-            "grant_type": self.grant_type,
+        return {
+            "grant_type": "client_credentials",
             "client_id": self.client_id,
             "client_secret": self.client_secret,
-            "code": code,
         }
-        return self._oath_token_request(payload=params)
 
-    def _oath_token_request(self, payload: dict) -> requests.Response:
+    def oauth_token_request(
+            self,
+            code: Optional[str] = None,
+            username: Optional[str] = None,
+            password: Optional[str] = None
+    ) -> requests.Response:
+        """
+        Request the Casdoor server to get access_token.
+        Must be set code or username and password for grant type.
+        If nothing is set then client credentials grant will be used.
+        Returns full response as dict.
+
+        :param code: the code that sent from Casdoor using redirect url
+                     back to your server.
+        :param username: Casdoor username
+        :param password: username password
+        :return: Response from Casdoor
+        """
+        params = self._get_payload_for_access_token_request(
+            code=code,
+            username=username,
+            password=password
+        )
+        return self._oauth_token_request(payload=params)
+
+    def _oauth_token_request(self, payload: dict) -> requests.Response:
         """
         Request the Casdoor server to get access_token.
 

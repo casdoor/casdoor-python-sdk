@@ -49,7 +49,7 @@ class TestOAuth(TestCase):
         )
         return sdk
 
-    def test__oath_token_request(self):
+    def test__oauth_token_request(self):
         sdk = self.get_sdk()
         data = {
             "grant_type": sdk.grant_type,
@@ -57,7 +57,7 @@ class TestOAuth(TestCase):
             "client_secret": sdk.client_secret,
             "code": self.code,
         }
-        response = sdk._oath_token_request(payload=data)
+        response = sdk._oauth_token_request(payload=data)
         self.assertIsInstance(response, dict)
 
     def test__get_payload_for_authorization_code(self):
@@ -66,6 +66,11 @@ class TestOAuth(TestCase):
             code=self.code
         )
         self.assertEqual("authorization_code", result.get("grant_type"))
+
+    def test__get_payload_for_client_credentials(self):
+        sdk = self.get_sdk()
+        result = sdk._CasdoorSDK__get_payload_for_client_credentials()  # noqa: It's private method
+        self.assertEqual("client_credentials", result.get("grant_type"))
 
     def test__get_payload_for_password_credentials(self):
         sdk = self.get_sdk()
@@ -80,6 +85,11 @@ class TestOAuth(TestCase):
         result = sdk._get_payload_for_access_token_request(code="test")
         self.assertEqual("authorization_code", result.get("grant_type"))
 
+    def test__get_payload_for_access_token_request_with_client_cred(self):
+        sdk = self.get_sdk()
+        result = sdk._get_payload_for_access_token_request()
+        self.assertEqual("client_credentials", result.get("grant_type"))
+
     def test__get_payload_for_access_token_request_with_cred(self):
         sdk = self.get_sdk()
         result = sdk._get_payload_for_access_token_request(
@@ -87,6 +97,11 @@ class TestOAuth(TestCase):
             password="test"
         )
         self.assertEqual("password", result.get("grant_type"))
+
+    def test_get_oauth_token_with_client_cred(self):
+        sdk = self.get_sdk()
+        access_token = sdk.get_oauth_token()
+        self.assertIsInstance(access_token, str)
 
     def test_get_oauth_token_with_code(self):
         sdk = self.get_sdk()
