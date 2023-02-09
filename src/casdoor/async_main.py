@@ -14,7 +14,7 @@
 
 import asyncio
 import json
-from typing import List
+from typing import List, Optional
 
 import aiohttp
 
@@ -79,32 +79,106 @@ class AsyncCasdoorSDK:
         async with self._session.request("", url, params=params) as request:
             return request.url
 
-    async def get_oauth_token(self, code: str) -> str:
+    async def get_oauth_token(
+            self,
+            code: Optional[str] = None,
+            username: Optional[str] = None,
+            password: Optional[str] = None
+    ) -> str:
         """
         Request the Casdoor server to get access_token.
-        :param code: the code that sent from Casdoor using redirect
-                     url back to your server.
-        :return: access_token
+        Must be set code or username and password for grant type.
+
+        :param code: the code that sent from Casdoor using redirect url
+                     back to your server.
+        :param username: Casdoor username
+        :param password: username password
+        :return: access token: str
         """
-        r = await self.oauth_token_request(code)
-        access_token = r.get("access_token")
+        payload = self._get_payload_for_access_token_request(
+            code=code,
+            username=username,
+            password=password
+        )
+        response = await self._oath_token_request(payload)
+        access_token = response.get("access_token")
+
         return access_token
+
+    def _get_payload_for_access_token_request(
+            self,
+            code: Optional[str] = None,
+            username: Optional[str] = None,
+            password: Optional[str] = None
+    ) -> dict:
+        """
+        Return payload for request body which was selecting by strategy.
+        """
+        if code:
+            return self.__get_payload_for_authorization_code(code=code)
+        elif username and password:
+            return self.__get_payload_for_password_credentials(
+                username=username,
+                password=password
+            )
+        else:
+            raise ValueError("Attributes for some grant type must be set"
+                             "(code or username and password)")
+
+    def __get_payload_for_authorization_code(self, code: str) -> dict:
+        """
+        Return payload for auth request with authorization code
+        """
+        return {
+            "grant_type": "authorization_code",
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "code": code,
+        }
+
+    def __get_payload_for_password_credentials(
+            self,
+            username: str,
+            password: str
+    ) -> dict:
+        """
+        Return payload for auth request with resource owner password
+        credentials.
+        """
+        return {
+            "grant_type": "password",
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "username": username,
+            "password": password
+        }
 
     async def oauth_token_request(self, code: str) -> dict:
         """
         Request the Casdoor server to get access_token.
+        Returns full response as dict.
+
         :param code: the code that sent from Casdoor using redirect url
                      back to your server.
         :return: Response from Casdoor
         """
-        url = self.endpoint + "/api/login/oauth/access_token"
         params = {
             "grant_type": self.grant_type,
             "client_id": self.client_id,
             "client_secret": self.client_secret,
             "code": code,
         }
-        async with self._session.post(url, data=params) as response:
+        return await self._oath_token_request(payload=params)
+
+    async def _oath_token_request(self, payload: dict) -> dict:
+        """
+        Request the Casdoor server to get access_token.
+
+        :param payload: Body for POST request.
+        :return: Response from Casdoor
+        """
+        url = self.endpoint + "/api/login/oauth/access_token"
+        async with self._session.post(url, data=payload) as response:
             return await response.json()
 
     async def refresh_token_request(
@@ -114,6 +188,7 @@ class AsyncCasdoorSDK:
     ) -> dict:
         """
         Request the Casdoor server to get access_token.
+
         :param refresh_token: refresh_token for send to Casdoor
         :param scope: OAuth scope
         :return: Response from Casdoor
@@ -136,6 +211,7 @@ class AsyncCasdoorSDK:
     ) -> str:
         """
         Request the Casdoor server to get access_token.
+
         :param refresh_token: refresh_token for send to Casdoor
         :param scope: OAuth scope
         :return: Response from Casdoor
@@ -149,6 +225,7 @@ class AsyncCasdoorSDK:
         """
         Converts the returned access_token to real data using
         jwt (JSON Web Token) algorithms.
+
         :param token: access_token
         :return: the data in dict format
         """
@@ -174,6 +251,7 @@ class AsyncCasdoorSDK:
     ) -> bool:
         """
         Send data to Casdoor enforce API
+
         :param permission_model_name: Name permission model
         :param sub: sub from Casbin
         :param obj: obj from Casbin
@@ -211,6 +289,7 @@ class AsyncCasdoorSDK:
     async def get_users(self) -> List[dict]:
         """
         Get the users from Casdoor.
+
         :return: a list of dicts containing user info
         """
         url = self.endpoint + "/api/get-users"
@@ -226,6 +305,7 @@ class AsyncCasdoorSDK:
     async def get_user(self, user_id: str) -> dict:
         """
         Get the user from Casdoor providing the user_id.
+
         :param user_id: the id of the user
         :return: a dict that contains user's info
         """

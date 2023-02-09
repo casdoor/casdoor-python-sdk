@@ -30,6 +30,12 @@ class TestOAuth(TestCase):
     # server returned authorization code
     code = "6d038ac60d4e1f17e742"
 
+    # Casdoor user and password for auth with
+    # Resource Owner Password Credentials Grant.
+    # Grant type "Password" must be enabled in Casdoor Application.
+    username = ""
+    password = ""
+
     @staticmethod
     def get_sdk():
 
@@ -43,9 +49,56 @@ class TestOAuth(TestCase):
         )
         return sdk
 
-    def test_get_oauth_token(self):
+    def test__oath_token_request(self):
         sdk = self.get_sdk()
-        access_token = sdk.get_oauth_token(self.code)
+        data = {
+            "grant_type": sdk.grant_type,
+            "client_id": sdk.client_id,
+            "client_secret": sdk.client_secret,
+            "code": self.code,
+        }
+        response = sdk._oath_token_request(payload=data)
+        self.assertIsInstance(response, dict)
+
+    def test__get_payload_for_authorization_code(self):
+        sdk = self.get_sdk()
+        result = sdk._CasdoorSDK__get_payload_for_authorization_code(  # noqa: It's private method
+            code=self.code
+        )
+        self.assertEqual("authorization_code", result.get("grant_type"))
+
+    def test__get_payload_for_password_credentials(self):
+        sdk = self.get_sdk()
+        result = sdk._CasdoorSDK__get_payload_for_password_credentials(  # noqa: It's private method
+            username="test",
+            password="test"
+        )
+        self.assertEqual("password", result.get("grant_type"))
+
+    def test__get_payload_for_access_token_request_with_code(self):
+        sdk = self.get_sdk()
+        result = sdk._get_payload_for_access_token_request(code="test")
+        self.assertEqual("authorization_code", result.get("grant_type"))
+
+    def test__get_payload_for_access_token_request_with_cred(self):
+        sdk = self.get_sdk()
+        result = sdk._get_payload_for_access_token_request(
+            username="test",
+            password="test"
+        )
+        self.assertEqual("password", result.get("grant_type"))
+
+    def test_get_oauth_token_with_code(self):
+        sdk = self.get_sdk()
+        access_token = sdk.get_oauth_token(code=self.code)
+        self.assertIsInstance(access_token, str)
+
+    def test_get_oauth_token_with_password(self):
+        sdk = self.get_sdk()
+        access_token = sdk.get_oauth_token(
+            username=self.username,
+            password=self.password
+        )
         self.assertIsInstance(access_token, str)
 
     def test_oauth_token_request(self):
@@ -64,9 +117,7 @@ class TestOAuth(TestCase):
         sdk = self.get_sdk()
         response = sdk.oauth_token_request(self.code)
         refresh_token = response.json().get("refresh_token")
-        sdk.grant_type = "refresh_token"
         response = sdk.refresh_oauth_token(refresh_token)
-        sdk.grant_type = "authorization_code"
         self.assertIsInstance(response, str)
 
     def test_parse_jwt_token(self):
