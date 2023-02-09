@@ -94,12 +94,12 @@ listen to the response from `Casdoor`. For example, if your `redirect_uri` is `h
 
 After Casdoor verification passed, it will be redirected to your application with code and state as said in Step2, like `https://forum.casbin.com/callback?code=xxx&state=yyyy`.
 
-Your web application can get the `code` and call `get_oauth_token(code)`, then parse out jwt token.
+Your web application can get the `code` and call `get_oauth_token(code=code)`, then parse out jwt token.
 
 The general process is as follows:
 
 ```python
-access_token = sdk.get_oauth_token(code)
+access_token = sdk.get_oauth_token(code=code)
 decoded_msg = sdk.parse_jwt_token(access_token)
 ```
 
@@ -114,3 +114,15 @@ casdoor-python-sdk support basic user operations, like:
 - `modify_user(method: str, user: User)/add_user(user: User)/update_user(user: User)/delete_user(user: User)`, write user to database.
 - `refresh_token_request(refresh_token: str, scope: str)`, refresh access token
 - `enforce(self, permission_model_name: str, sub: str, obj: str, act: str)`, check permission from model
+
+
+## Also. Resource Owner Password Credentials Grant
+
+If your application doesn't have a frontend that redirects users to Casdoor and you have Password Credentials Grant enabled, then you may get access token like this:
+
+```python
+access_token = sdk.get_oauth_token(username=username, password=password)
+decoded_msg = sdk.parse_jwt_token(access_token)
+```
+
+`decoded_msg` is the JSON data decoded from the `access_token`, which contains user info and other useful stuff.
