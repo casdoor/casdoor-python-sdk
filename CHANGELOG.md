@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.7.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.6.0...v1.7.0) (2023-02-09)
+
+
+### Features
+
+* Added ability to use Resource Owner Password Credentials Grant ([#38](https://github.com/casdoor/casdoor-python-sdk/issues/38)) ([caf8e8a](https://github.com/casdoor/casdoor-python-sdk/commit/caf8e8af862fe9c2ba361358278efa4b318c987a))
+
 # [1.6.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.5.1...v1.6.0) (2023-01-17)
 
 
