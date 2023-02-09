@@ -91,7 +91,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
         )
         self.assertEqual("password", result.get("grant_type"))
 
-    async def test__get_payload_for_access_token_request_with_client_cred(self):
+    async def test_get_payload_for_access_token_request_with_client_cred(self):
         sdk = self.get_sdk()
         result = sdk._get_payload_for_access_token_request()
         self.assertEqual("client_credentials", result.get("grant_type"))
