@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.8.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.7.0...v1.8.0) (2023-02-10)
+
+
+### Features
+
+* Added ability to use Client Credentials Grant ([#39](https://github.com/casdoor/casdoor-python-sdk/issues/39)) ([fee0fe0](https://github.com/casdoor/casdoor-python-sdk/commit/fee0fe08b346092ed12e62196eec8e64d3a6003d))
+
 # [1.7.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.6.0...v1.7.0) (2023-02-09)
 
 
