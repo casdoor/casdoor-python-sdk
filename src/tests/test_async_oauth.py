@@ -47,7 +47,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
         )
         return sdk
 
-    async def test__oath_token_request(self):
+    async def test__oauth_token_request(self):
         sdk = self.get_sdk()
         data = {
             "grant_type": sdk.grant_type,
@@ -55,7 +55,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
             "client_secret": sdk.client_secret,
             "code": self.code,
         }
-        response = await sdk._oath_token_request(payload=data)
+        response = await sdk._oauth_token_request(payload=data)
         self.assertIsInstance(response, dict)
 
     async def test__get_payload_for_authorization_code(self):
@@ -73,6 +73,11 @@ class TestOAuth(IsolatedAsyncioTestCase):
         )
         self.assertEqual("password", result.get("grant_type"))
 
+    async def test__get_payload_for_client_credentials(self):
+        sdk = self.get_sdk()
+        result = sdk._AsyncCasdoorSDK__get_payload_for_client_credentials()  # noqa: It's private method
+        self.assertEqual("client_credentials", result.get("grant_type"))
+
     async def test__get_payload_for_access_token_request_with_code(self):
         sdk = self.get_sdk()
         result = sdk._get_payload_for_access_token_request(code="test")
@@ -86,12 +91,22 @@ class TestOAuth(IsolatedAsyncioTestCase):
         )
         self.assertEqual("password", result.get("grant_type"))
 
+    async def test_get_payload_for_access_token_request_with_client_cred(self):
+        sdk = self.get_sdk()
+        result = sdk._get_payload_for_access_token_request()
+        self.assertEqual("client_credentials", result.get("grant_type"))
+
     async def test_get_oauth_token_with_password(self):
         sdk = self.get_sdk()
         access_token = await sdk.get_oauth_token(
             username=self.username,
             password=self.password
         )
+        self.assertIsInstance(access_token, str)
+
+    async def test_get_oauth_token_with_client_cred(self):
+        sdk = self.get_sdk()
+        access_token = await sdk.get_oauth_token()
         self.assertIsInstance(access_token, str)
 
     async def test_get_oauth_token(self):

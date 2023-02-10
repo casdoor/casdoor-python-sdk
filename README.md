@@ -116,7 +116,7 @@ casdoor-python-sdk support basic user operations, like:
 - `enforce(self, permission_model_name: str, sub: str, obj: str, act: str)`, check permission from model
 
 
-## Also. Resource Owner Password Credentials Grant
+## Resource Owner Password Credentials Grant
 
 If your application doesn't have a frontend that redirects users to Casdoor and you have Password Credentials Grant enabled, then you may get access token like this:
 
@@ -126,3 +126,15 @@ decoded_msg = sdk.parse_jwt_token(access_token)
 ```
 
 `decoded_msg` is the JSON data decoded from the `access_token`, which contains user info and other useful stuff.
+
+## Client Credentials Grant
+
+You can also use Client Credentials Grant when your application does not have a frontend.
+It is important to note that the AccessToken obtained in this way differs from other in that it corresponds to the application rather than to the user.
+
+```python
+access_token = sdk.get_oauth_token()
+decoded_msg = sdk.parse_jwt_token(access_token)
+```
+
+`decoded_msg` is the JSON data decoded from the `access_token`.
