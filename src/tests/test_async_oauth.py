@@ -156,6 +156,16 @@ class TestOAuth(IsolatedAsyncioTestCase):
         user = await sdk.get_user("admin")
         self.assertIsInstance(user, dict)
 
+    async def test_get_user_count(self):
+        sdk = self.get_sdk()
+        online_count = await sdk.get_user_count(is_online=True)
+        offline_count = await sdk.get_user_count(is_online=False)
+        all_count = await sdk.get_user_count()
+        self.assertIsInstance(online_count, int)
+        self.assertIsInstance(offline_count, int)
+        self.assertIsInstance(all_count, int)
+        self.assertEqual(online_count + offline_count, all_count)
+
     async def test_modify_user(self):
         sdk = self.get_sdk()
         user = User()
