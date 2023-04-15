@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.9.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.8.0...v1.9.0) (2023-04-15)
+
+
+### Features
+
+* add get_user_count() to sdk ([#42](https://github.com/casdoor/casdoor-python-sdk/issues/42)) ([f06ae3f](https://github.com/casdoor/casdoor-python-sdk/commit/f06ae3f686a133171c5bb9005b4e6c4c279f5664))
+
 # [1.8.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.7.0...v1.8.0) (2023-02-10)
 
 
