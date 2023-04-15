@@ -153,6 +153,16 @@ class TestOAuth(TestCase):
         users = sdk.get_users()
         self.assertIsInstance(users, list)
 
+    def test_get_user_count(self):
+        sdk = self.get_sdk()
+        online_count = sdk.get_user_count(is_online=True)
+        offline_count = sdk.get_user_count(is_online=False)
+        all_count = sdk.get_user_count()
+        self.assertIsInstance(online_count, int)
+        self.assertIsInstance(offline_count, int)
+        self.assertIsInstance(all_count, int)
+        self.assertEqual(online_count + offline_count, all_count)
+
     def test_get_user(self):
         sdk = self.get_sdk()
         user = sdk.get_user("admin")

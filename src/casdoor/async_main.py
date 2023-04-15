@@ -332,6 +332,29 @@ class AsyncCasdoorSDK:
             user = await request.json()
             return user
 
+    async def get_user_count(self, is_online: bool = None) -> int:
+        """
+        Get the count of filtered users for an organization
+        :param is_online: True for online users, False for offline users,
+                          None for all users
+        :return: the count of filtered users for an organization
+        """
+        url = self.endpoint + "/api/get-user-count"
+        params = {
+            "owner": self.org_name,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+
+        if is_online is None:
+            params["isOnline"] = ""
+        else:
+            params["isOnline"] = "1" if is_online else "0"
+
+        async with self._session.get(url, params=params) as request:
+            count = await request.json()
+            return count
+
     async def modify_user(self, method: str, user: User) -> dict:
         url = self.endpoint + f"/api/{method}"
         user.owner = self.org_name
