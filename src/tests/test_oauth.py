@@ -150,7 +150,10 @@ class TestOAuth(TestCase):
 
     def mocked_enforce_requests_post(*args, **kwargs):
         class MockResponse:
-            def __init__(self, json_data, status_code=200, headers={'content-type': 'json'}):
+            def __init__(self, 
+                         json_data, 
+                         status_code=200, 
+                         headers={'content-type': 'json'}):
                 self.json_data = json_data
                 self.status_code = status_code
                 self.headers = headers
@@ -168,7 +171,13 @@ class TestOAuth(TestCase):
     def test_enforce_parmas(self, mock_post):
         sdk = self.get_sdk()
         status = sdk.enforce(
-            "built-in/permission-built-in", "v0", "v1", "v2", v3='v3', v4='v4', v5='v5'
+            "built-in/permission-built-in",
+            "v0",
+            "v1",
+            "v2",
+            v3='v3',
+            v4='v4',
+            v5='v5'
         )
         self.assertEqual(status, True)
 
