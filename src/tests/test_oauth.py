@@ -167,7 +167,8 @@ class TestOAuth(TestCase):
 
         return MockResponse(result)
 
-    @mock.patch("requests.post", side_effect=mocked_enforce_requests_post)
+    @mock.patch("requests.post",
+                side_effect=mocked_enforce_requests_post)
     def test_enforce_parmas(self, mock_post):
         sdk = self.get_sdk()
         status = sdk.enforce(
