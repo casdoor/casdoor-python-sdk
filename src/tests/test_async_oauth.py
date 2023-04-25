@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest import IsolatedAsyncioTestCase
+from unittest import IsolatedAsyncioTestCase, mock
 
 from src.casdoor.async_main import AsyncCasdoorSDK, User
 
@@ -146,6 +146,40 @@ class TestOAuth(IsolatedAsyncioTestCase):
         )
         self.assertIsInstance(status, bool)
 
+    def mocked_enforce_requests_post(*args, **kwargs):
+        class MockResponse:
+            def __init__(self,
+                         json_data,
+                         status_code=200,
+                         headers={'content-type': 'json'}):
+                self.json_data = json_data
+                self.status_code = status_code
+                self.headers = headers
+
+            def json(self):
+                return self.json_data
+        result = True
+        for i in range(0, 5):
+            if kwargs.get('json').get(f"v{i}") != f"v{i}":
+                result = False
+
+        return MockResponse(result)
+
+    @mock.patch("aiohttp.ClientSession.post",
+                side_effect=mocked_enforce_requests_post)
+    async def test_enforce_parmas(self, mock_post):
+        sdk = self.get_sdk()
+        status = await sdk.enforce(
+            "built-in/permission-built-in",
+            "v0",
+            "v1",
+            "v2",
+            v3='v3',
+            v4='v4',
+            v5='v5'
+        )
+        self.assertEqual(status, True)
+
     async def test_get_users(self):
         sdk = self.get_sdk()
         users = await sdk.get_users()
@@ -187,3 +221,6 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
         self.assertIn("status", response)
         self.assertIsInstance(response, dict)
+
+    def check_enforce_request(*args, **kwargs):
+        return True

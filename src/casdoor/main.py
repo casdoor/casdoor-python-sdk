@@ -249,7 +249,10 @@ class CasdoorSDK:
             permission_model_name: str,
             sub: str,
             obj: str,
-            act: str
+            act: str,
+            v3: Optional[str] = None,
+            v4: Optional[str] = None,
+            v5: Optional[str] = None,
     ) -> bool:
         """
         Send data to Casdoor enforce API
@@ -258,6 +261,9 @@ class CasdoorSDK:
         :param sub: sub from Casbin
         :param obj: obj from Casbin
         :param act: act from Casbin
+        :param v3: v3 from Casbin
+        :param v4: v4 from Casbin
+        :param v5: v5 from Casbin
         """
         url = self.endpoint + "/api/enforce"
         query_params = {
@@ -269,6 +275,9 @@ class CasdoorSDK:
             "v0": sub,
             "v1": obj,
             "v2": act,
+            "v3": v3,
+            "v4": v4,
+            "v5": v5,
         }
         r = requests.post(url, json=params, params=query_params)
         if r.status_code != 200 or "json" not in r.headers["content-type"]:
