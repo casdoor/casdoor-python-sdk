@@ -80,7 +80,7 @@ class CasdoorSDK:
             password: Optional[str] = None
     ) -> str:
         """
-        Request the Casdoor server to get access_token.
+        Request the Casdoor server to get OAuth token.
         Must be set code or username and password for grant type.
         If nothing is set then client credentials grant will be used.
 
@@ -88,12 +88,12 @@ class CasdoorSDK:
                      to your server.
         :param username: casdoor username
         :param password: username password
-        :return: access_token: str
+        :return: token: OAuth token
         """
         response = self.oauth_token_request(code, username, password)
-        access_token = response.json().get("access_token")
+        token = response.json()
 
-        return access_token
+        return token
 
     def _get_payload_for_access_token_request(
             self,
