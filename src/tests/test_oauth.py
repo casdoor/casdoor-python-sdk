@@ -100,20 +100,23 @@ class TestOAuth(TestCase):
 
     def test_get_oauth_token_with_client_cred(self):
         sdk = self.get_sdk()
-        access_token = sdk.get_oauth_token()
+        token = sdk.get_oauth_token()
+        access_token = token.get("access_token")
         self.assertIsInstance(access_token, str)
 
     def test_get_oauth_token_with_code(self):
         sdk = self.get_sdk()
-        access_token = sdk.get_oauth_token(code=self.code)
+        token = sdk.get_oauth_token(code=self.code)
+        access_token = token.get("access_token")
         self.assertIsInstance(access_token, str)
 
     def test_get_oauth_token_with_password(self):
         sdk = self.get_sdk()
-        access_token = sdk.get_oauth_token(
+        token = sdk.get_oauth_token(
             username=self.username,
             password=self.password
         )
+        access_token = token.get("access_token")
         self.assertIsInstance(access_token, str)
 
     def test_oauth_token_request(self):
@@ -137,7 +140,8 @@ class TestOAuth(TestCase):
 
     def test_parse_jwt_token(self):
         sdk = self.get_sdk()
-        access_token = sdk.get_oauth_token(self.code)
+        token = sdk.get_oauth_token(self.code)
+        access_token = token.get("access_token")
         decoded_msg = sdk.parse_jwt_token(access_token)
         self.assertIsInstance(decoded_msg, dict)
 
