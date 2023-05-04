@@ -113,7 +113,8 @@ casdoor-python-sdk support basic user operations, like:
 - `get_users()`, get all users.
 - `modify_user(method: str, user: User)/add_user(user: User)/update_user(user: User)/delete_user(user: User)`, write user to database.
 - `refresh_token_request(refresh_token: str, scope: str)`, refresh access token
-- `enforce(self, permission_model_name: str, sub: str, obj: str, act: str)`, check permission from model
+- `enforce(self, permission_model_name: str, sub: str, obj: str, act: str, v3: Optional[str], v4: Optional[str], v5: Optional[str])`, check permission from model
+- `batch_enforce(self, permission_model_name: str, permission_rules: list[list[str]])`, batch check permission from model
 - `get_user_count(is_online: bool = None)`, get user count.
 
 ## Resource Owner Password Credentials Grant

@@ -292,6 +292,51 @@ class CasdoorSDK:
 
         return has_permission
 
+    def batch_enforce(
+            self,
+            permission_model_name: str,
+            permission_rules: list[list[str]]
+    ) -> list[bool]:
+        """
+        Send data to Casdoor enforce API
+
+        :param permission_model_name: Name permission model
+        :param permission_rules: permission rules to enforce
+                        [][0] -> sub: sub from Casbin
+                        [][1] -> obj: obj from Casbin
+                        [][2] -> act: act from Casbin
+                        [][3] -> v3: v3 from Casbin (optional)
+                        [][4] -> v4: v4 from Casbin (optional)
+                        [][5] -> v5: v5 from Casbin (optional)
+        """
+        url = self.endpoint + "/api/batch-enforce"
+        query_params = {
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret
+        }
+        def map_rule(rule: list[str], idx) -> dict:
+            if len(rule) < 3:
+                raise ValueError("Invalid permission rule[{0}]: {1}".format(idx, rule))
+            result = {
+                "id": permission_model_name
+            }
+            for i in range(0, len(rule)):
+                result.update({"v{0}".format(i): rule[i]})
+            return result
+        params = [map_rule(permission_rules[i], i) for i in range(0, len(permission_rules))]
+        r = requests.post(url, json=params, params=query_params)
+        if r.status_code != 200 or "json" not in r.headers["content-type"]:
+            error_str = "Casdoor response error:\n" + str(r.text)
+            raise ValueError(error_str)
+
+        enforce_results = r.json()
+
+        if not isinstance(enforce_results, list) or len(enforce_results) == 0 or not isinstance(enforce_results[0], bool):
+            error_str = "Casdoor response error:\n" + r.text
+            raise ValueError(error_str)
+
+        return enforce_results
+
     def get_users(self) -> List[dict]:
         """
         Get the users from Casdoor.
