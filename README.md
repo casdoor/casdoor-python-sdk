@@ -1,9 +1,9 @@
 # casdoor-python-sdk
 
 [![GitHub Action](https://github.com/casdoor/casdoor-python-sdk/workflows/build/badge.svg?branch=master)](https://github.com/casdoor/casdoor-python-sdk/actions)
-[![Version](https://img.shields.io/pypi/v/casdoor.svg)](https://pypi.org/project/casdoor/)
-[![PyPI - Wheel](https://img.shields.io/pypi/wheel/casdoor.svg)](https://pypi.org/project/casdoor/)
-[![Pyversions](https://img.shields.io/pypi/pyversions/casdoor.svg)](https://pypi.org/project/casdoor/)
+[![Version](https://img.shields.io/pypi/v/casdoor.svg)](https://pypi.org/project/casdoor)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/casdoor.svg)](https://pypi.org/project/casdoor)
+[![Pyversions](https://img.shields.io/pypi/pyversions/casdoor.svg)](https://pypi.org/project/casdoor)
 [![Gitter](https://badges.gitter.im/casbin/casdoor.svg)](https://gitter.im/casbin/casdoor)
 
 Casdoor's SDK for Python will allow you to easily connect your application to the Casdoor authentication system without having to implement it from scratch.
@@ -99,7 +99,8 @@ Your web application can get the `code` and call `get_oauth_token(code=code)`, t
 The general process is as follows:
 
 ```python
-access_token = sdk.get_oauth_token(code=code)
+token = sdk.get_oauth_token(code=code)
+access_token = token.get("access_token")
 decoded_msg = sdk.parse_jwt_token(access_token)
 ```
 
@@ -122,7 +123,8 @@ casdoor-python-sdk support basic user operations, like:
 If your application doesn't have a frontend that redirects users to Casdoor and you have Password Credentials Grant enabled, then you may get access token like this:
 
 ```python
-access_token = sdk.get_oauth_token(username=username, password=password)
+token = sdk.get_oauth_token(username=username, password=password)
+access_token = token.get("access_token")
 decoded_msg = sdk.parse_jwt_token(access_token)
 ```
 
@@ -134,7 +136,8 @@ You can also use Client Credentials Grant when your application does not have a 
 It is important to note that the AccessToken obtained in this way differs from other in that it corresponds to the application rather than to the user.
 
 ```python
-access_token = sdk.get_oauth_token()
+token = sdk.get_oauth_token()
+access_token = token.get("access_token")
 decoded_msg = sdk.parse_jwt_token(access_token)
 ```
 

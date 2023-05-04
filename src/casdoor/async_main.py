@@ -86,7 +86,7 @@ class AsyncCasdoorSDK:
             password: Optional[str] = None
     ) -> str:
         """
-        Request the Casdoor server to get access_token.
+        Request the Casdoor server to get OAuth token.
         Must be set code or username and password for grant type.
         If nothing is set then client credentials grant will be used.
 
@@ -94,12 +94,12 @@ class AsyncCasdoorSDK:
                      back to your server.
         :param username: Casdoor username
         :param password: username password
-        :return: access token: str
+        :return: token: OAuth token
         """
         response = await self.oauth_token_request(code, username, password)
-        access_token = response.get("access_token")
+        token = response
 
-        return access_token
+        return token
 
     def _get_payload_for_access_token_request(
             self,

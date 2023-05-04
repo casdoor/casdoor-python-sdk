@@ -1,5 +1,19 @@
 # Semantic Versioning Changelog
 
+# [1.11.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.10.0...v1.11.0) (2023-04-30)
+
+
+### Features
+
+* support refresh token in get_oauth_token() ([#45](https://github.com/casdoor/casdoor-python-sdk/issues/45)) ([27fef52](https://github.com/casdoor/casdoor-python-sdk/commit/27fef5267835a6cf6dc3247837dd814e0638515b))
+
+# [1.10.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.9.0...v1.10.0) (2023-04-25)
+
+
+### Features
+
+* add v3-v5 field into enforce function's arg. ([#44](https://github.com/casdoor/casdoor-python-sdk/issues/44)) ([485ee89](https://github.com/casdoor/casdoor-python-sdk/commit/485ee897ecf7ccd91cfa6106e8ec8508b07682e7))
+
 # [1.9.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.8.0...v1.9.0) (2023-04-15)
 
 
