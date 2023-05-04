@@ -227,13 +227,14 @@ class TestOAuth(TestCase):
     def test_batch_enforce_raise(self, mock_post):
         sdk = self.get_sdk()
         with self.assertRaises(ValueError) as context:
-            status = sdk.batch_enforce(
+            sdk.batch_enforce(
                 "built-in/permission-built-in",
                 [
                     ["v0", "v1"]
                 ]
             )
-        self.assertEqual("Invalid permission rule[0]: ['v0', 'v1']", str(context.exception))
+        self.assertEqual("Invalid permission rule[0]: ['v0', 'v1']",
+                         str(context.exception))
 
     def test_get_users(self):
         sdk = self.get_sdk()

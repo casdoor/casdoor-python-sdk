@@ -330,16 +330,19 @@ class AsyncCasdoorSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret
         }
+
         def map_rule(rule: list[str], idx) -> dict:
             if len(rule) < 3:
-                raise ValueError("Invalid permission rule[{0}]: {1}".format(idx, rule))
+                raise ValueError("Invalid permission rule[{0}]: {1}"
+                                 .format(idx, rule))
             result = {
                 "id": permission_model_name
             }
             for i in range(0, len(rule)):
                 result.update({"v{0}".format(i): rule[i]})
             return result
-        params = [map_rule(permission_rules[i], i) for i in range(0, len(permission_rules))]
+        params = [map_rule(permission_rules[i], i)
+                  for i in range(0, len(permission_rules))]
         async with self._session.post(
                 url, params=query_params, json=params
         ) as response:

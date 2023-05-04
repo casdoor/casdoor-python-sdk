@@ -314,16 +314,19 @@ class CasdoorSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret
         }
+
         def map_rule(rule: list[str], idx) -> dict:
             if len(rule) < 3:
-                raise ValueError("Invalid permission rule[{0}]: {1}".format(idx, rule))
+                raise ValueError("Invalid permission rule[{0}]: {1}"
+                                 .format(idx, rule))
             result = {
                 "id": permission_model_name
             }
             for i in range(0, len(rule)):
                 result.update({"v{0}".format(i): rule[i]})
             return result
-        params = [map_rule(permission_rules[i], i) for i in range(0, len(permission_rules))]
+        params = [map_rule(permission_rules[i], i)
+                  for i in range(0, len(permission_rules))]
         r = requests.post(url, json=params, params=query_params)
         if r.status_code != 200 or "json" not in r.headers["content-type"]:
             error_str = "Casdoor response error:\n" + str(r.text)
@@ -331,7 +334,9 @@ class CasdoorSDK:
 
         enforce_results = r.json()
 
-        if not isinstance(enforce_results, list) or len(enforce_results) == 0 or not isinstance(enforce_results[0], bool):
+        if not isinstance(enforce_results, list) or \
+           len(enforce_results) == 0 or \
+           not isinstance(enforce_results[0], bool):
             error_str = "Casdoor response error:\n" + r.text
             raise ValueError(error_str)
 
