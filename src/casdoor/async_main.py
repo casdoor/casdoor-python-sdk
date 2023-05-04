@@ -308,6 +308,59 @@ class AsyncCasdoorSDK:
 
             return has_permission
 
+    async def batch_enforce(
+            self,
+            permission_model_name: str,
+            permission_rules: list[list[str]]
+    ) -> list[bool]:
+        """
+        Send data to Casdoor enforce API
+
+        :param permission_model_name: Name permission model
+        :param permission_rules: permission rules to enforce
+                        [][0] -> sub: sub from Casbin
+                        [][1] -> obj: obj from Casbin
+                        [][2] -> act: act from Casbin
+                        [][3] -> v3: v3 from Casbin (optional)
+                        [][4] -> v4: v4 from Casbin (optional)
+                        [][5] -> v5: v5 from Casbin (optional)
+        """
+        url = self.endpoint + "/api/batch-enforce"
+        query_params = {
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret
+        }
+
+        def map_rule(rule: list[str], idx) -> dict:
+            if len(rule) < 3:
+                raise ValueError("Invalid permission rule[{0}]: {1}"
+                                 .format(idx, rule))
+            result = {
+                "id": permission_model_name
+            }
+            for i in range(0, len(rule)):
+                result.update({"v{0}".format(i): rule[i]})
+            return result
+        params = [map_rule(permission_rules[i], i)
+                  for i in range(0, len(permission_rules))]
+        async with self._session.post(
+                url, params=query_params, json=params
+        ) as response:
+            if (
+                    response.status != 200 or
+                    "json" not in response.headers["content-type"]
+            ):
+                error_str = "Casdoor response error:\n" + str(response.text)
+                raise ValueError(error_str)
+
+            enforce_results = await response.json()
+
+            if not isinstance(enforce_results, bool):
+                error_str = "Casdoor response error:\n" + await response.text()
+                raise ValueError(error_str)
+
+            return enforce_results
+
     async def get_users(self) -> List[dict]:
         """
         Get the users from Casdoor.
