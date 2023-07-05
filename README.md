@@ -4,7 +4,7 @@
 [![Version](https://img.shields.io/pypi/v/casdoor.svg)](https://pypi.org/project/casdoor)
 [![PyPI - Wheel](https://img.shields.io/pypi/wheel/casdoor.svg)](https://pypi.org/project/casdoor)
 [![Pyversions](https://img.shields.io/pypi/pyversions/casdoor.svg)](https://pypi.org/project/casdoor)
-[![Gitter](https://badges.gitter.im/casbin/casdoor.svg)](https://gitter.im/casbin/casdoor)
+[![Discord](https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2)](https://discord.gg/5rPsrAzK7S)
 
 Casdoor's SDK for Python will allow you to easily connect your application to the Casdoor authentication system without having to implement it from scratch.
 
