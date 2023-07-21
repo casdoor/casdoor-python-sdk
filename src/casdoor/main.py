@@ -78,7 +78,7 @@ class CasdoorSDK:
             code: Optional[str] = None,
             username: Optional[str] = None,
             password: Optional[str] = None
-    ) -> str:
+    ) -> dict:
         """
         Request the Casdoor server to get OAuth token.
         Must be set code or username and password for grant type.
