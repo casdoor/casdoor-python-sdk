@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.12.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.12.0...v1.12.1) (2023-07-21)
+
+
+### Bug Fixes
+
+* Fixed an incorrect type hint. ([#50](https://github.com/casdoor/casdoor-python-sdk/issues/50)) ([40e0f88](https://github.com/casdoor/casdoor-python-sdk/commit/40e0f88c556e08ca25a02e805f9b8d60f07f884b))
+
 # [1.12.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.11.0...v1.12.0) (2023-05-04)
 
 
