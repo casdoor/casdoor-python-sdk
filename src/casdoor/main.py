@@ -223,7 +223,7 @@ class CasdoorSDK:
 
         return access_token
 
-    def parse_jwt_token(self, token: str) -> dict:
+    def parse_jwt_token(self, token: str, **kwargs) -> dict:
         """
         Converts the returned access_token to real data using
         jwt (JSON Web Token) algorithms.
@@ -241,6 +241,7 @@ class CasdoorSDK:
             certificate.public_key(),
             algorithms=self.algorithms,
             audience=self.client_id,
+            **kwargs
         )
         return return_json
 
