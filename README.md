@@ -101,7 +101,7 @@ The general process is as follows:
 ```python
 token = sdk.get_oauth_token(code=code)
 access_token = token.get("access_token")
-decoded_msg = sdk.parse_jwt_token(access_token)
+decoded_msg = sdk.parse_jwt_token(access_token) # or sdk.parse_jwt_token(access_token, kwargs)
 ```
 
 `decoded_msg` is the JSON data decoded from the `access_token`, which contains user info and other useful stuff.
@@ -125,7 +125,7 @@ If your application doesn't have a frontend that redirects users to Casdoor and 
 ```python
 token = sdk.get_oauth_token(username=username, password=password)
 access_token = token.get("access_token")
-decoded_msg = sdk.parse_jwt_token(access_token)
+decoded_msg = sdk.parse_jwt_token(access_token) # or sdk.parse_jwt_token(access_token, kwargs)
 ```
 
 `decoded_msg` is the JSON data decoded from the `access_token`, which contains user info and other useful stuff.
@@ -138,7 +138,7 @@ It is important to note that the AccessToken obtained in this way differs from o
 ```python
 token = sdk.get_oauth_token()
 access_token = token.get("access_token")
-decoded_msg = sdk.parse_jwt_token(access_token)
+decoded_msg = sdk.parse_jwt_token(access_token) # or sdk.parse_jwt_token(access_token, kwargs)
 ```
 
 `decoded_msg` is the JSON data decoded from the `access_token`.
