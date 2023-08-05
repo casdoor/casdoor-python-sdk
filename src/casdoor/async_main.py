@@ -17,9 +17,11 @@ import json
 from typing import Dict, List, Optional
 
 import aiohttp
-import jwt
+
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+
+import jwt
 
 from .user import User
 
