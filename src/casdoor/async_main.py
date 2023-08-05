@@ -14,7 +14,7 @@
 
 import asyncio
 import json
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import aiohttp
 
@@ -28,14 +28,14 @@ from .user import User
 
 class AsyncCasdoorSDK:
     def __init__(
-        self,
-        endpoint: str,
-        client_id: str,
-        client_secret: str,
-        certificate: str,
-        org_name: str,
-        application_name: str,
-        front_endpoint: str = None
+            self,
+            endpoint: str,
+            client_id: str,
+            client_secret: str,
+            certificate: str,
+            org_name: str,
+            application_name: str,
+            front_endpoint: str = None
     ):
         self.endpoint = endpoint
         if front_endpoint:
@@ -84,7 +84,7 @@ class AsyncCasdoorSDK:
             code: Optional[str] = None,
             username: Optional[str] = None,
             password: Optional[str] = None
-    ) -> str:
+    ) -> Dict:
         """
         Request the Casdoor server to get OAuth token.
         Must be set code or username and password for grant type.
@@ -94,19 +94,16 @@ class AsyncCasdoorSDK:
                      back to your server.
         :param username: Casdoor username
         :param password: username password
-        :return: token: OAuth token
+        :return: OAuth token
         """
-        response = await self.oauth_token_request(code, username, password)
-        token = response
-
-        return token
+        return await self.oauth_token_request(code, username, password)
 
     def _get_payload_for_access_token_request(
             self,
             code: Optional[str] = None,
             username: Optional[str] = None,
             password: Optional[str] = None
-    ) -> dict:
+    ) -> Dict:
         """
         Return payload for request body which was selecting by strategy.
         """
@@ -120,7 +117,7 @@ class AsyncCasdoorSDK:
         else:
             return self.__get_payload_for_client_credentials()
 
-    def __get_payload_for_authorization_code(self, code: str) -> dict:
+    def __get_payload_for_authorization_code(self, code: str) -> Dict:
         """
         Return payload for auth request with authorization code
         """
@@ -135,7 +132,7 @@ class AsyncCasdoorSDK:
             self,
             username: str,
             password: str
-    ) -> dict:
+    ) -> Dict:
         """
         Return payload for auth request with resource owner password
         credentials.
@@ -148,7 +145,7 @@ class AsyncCasdoorSDK:
             "password": password
         }
 
-    def __get_payload_for_client_credentials(self) -> dict:
+    def __get_payload_for_client_credentials(self) -> Dict:
         """
         Return payload for auth request with client credentials.
         """
@@ -163,7 +160,7 @@ class AsyncCasdoorSDK:
             code: Optional[str] = None,
             username: Optional[str] = None,
             password: Optional[str] = None
-    ) -> dict:
+    ) -> Dict:
         """
         Request the Casdoor server to get access_token.
         Must be set code or username and password for grant type.
@@ -183,7 +180,7 @@ class AsyncCasdoorSDK:
         )
         return await self._oauth_token_request(payload=params)
 
-    async def _oauth_token_request(self, payload: dict) -> dict:
+    async def _oauth_token_request(self, payload: Dict) -> Dict:
         """
         Request the Casdoor server to get access_token.
 
@@ -198,7 +195,7 @@ class AsyncCasdoorSDK:
             self,
             refresh_token: str,
             scope: str = ""
-    ) -> dict:
+    ) -> Dict:
         """
         Request the Casdoor server to get access_token.
 
@@ -234,7 +231,7 @@ class AsyncCasdoorSDK:
 
         return access_token
 
-    def parse_jwt_token(self, token: str) -> dict:
+    def parse_jwt_token(self, token: str) -> Dict:
         """
         Converts the returned access_token to real data using
         jwt (JSON Web Token) algorithms.
@@ -311,8 +308,8 @@ class AsyncCasdoorSDK:
     async def batch_enforce(
             self,
             permission_model_name: str,
-            permission_rules: list[list[str]]
-    ) -> list[bool]:
+            permission_rules: List[List[str]]
+    ) -> List[bool]:
         """
         Send data to Casdoor enforce API
 
@@ -331,7 +328,7 @@ class AsyncCasdoorSDK:
             "clientSecret": self.client_secret
         }
 
-        def map_rule(rule: list[str], idx) -> dict:
+        def map_rule(rule: List[str], idx) -> Dict:
             if len(rule) < 3:
                 raise ValueError("Invalid permission rule[{0}]: {1}"
                                  .format(idx, rule))
@@ -341,6 +338,7 @@ class AsyncCasdoorSDK:
             for i in range(0, len(rule)):
                 result.update({"v{0}".format(i): rule[i]})
             return result
+
         params = [map_rule(permission_rules[i], i)
                   for i in range(0, len(permission_rules))]
         async with self._session.post(
@@ -361,7 +359,7 @@ class AsyncCasdoorSDK:
 
             return enforce_results
 
-    async def get_users(self) -> List[dict]:
+    async def get_users(self) -> List[Dict]:
         """
         Get the users from Casdoor.
 
@@ -377,7 +375,7 @@ class AsyncCasdoorSDK:
             users = await request.json()
             return users
 
-    async def get_user(self, user_id: str) -> dict:
+    async def get_user(self, user_id: str) -> Dict:
         """
         Get the user from Casdoor providing the user_id.
 
@@ -417,7 +415,7 @@ class AsyncCasdoorSDK:
             count = await request.json()
             return count
 
-    async def modify_user(self, method: str, user: User) -> dict:
+    async def modify_user(self, method: str, user: User) -> Dict:
         url = self.endpoint + f"/api/{method}"
         user.owner = self.org_name
         params = {
@@ -434,14 +432,14 @@ class AsyncCasdoorSDK:
             response = await request.json()
             return response
 
-    async def add_user(self, user: User) -> dict:
+    async def add_user(self, user: User) -> Dict:
         response = await self.modify_user("add-user", user)
         return response
 
-    async def update_user(self, user: User) -> dict:
+    async def update_user(self, user: User) -> Dict:
         response = await self.modify_user("update-user", user)
         return response
 
-    async def delete_user(self, user: User) -> dict:
+    async def delete_user(self, user: User) -> Dict:
         response = await self.modify_user("delete-user", user)
         return response
