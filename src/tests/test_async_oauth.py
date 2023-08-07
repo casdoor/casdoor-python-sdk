@@ -42,7 +42,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
             client_secret="3f0d1f06d28d65309c8f38b505cb9dcfa487754d",
             certificate="CasdoorSecret",
             org_name="built-in",
-            application_name="app-built-in"
+            application_name="app-built-in",
         )
         return sdk
 
@@ -59,9 +59,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     async def test__get_payload_for_authorization_code(self):
         sdk = self.get_sdk()
-        result = sdk._AsyncCasdoorSDK__get_payload_for_authorization_code(  # noqa: It's private method
-            code=self.code
-        )
+        result = sdk._AsyncCasdoorSDK__get_payload_for_authorization_code(code=self.code)  # noqa: It's private method
         self.assertEqual("authorization_code", result.get("grant_type"))
 
     async def test__get_payload_for_password_credentials(self):
@@ -73,9 +71,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     async def test__get_payload_for_client_credentials(self):
         sdk = self.get_sdk()
-        result = (
-            sdk._AsyncCasdoorSDK__get_payload_for_client_credentials()
-        )  # noqa: It's private method
+        result = sdk._AsyncCasdoorSDK__get_payload_for_client_credentials()  # noqa: It's private method
         self.assertEqual("client_credentials", result.get("grant_type"))
 
     async def test__get_payload_for_access_token_request_with_code(self):
@@ -85,9 +81,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     async def test__get_payload_for_access_token_request_with_cred(self):
         sdk = self.get_sdk()
-        result = sdk._get_payload_for_access_token_request(
-            username="test", password="test"
-        )
+        result = sdk._get_payload_for_access_token_request(username="test", password="test")
         self.assertEqual("password", result.get("grant_type"))
 
     async def test_get_payload_for_access_token_request_with_client_cred(self):
@@ -97,9 +91,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     async def test_get_oauth_token_with_password(self):
         sdk = self.get_sdk()
-        token = await sdk.get_oauth_token(
-            username=self.username, password=self.password
-        )
+        token = await sdk.get_oauth_token(username=self.username, password=self.password)
         access_token = token.get("access_token")
         self.assertIsInstance(access_token, str)
 
@@ -144,22 +136,18 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     async def test_enforce(self):
         sdk = self.get_sdk()
-        status = await sdk.enforce(
-            "built-in/permission-built-in", "admin", "a", "ac"
-        )
+        status = await sdk.enforce("built-in/permission-built-in", "admin", "a", "ac")
         self.assertIsInstance(status, bool)
 
     def mocked_enforce_requests_post(*args, **kwargs):
         class MockResponse:
             def __init__(
-                    self,
-                    json_data,
-                    status_code=200,
-                    headers={"content-type": "json"},
+                self,
+                json_data,
+                status_code=200,
             ):
                 self.json_data = json_data
                 self.status_code = status_code
-                self.headers = headers
 
             def json(self):
                 return self.json_data
@@ -171,9 +159,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
         return MockResponse(result)
 
-    @mock.patch(
-        "aiohttp.ClientSession.post", side_effect=mocked_enforce_requests_post
-    )
+    @mock.patch("aiohttp.ClientSession.post", side_effect=mocked_enforce_requests_post)
     async def test_enforce_parmas(self, mock_post):
         sdk = self.get_sdk()
         status = await sdk.enforce(
@@ -190,14 +176,12 @@ class TestOAuth(IsolatedAsyncioTestCase):
     def mocked_batch_enforce_requests_post(*args, **kwargs):
         class MockResponse:
             def __init__(
-                    self,
-                    json_data,
-                    status_code=200,
-                    headers={"content-type": "json"},
+                self,
+                json_data,
+                status_code=200,
             ):
                 self.json_data = json_data
                 self.status_code = status_code
-                self.headers = headers
 
             def json(self):
                 return self.json_data
@@ -236,9 +220,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
         sdk = self.get_sdk()
         with self.assertRaises(ValueError) as context:
             sdk.batch_enforce("built-in/permission-built-in", [["v0", "v1"]])
-        self.assertEqual(
-            "Invalid permission rule[0]: ['v0', 'v1']", str(context.exception)
-        )
+        self.assertEqual("Invalid permission rule[0]: ['v0', 'v1']", str(context.exception))
 
     async def test_get_users(self):
         sdk = self.get_sdk()
