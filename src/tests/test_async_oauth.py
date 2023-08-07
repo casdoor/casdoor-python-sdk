@@ -36,7 +36,6 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     @staticmethod
     def get_sdk():
-
         sdk = AsyncCasdoorSDK(
             endpoint="http://test.casbin.com:8000",
             client_id="3267f876b11e7d1cb217",
@@ -55,8 +54,8 @@ class TestOAuth(IsolatedAsyncioTestCase):
             "client_secret": sdk.client_secret,
             "code": self.code,
         }
-        response = await sdk._oauth_token_request(payload=data)
-        self.assertIsInstance(response, dict)
+        auth_token = await sdk._oauth_token_request(payload=data)
+        self.assertIn("access_token", auth_token)
 
     async def test__get_payload_for_authorization_code(self):
         sdk = self.get_sdk()
@@ -68,14 +67,15 @@ class TestOAuth(IsolatedAsyncioTestCase):
     async def test__get_payload_for_password_credentials(self):
         sdk = self.get_sdk()
         result = sdk._AsyncCasdoorSDK__get_payload_for_password_credentials(  # noqa: It's private method
-            username="test",
-            password="test"
+            username="test", password="test"
         )
         self.assertEqual("password", result.get("grant_type"))
 
     async def test__get_payload_for_client_credentials(self):
         sdk = self.get_sdk()
-        result = sdk._AsyncCasdoorSDK__get_payload_for_client_credentials()  # noqa: It's private method
+        result = (
+            sdk._AsyncCasdoorSDK__get_payload_for_client_credentials()
+        )  # noqa: It's private method
         self.assertEqual("client_credentials", result.get("grant_type"))
 
     async def test__get_payload_for_access_token_request_with_code(self):
@@ -86,8 +86,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
     async def test__get_payload_for_access_token_request_with_cred(self):
         sdk = self.get_sdk()
         result = sdk._get_payload_for_access_token_request(
-            username="test",
-            password="test"
+            username="test", password="test"
         )
         self.assertEqual("password", result.get("grant_type"))
 
@@ -99,8 +98,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
     async def test_get_oauth_token_with_password(self):
         sdk = self.get_sdk()
         token = await sdk.get_oauth_token(
-            username=self.username,
-            password=self.password
+            username=self.username, password=self.password
         )
         access_token = token.get("access_token")
         self.assertIsInstance(access_token, str)
@@ -126,6 +124,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
         sdk = self.get_sdk()
         response = await sdk.oauth_token_request(self.code)
         refresh_token = response.get("refresh_token")
+        self.assertIsInstance(refresh_token, str)
         response = await sdk.refresh_token_request(refresh_token)
         self.assertIsInstance(response, dict)
 
@@ -152,25 +151,29 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     def mocked_enforce_requests_post(*args, **kwargs):
         class MockResponse:
-            def __init__(self,
-                         json_data,
-                         status_code=200,
-                         headers={'content-type': 'json'}):
+            def __init__(
+                    self,
+                    json_data,
+                    status_code=200,
+                    headers={"content-type": "json"},
+            ):
                 self.json_data = json_data
                 self.status_code = status_code
                 self.headers = headers
 
             def json(self):
                 return self.json_data
+
         result = True
         for i in range(0, 5):
-            if kwargs.get('json').get(f"v{i}") != f"v{i}":
+            if kwargs.get("json").get(f"v{i}") != f"v{i}":
                 result = False
 
         return MockResponse(result)
 
-    @mock.patch("aiohttp.ClientSession.post",
-                side_effect=mocked_enforce_requests_post)
+    @mock.patch(
+        "aiohttp.ClientSession.post", side_effect=mocked_enforce_requests_post
+    )
     async def test_enforce_parmas(self, mock_post):
         sdk = self.get_sdk()
         status = await sdk.enforce(
@@ -178,25 +181,28 @@ class TestOAuth(IsolatedAsyncioTestCase):
             "v0",
             "v1",
             "v2",
-            v3='v3',
-            v4='v4',
-            v5='v5'
+            v3="v3",
+            v4="v4",
+            v5="v5",
         )
         self.assertEqual(status, True)
 
     def mocked_batch_enforce_requests_post(*args, **kwargs):
         class MockResponse:
-            def __init__(self,
-                         json_data,
-                         status_code=200,
-                         headers={'content-type': 'json'}):
+            def __init__(
+                    self,
+                    json_data,
+                    status_code=200,
+                    headers={"content-type": "json"},
+            ):
                 self.json_data = json_data
                 self.status_code = status_code
                 self.headers = headers
 
             def json(self):
                 return self.json_data
-        json = kwargs.get('json')
+
+        json = kwargs.get("json")
         result = [True for i in range(0, len(json))]
         for k in range(0, len(json)):
             for i in range(0, len(json[k]) - 1):
@@ -205,34 +211,34 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
         return MockResponse(result)
 
-    @mock.patch("aiohttp.ClientSession.post",
-                side_effect=mocked_batch_enforce_requests_post)
+    @mock.patch(
+        "aiohttp.ClientSession.post",
+        side_effect=mocked_batch_enforce_requests_post,
+    )
     def test_batch_enforce(self, mock_post):
         sdk = self.get_sdk()
         status = sdk.batch_enforce(
             "built-in/permission-built-in",
             [
-             ["v0", "v1", "v2", "v3", "v4", 'v5'],
-             ["v0", "v1", "v2", "v3", "v4", "v1"]
-            ]
+                ["v0", "v1", "v2", "v3", "v4", "v5"],
+                ["v0", "v1", "v2", "v3", "v4", "v1"],
+            ],
         )
         self.assertEqual(len(status), 2)
         self.assertEqual(status[0], True)
         self.assertEqual(status[1], False)
 
-    @mock.patch("aiohttp.ClientSession.post",
-                side_effect=mocked_batch_enforce_requests_post)
+    @mock.patch(
+        "aiohttp.ClientSession.post",
+        side_effect=mocked_batch_enforce_requests_post,
+    )
     def test_batch_enforce_raise(self, mock_post):
         sdk = self.get_sdk()
         with self.assertRaises(ValueError) as context:
-            sdk.batch_enforce(
-                "built-in/permission-built-in",
-                [
-                    ["v0", "v1"]
-                ]
-            )
-        self.assertEqual("Invalid permission rule[0]: ['v0', 'v1']",
-                         str(context.exception))
+            sdk.batch_enforce("built-in/permission-built-in", [["v0", "v1"]])
+        self.assertEqual(
+            "Invalid permission rule[0]: ['v0', 'v1']", str(context.exception)
+        )
 
     async def test_get_users(self):
         sdk = self.get_sdk()
@@ -243,6 +249,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
         sdk = self.get_sdk()
         user = await sdk.get_user("admin")
         self.assertIsInstance(user, dict)
+        self.assertEqual(user["name"], "admin")
 
     async def test_get_user_count(self):
         sdk = self.get_sdk()
@@ -258,6 +265,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
         sdk = self.get_sdk()
         user = User()
         user.name = "test_ffyuanda"
+        user.owner = sdk.org_name
         await sdk.delete_user(user)
 
         response = await sdk.add_user(user)
@@ -278,3 +286,12 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     def check_enforce_request(*args, **kwargs):
         return True
+
+    async def test_auth_link(self):
+        sdk = self.get_sdk()
+        redirect_uri = "http://localhost:9000/callback"
+        response = await sdk.get_auth_link(redirect_uri=redirect_uri)
+        self.assertEqual(
+            response,
+            f"{sdk.front_endpoint}/login/oauth/authorize?client_id={sdk.client_id}&response_type=code&redirect_uri={redirect_uri}&scope=read&state={sdk.application_name}",  # noqa
+        )

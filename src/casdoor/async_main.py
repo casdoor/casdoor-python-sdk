@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
-import json
+import base64
+from functools import cached_property
 from typing import Dict, List, Optional
 
 import aiohttp
@@ -23,19 +23,54 @@ from cryptography.hazmat.backends import default_backend
 
 import jwt
 
+from yarl import URL
+
 from .user import User
+
+
+class AioHttpClient:
+    def __init__(self, base_url):
+        self.base_url = base_url
+        self.session = None
+
+    async def fetch(self, path, method="GET", **kwargs):
+        url = self.base_url + path
+        async with self.session.request(method, url, **kwargs) as response:
+            if (
+                response.status != 200
+                and "application/json" not in response.headers["Content-Type"]
+            ):
+                raise ValueError(f"Casdoor response error:{response.text}")
+            return await response.json()
+
+    async def get(self, path, **kwargs):
+        return await self.fetch(path, method="GET", **kwargs)
+
+    async def post(self, path, **kwargs):
+        return await self.fetch(path, method="POST", **kwargs)
+
+    async def __aenter__(self):
+        self.session = await aiohttp.ClientSession().__aenter__()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        try:
+            if exc_type:
+                raise exc_val
+        finally:
+            await self.session.__aexit__(exc_type, exc_val, exc_tb)
 
 
 class AsyncCasdoorSDK:
     def __init__(
-            self,
-            endpoint: str,
-            client_id: str,
-            client_secret: str,
-            certificate: str,
-            org_name: str,
-            application_name: str,
-            front_endpoint: str = None
+        self,
+        endpoint: str,
+        client_id: str,
+        client_secret: str,
+        certificate: str,
+        org_name: str,
+        application_name: str,
+        front_endpoint: str = None,
     ):
         self.endpoint = endpoint
         if front_endpoint:
@@ -50,24 +85,31 @@ class AsyncCasdoorSDK:
         self.grant_type = "authorization_code"
 
         self.algorithms = ["RS256"]
-        self._session = aiohttp.ClientSession()
+        self._session = AioHttpClient(base_url=self.endpoint)
 
-    def __del__(self):
-        loop = asyncio.get_running_loop()
-        loop.create_task(self._session.close())
+    @cached_property
+    def headers(self) -> Dict:
+        basic_auth = base64.b64encode(
+            f"{self.client_id}:{self.client_secret}".encode("utf-8")
+        ).decode("utf-8")
+        return {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": f"Basic {basic_auth}",
+        }
 
     @property
     def certification(self) -> bytes:
-        if type(self.certificate) is not str:
+        if not isinstance(self.certificate, str):
             raise TypeError("certificate field must be str type")
         return self.certificate.encode("utf-8")
 
     async def get_auth_link(
-            self,
-            redirect_uri: str,
-            response_type: str = "code",
-            scope: str = "read"
-    ):
+        self,
+        redirect_uri: str,
+        response_type: str = "code",
+        scope: str = "read",
+    ) -> str:
         url = self.front_endpoint + "/login/oauth/authorize"
         params = {
             "client_id": self.client_id,
@@ -76,14 +118,13 @@ class AsyncCasdoorSDK:
             "scope": scope,
             "state": self.application_name,
         }
-        async with self._session.request("", url, params=params) as request:
-            return request.url
+        return str(URL(url).with_query(params))
 
     async def get_oauth_token(
-            self,
-            code: Optional[str] = None,
-            username: Optional[str] = None,
-            password: Optional[str] = None
+        self,
+        code: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
     ) -> Dict:
         """
         Request the Casdoor server to get OAuth token.
@@ -99,10 +140,10 @@ class AsyncCasdoorSDK:
         return await self.oauth_token_request(code, username, password)
 
     def _get_payload_for_access_token_request(
-            self,
-            code: Optional[str] = None,
-            username: Optional[str] = None,
-            password: Optional[str] = None
+        self,
+        code: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
     ) -> Dict:
         """
         Return payload for request body which was selecting by strategy.
@@ -111,8 +152,7 @@ class AsyncCasdoorSDK:
             return self.__get_payload_for_authorization_code(code=code)
         elif username and password:
             return self.__get_payload_for_password_credentials(
-                username=username,
-                password=password
+                username=username, password=password
             )
         else:
             return self.__get_payload_for_client_credentials()
@@ -129,9 +169,7 @@ class AsyncCasdoorSDK:
         }
 
     def __get_payload_for_password_credentials(
-            self,
-            username: str,
-            password: str
+        self, username: str, password: str
     ) -> Dict:
         """
         Return payload for auth request with resource owner password
@@ -142,7 +180,7 @@ class AsyncCasdoorSDK:
             "client_id": self.client_id,
             "client_secret": self.client_secret,
             "username": username,
-            "password": password
+            "password": password,
         }
 
     def __get_payload_for_client_credentials(self) -> Dict:
@@ -156,10 +194,10 @@ class AsyncCasdoorSDK:
         }
 
     async def oauth_token_request(
-            self,
-            code: Optional[str] = None,
-            username: Optional[str] = None,
-            password: Optional[str] = None
+        self,
+        code: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
     ) -> Dict:
         """
         Request the Casdoor server to get access_token.
@@ -174,9 +212,7 @@ class AsyncCasdoorSDK:
         :return: Response from Casdoor
         """
         params = self._get_payload_for_access_token_request(
-            code=code,
-            username=username,
-            password=password
+            code=code, username=username, password=password
         )
         return await self._oauth_token_request(payload=params)
 
@@ -187,14 +223,12 @@ class AsyncCasdoorSDK:
         :param payload: Body for POST request.
         :return: Response from Casdoor
         """
-        url = self.endpoint + "/api/login/oauth/access_token"
-        async with self._session.post(url, data=payload) as response:
-            return await response.json()
+        path = "/api/login/oauth/access_token"
+        async with self._session as session:
+            return await session.post(path, data=payload)
 
     async def refresh_token_request(
-            self,
-            refresh_token: str,
-            scope: str = ""
+        self, refresh_token: str, scope: str = ""
     ) -> Dict:
         """
         Request the Casdoor server to get access_token.
@@ -203,7 +237,7 @@ class AsyncCasdoorSDK:
         :param scope: OAuth scope
         :return: Response from Casdoor
         """
-        url = self.endpoint + "/api/login/oauth/refresh_token"
+        path = "/api/login/oauth/refresh_token"
         params = {
             "grant_type": "refresh_token",
             "client_id": self.client_id,
@@ -211,13 +245,11 @@ class AsyncCasdoorSDK:
             "scope": scope,
             "refresh_token": refresh_token,
         }
-        async with self._session.post(url, data=params) as request:
-            return await request.json()
+        async with self._session as session:
+            return await session.post(path, data=params)
 
     async def refresh_oauth_token(
-            self,
-            refresh_token: str,
-            scope: str = ""
+        self, refresh_token: str, scope: str = ""
     ) -> str:
         """
         Request the Casdoor server to get access_token.
@@ -226,10 +258,8 @@ class AsyncCasdoorSDK:
         :param scope: OAuth scope
         :return: Response from Casdoor
         """
-        r = await self.refresh_token_request(refresh_token, scope)
-        access_token = r.get("access_token")
-
-        return access_token
+        token = await self.refresh_token_request(refresh_token, scope)
+        return token.get("access_token")
 
     def parse_jwt_token(self, token: str) -> Dict:
         """
@@ -240,8 +270,7 @@ class AsyncCasdoorSDK:
         :return: the data in dict format
         """
         certificate = x509.load_pem_x509_certificate(
-            self.certification,
-            default_backend()
+            self.certification, default_backend()
         )
 
         return_json = jwt.decode(
@@ -253,17 +282,18 @@ class AsyncCasdoorSDK:
         return return_json
 
     async def enforce(
-            self,
-            permission_model_name: str,
-            sub: str,
-            obj: str,
-            act: str,
-            v3: Optional[str] = None,
-            v4: Optional[str] = None,
-            v5: Optional[str] = None,
+        self,
+        permission_model_name: str,
+        sub: str,
+        obj: str,
+        act: str,
+        v3: Optional[str] = None,
+        v4: Optional[str] = None,
+        v5: Optional[str] = None,
     ) -> bool:
         """
         Send data to Casdoor enforce API
+        # https://casdoor.org/docs/permission/exposed-casbin-apis#enforce
 
         :param permission_model_name: Name permission model
         :param sub: sub from Casbin
@@ -273,11 +303,7 @@ class AsyncCasdoorSDK:
         :param v4: v4 from Casbin
         :param v5: v5 from Casbin
         """
-        url = self.endpoint + "/api/enforce"
-        query_params = {
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret
-        }
+        path = "/api/enforce"
         params = {
             "id": permission_model_name,
             "v0": sub,
@@ -287,28 +313,16 @@ class AsyncCasdoorSDK:
             "v4": v4,
             "v5": v5,
         }
-        async with self._session.post(
-                url, params=query_params, json=params
-        ) as response:
-            if (
-                    response.status != 200 or
-                    "json" not in response.headers["content-type"]
-            ):
-                error_str = "Casdoor response error:\n" + str(response.text)
-                raise ValueError(error_str)
-
-            has_permission = await response.json()
-
+        async with self._session as session:
+            has_permission = await session.post(
+                path, headers=self.headers, json=params
+            )
             if not isinstance(has_permission, bool):
-                error_str = "Casdoor response error:\n" + await response.text()
-                raise ValueError(error_str)
-
+                raise ValueError(f"Casdoor response error: {has_permission}")
             return has_permission
 
     async def batch_enforce(
-            self,
-            permission_model_name: str,
-            permission_rules: List[List[str]]
+        self, permission_model_name: str, permission_rules: List[List[str]]
     ) -> List[bool]:
         """
         Send data to Casdoor enforce API
@@ -322,58 +336,43 @@ class AsyncCasdoorSDK:
                         [][4] -> v4: v4 from Casbin (optional)
                         [][5] -> v5: v5 from Casbin (optional)
         """
-        url = self.endpoint + "/api/batch-enforce"
-        query_params = {
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret
-        }
+        path = "/api/batch-enforce"
 
         def map_rule(rule: List[str], idx) -> Dict:
             if len(rule) < 3:
-                raise ValueError("Invalid permission rule[{0}]: {1}"
-                                 .format(idx, rule))
-            result = {
-                "id": permission_model_name
-            }
-            for i in range(0, len(rule)):
-                result.update({"v{0}".format(i): rule[i]})
+                raise ValueError(f"Invalid permission rule[{idx}]: {rule}")
+            result = {"id": permission_model_name}
+            for i in range(len(rule)):
+                result.update({f"v{i}": rule[i]})
             return result
 
-        params = [map_rule(permission_rules[i], i)
-                  for i in range(0, len(permission_rules))]
-        async with self._session.post(
-                url, params=query_params, json=params
-        ) as response:
-            if (
-                    response.status != 200 or
-                    "json" not in response.headers["content-type"]
-            ):
-                error_str = "Casdoor response error:\n" + str(response.text)
-                raise ValueError(error_str)
+        params = [
+            map_rule(permission_rules[i], i)
+            for i in range(len(permission_rules))
+        ]
 
-            enforce_results = await response.json()
-
+        async with self._session as session:
+            enforce_results = await session.post(
+                path, headers=self.headers, json=params
+            )
             if not isinstance(enforce_results, bool):
-                error_str = "Casdoor response error:\n" + await response.text()
-                raise ValueError(error_str)
+                raise ValueError(f"Casdoor response error:{enforce_results}")
 
             return enforce_results
 
-    async def get_users(self) -> List[Dict]:
+    async def get_users(self) -> Dict:
         """
         Get the users from Casdoor.
 
         :return: a list of dicts containing user info
         """
-        url = self.endpoint + "/api/get-users"
-        params = {
-            "owner": self.org_name,
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret,
-        }
-        async with self._session.get(url, params=params) as request:
-            users = await request.json()
-            return users
+        path = "/api/get-users"
+        params = {"owner": self.org_name}
+        async with self._session as session:
+            users = await session.get(
+                path, headers=self.headers, params=params
+            )
+            return users["data"]
 
     async def get_user(self, user_id: str) -> Dict:
         """
@@ -382,15 +381,11 @@ class AsyncCasdoorSDK:
         :param user_id: the id of the user
         :return: a dict that contains user's info
         """
-        url = self.endpoint + "/api/get-user"
-        params = {
-            "id": f"{self.org_name}/{user_id}",
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret,
-        }
-        async with self._session.get(url, params=params) as request:
-            user = await request.json()
-            return user
+        path = "/api/get-user"
+        params = {"id": f"{self.org_name}/{user_id}"}
+        async with self._session as session:
+            user = await session.get(path, headers=self.headers, params=params)
+            return user["data"]
 
     async def get_user_count(self, is_online: bool = None) -> int:
         """
@@ -399,11 +394,9 @@ class AsyncCasdoorSDK:
                           None for all users
         :return: the count of filtered users for an organization
         """
-        url = self.endpoint + "/api/get-user-count"
+        path = "/api/get-user-count"
         params = {
             "owner": self.org_name,
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret,
         }
 
         if is_online is None:
@@ -411,33 +404,26 @@ class AsyncCasdoorSDK:
         else:
             params["isOnline"] = "1" if is_online else "0"
 
-        async with self._session.get(url, params=params) as request:
-            count = await request.json()
-            return count
+        async with self._session as session:
+            count = await session.get(
+                path, headers=self.headers, params=params
+            )
+            return count["data"]
 
-    async def modify_user(self, method: str, user: User) -> Dict:
-        url = self.endpoint + f"/api/{method}"
-        user.owner = self.org_name
-        params = {
-            "id": f"{user.owner}/{user.name}",
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret,
-        }
-        user_info = json.dumps(user.to_dict())
-        async with self._session.post(
-                url,
-                params=params,
-                data=user_info
-        ) as request:
-            response = await request.json()
-            return response
+    async def modify_user(self, method: str, user: User, params=None) -> Dict:
+        path = f"/api/{method}"
+        async with self._session as session:
+            return await session.post(
+                path, params=params, headers=self.headers, json=user.to_dict()
+            )
 
     async def add_user(self, user: User) -> Dict:
         response = await self.modify_user("add-user", user)
         return response
 
     async def update_user(self, user: User) -> Dict:
-        response = await self.modify_user("update-user", user)
+        params = {"id": f"{user.owner}/{user.name}"}
+        response = await self.modify_user("update-user", user, params)
         return response
 
     async def delete_user(self, user: User) -> Dict:
