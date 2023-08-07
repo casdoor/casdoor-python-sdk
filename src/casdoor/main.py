@@ -15,12 +15,10 @@
 import json
 from typing import List, Optional
 
+import jwt
+import requests
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-
-import jwt
-
-import requests
 
 from .user import User
 
@@ -34,7 +32,7 @@ class CasdoorSDK:
         certificate: str,
         org_name: str,
         application_name: str,
-        front_endpoint: str = None
+        front_endpoint: str = None,
     ):
         self.endpoint = endpoint
         if front_endpoint:
@@ -56,12 +54,7 @@ class CasdoorSDK:
             raise TypeError("certificate field must be str type")
         return self.certificate.encode("utf-8")
 
-    def get_auth_link(
-            self,
-            redirect_uri: str,
-            response_type: str = "code",
-            scope: str = "read"
-    ):
+    def get_auth_link(self, redirect_uri: str, response_type: str = "code", scope: str = "read"):
         url = self.front_endpoint + "/login/oauth/authorize"
         params = {
             "client_id": self.client_id,
@@ -74,10 +67,7 @@ class CasdoorSDK:
         return r.url
 
     def get_oauth_token(
-            self,
-            code: Optional[str] = None,
-            username: Optional[str] = None,
-            password: Optional[str] = None
+        self, code: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None
     ) -> dict:
         """
         Request the Casdoor server to get OAuth token.
@@ -96,10 +86,7 @@ class CasdoorSDK:
         return token
 
     def _get_payload_for_access_token_request(
-            self,
-            code: Optional[str] = None,
-            username: Optional[str] = None,
-            password: Optional[str] = None
+        self, code: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None
     ) -> dict:
         """
         Return payload for request body which was selecting by strategy.
@@ -107,10 +94,7 @@ class CasdoorSDK:
         if code:
             return self.__get_payload_for_authorization_code(code=code)
         elif username and password:
-            return self.__get_payload_for_password_credentials(
-                username=username,
-                password=password
-            )
+            return self.__get_payload_for_password_credentials(username=username, password=password)
         else:
             return self.__get_payload_for_client_credentials()
 
@@ -125,11 +109,7 @@ class CasdoorSDK:
             "code": code,
         }
 
-    def __get_payload_for_password_credentials(
-            self,
-            username: str,
-            password: str
-    ) -> dict:
+    def __get_payload_for_password_credentials(self, username: str, password: str) -> dict:
         """
         Return payload for auth request with resource owner password
         credentials.
@@ -139,7 +119,7 @@ class CasdoorSDK:
             "client_id": self.client_id,
             "client_secret": self.client_secret,
             "username": username,
-            "password": password
+            "password": password,
         }
 
     def __get_payload_for_client_credentials(self) -> dict:
@@ -153,10 +133,7 @@ class CasdoorSDK:
         }
 
     def oauth_token_request(
-            self,
-            code: Optional[str] = None,
-            username: Optional[str] = None,
-            password: Optional[str] = None
+        self, code: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None
     ) -> requests.Response:
         """
         Request the Casdoor server to get access_token.
@@ -170,11 +147,7 @@ class CasdoorSDK:
         :param password: username password
         :return: Response from Casdoor
         """
-        params = self._get_payload_for_access_token_request(
-            code=code,
-            username=username,
-            password=password
-        )
+        params = self._get_payload_for_access_token_request(code=code, username=username, password=password)
         return self._oauth_token_request(payload=params)
 
     def _oauth_token_request(self, payload: dict) -> requests.Response:
@@ -188,11 +161,7 @@ class CasdoorSDK:
         response = requests.post(url, payload)
         return response
 
-    def refresh_token_request(
-            self,
-            refresh_token: str,
-            scope: str = ""
-    ) -> requests.Response:
+    def refresh_token_request(self, refresh_token: str, scope: str = "") -> requests.Response:
         """
         Request the Casdoor server to get access_token.
 
@@ -231,29 +200,22 @@ class CasdoorSDK:
         :param token: access_token
         :return: the data in dict format
         """
-        certificate = x509.load_pem_x509_certificate(
-            self.certification,
-            default_backend()
-        )
+        certificate = x509.load_pem_x509_certificate(self.certification, default_backend())
 
         return_json = jwt.decode(
-            token,
-            certificate.public_key(),
-            algorithms=self.algorithms,
-            audience=self.client_id,
-            **kwargs
+            token, certificate.public_key(), algorithms=self.algorithms, audience=self.client_id, **kwargs
         )
         return return_json
 
     def enforce(
-            self,
-            permission_model_name: str,
-            sub: str,
-            obj: str,
-            act: str,
-            v3: Optional[str] = None,
-            v4: Optional[str] = None,
-            v5: Optional[str] = None,
+        self,
+        permission_model_name: str,
+        sub: str,
+        obj: str,
+        act: str,
+        v3: Optional[str] = None,
+        v4: Optional[str] = None,
+        v5: Optional[str] = None,
     ) -> bool:
         """
         Send data to Casdoor enforce API
@@ -267,10 +229,7 @@ class CasdoorSDK:
         :param v5: v5 from Casbin
         """
         url = self.endpoint + "/api/enforce"
-        query_params = {
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret
-        }
+        query_params = {"clientId": self.client_id, "clientSecret": self.client_secret}
         params = {
             "id": permission_model_name,
             "v0": sub,
@@ -293,11 +252,7 @@ class CasdoorSDK:
 
         return has_permission
 
-    def batch_enforce(
-            self,
-            permission_model_name: str,
-            permission_rules: list[list[str]]
-    ) -> list[bool]:
+    def batch_enforce(self, permission_model_name: str, permission_rules: list[list[str]]) -> list[bool]:
         """
         Send data to Casdoor enforce API
 
@@ -311,23 +266,17 @@ class CasdoorSDK:
                         [][5] -> v5: v5 from Casbin (optional)
         """
         url = self.endpoint + "/api/batch-enforce"
-        query_params = {
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret
-        }
+        query_params = {"clientId": self.client_id, "clientSecret": self.client_secret}
 
         def map_rule(rule: list[str], idx) -> dict:
             if len(rule) < 3:
-                raise ValueError("Invalid permission rule[{0}]: {1}"
-                                 .format(idx, rule))
-            result = {
-                "id": permission_model_name
-            }
+                raise ValueError("Invalid permission rule[{0}]: {1}".format(idx, rule))
+            result = {"id": permission_model_name}
             for i in range(0, len(rule)):
                 result.update({"v{0}".format(i): rule[i]})
             return result
-        params = [map_rule(permission_rules[i], i)
-                  for i in range(0, len(permission_rules))]
+
+        params = [map_rule(permission_rules[i], i) for i in range(0, len(permission_rules))]
         r = requests.post(url, json=params, params=query_params)
         if r.status_code != 200 or "json" not in r.headers["content-type"]:
             error_str = "Casdoor response error:\n" + str(r.text)
@@ -335,9 +284,11 @@ class CasdoorSDK:
 
         enforce_results = r.json()
 
-        if not isinstance(enforce_results, list) or \
-           len(enforce_results) == 0 or \
-           not isinstance(enforce_results[0], bool):
+        if (
+            not isinstance(enforce_results, list)
+            or len(enforce_results) == 0
+            or not isinstance(enforce_results[0], bool)
+        ):
             error_str = "Casdoor response error:\n" + r.text
             raise ValueError(error_str)
 

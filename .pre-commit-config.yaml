@@ -1,0 +1,27 @@
+default_stages: [ commit ]
+fail_fast: true
+
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: black
+        language: system
+        types: [ python ]
+        description: "Black code formatter"
+
+      - id: ruff
+        name: ruff
+        description: "Ruff code checker"
+        entry: ruff check
+        args: [ --fix, --exit-non-zero-on-fix ]
+        language: system
+        types: [ python ]
+
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: 3.2.2
+    hooks:
+      - id: commitizen
+        stages: [ commit-msg ]

@@ -17,12 +17,9 @@ from functools import cached_property
 from typing import Dict, List, Optional
 
 import aiohttp
-
+import jwt
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-
-import jwt
-
 from yarl import URL
 
 from .user import User
@@ -36,10 +33,7 @@ class AioHttpClient:
     async def fetch(self, path, method="GET", **kwargs):
         url = self.base_url + path
         async with self.session.request(method, url, **kwargs) as response:
-            if (
-                response.status != 200
-                and "application/json" not in response.headers["Content-Type"]
-            ):
+            if response.status != 200 and "application/json" not in response.headers["Content-Type"]:
                 raise ValueError(f"Casdoor response error:{response.text}")
             return await response.json()
 
@@ -89,9 +83,7 @@ class AsyncCasdoorSDK:
 
     @cached_property
     def headers(self) -> Dict:
-        basic_auth = base64.b64encode(
-            f"{self.client_id}:{self.client_secret}".encode("utf-8")
-        ).decode("utf-8")
+        basic_auth = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode("utf-8")).decode("utf-8")
         return {
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -151,9 +143,7 @@ class AsyncCasdoorSDK:
         if code:
             return self.__get_payload_for_authorization_code(code=code)
         elif username and password:
-            return self.__get_payload_for_password_credentials(
-                username=username, password=password
-            )
+            return self.__get_payload_for_password_credentials(username=username, password=password)
         else:
             return self.__get_payload_for_client_credentials()
 
@@ -168,9 +158,7 @@ class AsyncCasdoorSDK:
             "code": code,
         }
 
-    def __get_payload_for_password_credentials(
-        self, username: str, password: str
-    ) -> Dict:
+    def __get_payload_for_password_credentials(self, username: str, password: str) -> Dict:
         """
         Return payload for auth request with resource owner password
         credentials.
@@ -211,9 +199,7 @@ class AsyncCasdoorSDK:
         :param password: username password
         :return: Response from Casdoor
         """
-        params = self._get_payload_for_access_token_request(
-            code=code, username=username, password=password
-        )
+        params = self._get_payload_for_access_token_request(code=code, username=username, password=password)
         return await self._oauth_token_request(payload=params)
 
     async def _oauth_token_request(self, payload: Dict) -> Dict:
@@ -227,9 +213,7 @@ class AsyncCasdoorSDK:
         async with self._session as session:
             return await session.post(path, data=payload)
 
-    async def refresh_token_request(
-        self, refresh_token: str, scope: str = ""
-    ) -> Dict:
+    async def refresh_token_request(self, refresh_token: str, scope: str = "") -> Dict:
         """
         Request the Casdoor server to get access_token.
 
@@ -248,9 +232,7 @@ class AsyncCasdoorSDK:
         async with self._session as session:
             return await session.post(path, data=params)
 
-    async def refresh_oauth_token(
-        self, refresh_token: str, scope: str = ""
-    ) -> str:
+    async def refresh_oauth_token(self, refresh_token: str, scope: str = "") -> str:
         """
         Request the Casdoor server to get access_token.
 
@@ -269,9 +251,7 @@ class AsyncCasdoorSDK:
         :param token: access_token
         :return: the data in dict format
         """
-        certificate = x509.load_pem_x509_certificate(
-            self.certification, default_backend()
-        )
+        certificate = x509.load_pem_x509_certificate(self.certification, default_backend())
 
         return_json = jwt.decode(
             token,
@@ -314,16 +294,12 @@ class AsyncCasdoorSDK:
             "v5": v5,
         }
         async with self._session as session:
-            has_permission = await session.post(
-                path, headers=self.headers, json=params
-            )
+            has_permission = await session.post(path, headers=self.headers, json=params)
             if not isinstance(has_permission, bool):
                 raise ValueError(f"Casdoor response error: {has_permission}")
             return has_permission
 
-    async def batch_enforce(
-        self, permission_model_name: str, permission_rules: List[List[str]]
-    ) -> List[bool]:
+    async def batch_enforce(self, permission_model_name: str, permission_rules: List[List[str]]) -> List[bool]:
         """
         Send data to Casdoor enforce API
 
@@ -346,15 +322,10 @@ class AsyncCasdoorSDK:
                 result.update({f"v{i}": rule[i]})
             return result
 
-        params = [
-            map_rule(permission_rules[i], i)
-            for i in range(len(permission_rules))
-        ]
+        params = [map_rule(permission_rules[i], i) for i in range(len(permission_rules))]
 
         async with self._session as session:
-            enforce_results = await session.post(
-                path, headers=self.headers, json=params
-            )
+            enforce_results = await session.post(path, headers=self.headers, json=params)
             if not isinstance(enforce_results, bool):
                 raise ValueError(f"Casdoor response error:{enforce_results}")
 
@@ -369,9 +340,7 @@ class AsyncCasdoorSDK:
         path = "/api/get-users"
         params = {"owner": self.org_name}
         async with self._session as session:
-            users = await session.get(
-                path, headers=self.headers, params=params
-            )
+            users = await session.get(path, headers=self.headers, params=params)
             return users["data"]
 
     async def get_user(self, user_id: str) -> Dict:
@@ -405,17 +374,13 @@ class AsyncCasdoorSDK:
             params["isOnline"] = "1" if is_online else "0"
 
         async with self._session as session:
-            count = await session.get(
-                path, headers=self.headers, params=params
-            )
+            count = await session.get(path, headers=self.headers, params=params)
             return count["data"]
 
     async def modify_user(self, method: str, user: User, params=None) -> Dict:
         path = f"/api/{method}"
         async with self._session as session:
-            return await session.post(
-                path, params=params, headers=self.headers, json=user.to_dict()
-            )
+            return await session.post(path, params=params, headers=self.headers, json=user.to_dict())
 
     async def add_user(self, user: User) -> Dict:
         response = await self.modify_user("add-user", user)

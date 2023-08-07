@@ -1,9 +1,9 @@
 name: build
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
 
 jobs:
   release:
@@ -28,12 +28,17 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-            
+
       - name: Install setuptools
         run: python -m pip install --upgrade setuptools wheel twine
 
-      - name: Linter
-        run: python -m pip install pip install flake8  flake8-import-order && flake8 .
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black ruff pre-commit
+
+      - name: Run linter
+        run: git diff --name-only HEAD~10 HEAD | xargs pre-commit run --files
 
       - name: Release
         env:
