@@ -109,8 +109,6 @@
 
 * fix init imports
 
-## [1.2.2](https://github.com/casdoor/casdoor-python-sdk/compare/v1.2.1...v1.2.2) (2022-12-02) 
-
 # Semantic Versioning Changelog
 
 ## [1.2.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.2.0...v1.2.1) (2022-08-19)
