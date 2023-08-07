@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.14.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.13.1...v1.14.0) (2023-08-07)
+
+
+### Features
+
+* Encapsulated aiohttp methods to replace __del__ to avoid http connection leaks ([#55](https://github.com/casdoor/casdoor-python-sdk/issues/55)) ([2a2b482](https://github.com/casdoor/casdoor-python-sdk/commit/2a2b482daa171b5fe169b43f942ab29a2ef172bb))
+
 ## [1.13.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.13.0...v1.13.1) (2023-08-05)
 
 
