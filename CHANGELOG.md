@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.14.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.14.0...v1.14.1) (2023-08-07)
+
+
+### Bug Fixes
+
+* fix broken links ([#54](https://github.com/casdoor/casdoor-python-sdk/issues/54)) ([db480cc](https://github.com/casdoor/casdoor-python-sdk/commit/db480cc29eb2a1008fff8f0b0a6ca10436afc8e7))
+
 # [1.14.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.13.1...v1.14.0) (2023-08-07)
 
 
