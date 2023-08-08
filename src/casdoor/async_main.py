@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import base64
-from functools import cached_property
 from typing import Dict, List, Optional
 
 import aiohttp
@@ -81,7 +80,7 @@ class AsyncCasdoorSDK:
         self.algorithms = ["RS256"]
         self._session = AioHttpClient(base_url=self.endpoint)
 
-    @cached_property
+    @property
     def headers(self) -> Dict:
         basic_auth = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode("utf-8")).decode("utf-8")
         return {
