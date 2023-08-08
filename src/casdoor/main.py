@@ -268,7 +268,7 @@ class CasdoorSDK:
         url = self.endpoint + "/api/batch-enforce"
         query_params = {"clientId": self.client_id, "clientSecret": self.client_secret}
 
-        def map_rule(rule: list[str], idx) -> dict:
+        def map_rule(rule: List[str], idx) -> Dict:
             if len(rule) < 3:
                 raise ValueError("Invalid permission rule[{0}]: {1}".format(idx, rule))
             result = {"id": permission_model_name}
