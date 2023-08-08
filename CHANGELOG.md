@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.15.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.14.2...v1.15.0) (2023-08-08)
+
+
+### Features
+
+* Removed cached_property for python 3.7 compatibility ([#62](https://github.com/casdoor/casdoor-python-sdk/issues/62)) ([2bae07a](https://github.com/casdoor/casdoor-python-sdk/commit/2bae07ad40227187d443fc0b3a3d532cb800d59b))
+
 ## [1.14.2](https://github.com/casdoor/casdoor-python-sdk/compare/v1.14.1...v1.14.2) (2023-08-08)
 
 
