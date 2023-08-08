@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import jwt
 import requests
@@ -68,7 +68,7 @@ class CasdoorSDK:
 
     def get_oauth_token(
         self, code: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None
-    ) -> dict:
+    ) -> Dict:
         """
         Request the Casdoor server to get OAuth token.
         Must be set code or username and password for grant type.
@@ -87,7 +87,7 @@ class CasdoorSDK:
 
     def _get_payload_for_access_token_request(
         self, code: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None
-    ) -> dict:
+    ) -> Dict:
         """
         Return payload for request body which was selecting by strategy.
         """
@@ -109,7 +109,7 @@ class CasdoorSDK:
             "code": code,
         }
 
-    def __get_payload_for_password_credentials(self, username: str, password: str) -> dict:
+    def __get_payload_for_password_credentials(self, username: str, password: str) -> Dict:
         """
         Return payload for auth request with resource owner password
         credentials.
@@ -122,7 +122,7 @@ class CasdoorSDK:
             "password": password,
         }
 
-    def __get_payload_for_client_credentials(self) -> dict:
+    def __get_payload_for_client_credentials(self) -> Dict:
         """
         Return payload for auth request with client credentials.
         """
@@ -150,7 +150,7 @@ class CasdoorSDK:
         params = self._get_payload_for_access_token_request(code=code, username=username, password=password)
         return self._oauth_token_request(payload=params)
 
-    def _oauth_token_request(self, payload: dict) -> requests.Response:
+    def _oauth_token_request(self, payload: Dict) -> requests.Response:
         """
         Request the Casdoor server to get access_token.
 
@@ -192,7 +192,7 @@ class CasdoorSDK:
 
         return access_token
 
-    def parse_jwt_token(self, token: str, **kwargs) -> dict:
+    def parse_jwt_token(self, token: str, **kwargs) -> Dict:
         """
         Converts the returned access_token to real data using
         jwt (JSON Web Token) algorithms.
@@ -252,7 +252,7 @@ class CasdoorSDK:
 
         return has_permission
 
-    def batch_enforce(self, permission_model_name: str, permission_rules: list[list[str]]) -> list[bool]:
+    def batch_enforce(self, permission_model_name: str, permission_rules: List[List[str]]) -> List[bool]:
         """
         Send data to Casdoor enforce API
 
@@ -268,7 +268,7 @@ class CasdoorSDK:
         url = self.endpoint + "/api/batch-enforce"
         query_params = {"clientId": self.client_id, "clientSecret": self.client_secret}
 
-        def map_rule(rule: list[str], idx) -> dict:
+        def map_rule(rule: List[str], idx) -> Dict:
             if len(rule) < 3:
                 raise ValueError("Invalid permission rule[{0}]: {1}".format(idx, rule))
             result = {"id": permission_model_name}
@@ -294,7 +294,7 @@ class CasdoorSDK:
 
         return enforce_results
 
-    def get_users(self) -> List[dict]:
+    def get_users(self) -> List[Dict]:
         """
         Get the users from Casdoor.
 
@@ -310,7 +310,7 @@ class CasdoorSDK:
         users = r.json()
         return users
 
-    def get_user(self, user_id: str) -> dict:
+    def get_user(self, user_id: str) -> Dict:
         """
         Get the user from Casdoor providing the user_id.
 
@@ -350,7 +350,7 @@ class CasdoorSDK:
         count = r.json()
         return count
 
-    def modify_user(self, method: str, user: User) -> dict:
+    def modify_user(self, method: str, user: User) -> Dict:
         url = self.endpoint + f"/api/{method}"
         user.owner = self.org_name
         params = {
@@ -363,14 +363,14 @@ class CasdoorSDK:
         response = r.json()
         return response
 
-    def add_user(self, user: User) -> dict:
+    def add_user(self, user: User) -> Dict:
         response = self.modify_user("add-user", user)
         return response
 
-    def update_user(self, user: User) -> dict:
+    def update_user(self, user: User) -> Dict:
         response = self.modify_user("update-user", user)
         return response
 
-    def delete_user(self, user: User) -> dict:
+    def delete_user(self, user: User) -> Dict:
         response = self.modify_user("delete-user", user)
         return response
