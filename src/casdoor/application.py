@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from .provider import Provider
-from .organization import Organization,ThemeData
+from .organization import Organization, ThemeData
+
 
 class ProviderItem:
     def __init__(self):

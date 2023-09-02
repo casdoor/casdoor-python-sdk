@@ -14,6 +14,7 @@
 
 from .user import User
 
+
 class Model:
     def __init__(self):
         self.owner = "string"

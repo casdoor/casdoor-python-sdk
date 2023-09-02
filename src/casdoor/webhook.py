@@ -14,6 +14,7 @@
 
 from .syncer import TableColumn
 
+
 class Webhook:
     def __init__(self):
         self.owner = "string"

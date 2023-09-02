@@ -14,6 +14,7 @@
 
 from datetime import datetime
 
+
 class Subscription:
     def __init__(self):
         self.owner = "string"

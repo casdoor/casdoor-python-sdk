@@ -14,6 +14,7 @@
 
 from .provider import Provider
 
+
 class Product:
     def __init__(self):
         self.owner = "string"
@@ -38,4 +39,3 @@ class Product:
 
     def to_dict(self) -> dict:
         return self.__dict__
-
