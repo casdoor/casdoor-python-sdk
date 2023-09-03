@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.16.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.15.0...v1.16.0) (2023-09-03)
+
+
+### Features
+
+* add all missing APIs ([#65](https://github.com/casdoor/casdoor-python-sdk/issues/65)) ([542c8d9](https://github.com/casdoor/casdoor-python-sdk/commit/542c8d90499ce362896699a04e96f75bfb51ad3c))
+
 # [1.15.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.14.2...v1.15.0) (2023-08-08)
 
 
