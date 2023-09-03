@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .provider import Provider
 from .organization import Organization, ThemeData
+from .provider import Provider
 
 
 class ProviderItem:

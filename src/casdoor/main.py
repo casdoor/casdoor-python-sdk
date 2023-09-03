@@ -20,27 +20,27 @@ import requests
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
-from .cert import Cert
-from .user import User
 from .adapter import Adapter
+from .application import Application
+from .cert import Cert
+from .enforcer import Enforcer
 from .group import Group
-from .role import Role
+from .model import Model
 from .organization import Organization
 from .payment import Payment
-from .provider import Provider
-from .application import Application
-from .model import Model
-from .plan import Plan
 from .permisssion import Permission
-from .enforcer import Enforcer
-from .resource import Resource
-from .token import Token
-from .session import Session
-from .syncer import Syncer
-from .webhook import Webhook
-from .subscription import Subscription
+from .plan import Plan
 from .pricing import Pricing
 from .product import Product
+from .provider import Provider
+from .resource import Resource
+from .role import Role
+from .session import Session
+from .subscription import Subscription
+from .syncer import Syncer
+from .token import Token
+from .user import User
+from .webhook import Webhook
 
 
 class CasdoorSDK:
@@ -70,7 +70,7 @@ class CasdoorSDK:
 
     @property
     def certification(self) -> bytes:
-        if type(self.certificate) is not str:
+        if not isinstance(self.certificate, str):
             raise TypeError("certificate field must be str type")
         return self.certificate.encode("utf-8")
 
@@ -1091,7 +1091,7 @@ class CasdoorSDK:
         response = self.modify_enforcer("delete-enforcer", enforcer)
         return response
 
-    def get_resources(self,owner,user,field,value,sort_field,sort_order) -> List[Dict]:
+    def get_resources(self, owner, user, field, value, sort_field, sort_order) -> List[Dict]:
         """
         Get the resources from Casdoor.
 
@@ -1154,7 +1154,7 @@ class CasdoorSDK:
         response = self.modify_resource("delete-resource", resource)
         return response
 
-    def get_tokens(self, p ,page_size) -> List[Dict]:
+    def get_tokens(self, p, page_size) -> List[Dict]:
         """
         Get the tokens from Casdoor.
 
@@ -1188,6 +1188,7 @@ class CasdoorSDK:
         r = requests.get(url, params)
         token = r.json()
         return token
+
     def modify_token(self, method: str, token: Token) -> Dict:
         url = self.endpoint + f"/api/{method}"
         token.owner = self.org_name
