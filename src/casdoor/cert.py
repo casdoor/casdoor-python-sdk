@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+from typing import Dict, List
+
+import requests
+
+from src.casdoor import CasdoorSDK
+
 
 class Cert:
     def __init__(self):
@@ -34,3 +41,63 @@ class Cert:
 
     def to_dict(self) -> dict:
         return self.__dict__
+
+
+class CertSDK(CasdoorSDK):
+    def get_certs(self) -> List[Dict]:
+        """
+        Get the certs from Casdoor.
+
+        :return: a list of dicts containing cert info
+        """
+        url = self.endpoint + "/api/get-certs"
+        params = {
+            "owner": self.org_name,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        certs = r.json()
+        return certs
+
+    def get_cert(self, cert_id: str) -> Dict:
+        """
+        Get the cert from Casdoor providing the cert_id.
+
+        :param cert_id: the id of the cert
+        :return: a dict that contains cert's info
+        """
+        url = self.endpoint + "/api/get-cert"
+        params = {
+            "id": f"{self.org_name}/{cert_id}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        cert = r.json()
+        return cert
+
+    def modify_cert(self, method: str, cert: Cert) -> Dict:
+        url = self.endpoint + f"/api/{method}"
+        cert.owner = self.org_name
+        params = {
+            "id": f"{cert.owner}/{cert.name}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        cert_info = json.dumps(cert.to_dict())
+        r = requests.post(url, params=params, data=cert_info)
+        response = r.json()
+        return response
+
+    def add_cert(self, cert: Cert) -> Dict:
+        response = self.modify_cert("add-cert", cert)
+        return response
+
+    def update_cert(self, cert: Cert) -> Dict:
+        response = self.modify_cert("update-cert", cert)
+        return response
+
+    def delete_cert(self, cert: Cert) -> Dict:
+        response = self.modify_cert("delete-cert", cert)
+        return response

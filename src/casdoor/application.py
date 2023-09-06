@@ -11,6 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
+from typing import Dict, List
+
+import requests
+
+from src.casdoor import CasdoorSDK
 
 from .organization import Organization, ThemeData
 from .provider import Provider
@@ -96,3 +102,63 @@ class Application:
 
     def to_dict(self) -> dict:
         return self.__dict__
+
+
+class ApplicationSDK(CasdoorSDK):
+    def get_applications(self) -> List[Dict]:
+        """
+        Get the applications from Casdoor.
+
+        :return: a list of dicts containing application info
+        """
+        url = self.endpoint + "/api/get-applications"
+        params = {
+            "owner": "admin",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        applications = r.json()
+        return applications
+
+    def get_application(self, application_id: str) -> Dict:
+        """
+        Get the application from Casdoor providing the application_id.
+
+        :param application_id: the id of the application
+        :return: a dict that contains application's info
+        """
+        url = self.endpoint + "/api/get-application"
+        params = {
+            "id": f"{self.org_name}/{application_id}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        application = r.json()
+        return application
+
+    def modify_application(self, method: str, application: Application) -> Dict:
+        url = self.endpoint + f"/api/{method}"
+        application.owner = self.org_name
+        params = {
+            "id": f"{application.owner}/{application.name}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        application_info = json.dumps(application.to_dict())
+        r = requests.post(url, params=params, data=application_info)
+        response = r.json()
+        return response
+
+    def add_application(self, application: Application) -> Dict:
+        response = self.modify_application("add-application", application)
+        return response
+
+    def update_application(self, application: Application) -> Dict:
+        response = self.modify_application("update-application", application)
+        return response
+
+    def delete_application(self, application: Application) -> Dict:
+        response = self.modify_application("delete-application", application)
+        return response
