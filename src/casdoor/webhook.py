@@ -11,6 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
+from typing import Dict, List
+
+import requests
+
+from src.casdoor import CasdoorSDK
 
 from .syncer import TableColumn
 
@@ -43,3 +49,63 @@ class Webhook:
 
     def to_dict(self) -> dict:
         return self.__dict__
+
+
+class WebhookSDK(CasdoorSDK):
+    def get_webhooks(self) -> List[Dict]:
+        """
+        Get the webhooks from Casdoor.
+
+        :return: a list of dicts containing webhook info
+        """
+        url = self.endpoint + "/api/get-webhooks"
+        params = {
+            "owner": self.org_name,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        webhooks = r.json()
+        return webhooks
+
+    def get_webhook(self, webhook_id: str) -> Dict:
+        """
+        Get the webhook from Casdoor providing the webhook_id.
+
+        :param webhook_id: the id of the webhook
+        :return: a dict that contains webhook's info
+        """
+        url = self.endpoint + "/api/get-webhook"
+        params = {
+            "id": f"{self.org_name}/{webhook_id}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        webhook = r.json()
+        return webhook
+
+    def modify_webhook(self, method: str, webhook: Webhook) -> Dict:
+        url = self.endpoint + f"/api/{method}"
+        webhook.owner = self.org_name
+        params = {
+            "id": f"{webhook.owner}/{webhook.name}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        webhook_info = json.dumps(webhook.to_dict())
+        r = requests.post(url, params=params, data=webhook_info)
+        response = r.json()
+        return response
+
+    def add_webhook(self, webhook: Webhook) -> Dict:
+        response = self.modify_webhook("add-webhook", webhook)
+        return response
+
+    def update_webhook(self, webhook: Webhook) -> Dict:
+        response = self.modify_webhook("update-webhook", webhook)
+        return response
+
+    def delete_webhook(self, webhook: Webhook) -> Dict:
+        response = self.modify_webhook("delete-webhook", webhook)
+        return response
