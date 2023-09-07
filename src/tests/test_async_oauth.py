@@ -14,7 +14,8 @@
 
 from unittest import IsolatedAsyncioTestCase, mock
 
-from src.casdoor.async_main import AsyncCasdoorSDK, User
+from src.casdoor.async_main import AsyncCasdoorSDK
+from src.casdoor.user import User
 
 
 class TestOAuth(IsolatedAsyncioTestCase):

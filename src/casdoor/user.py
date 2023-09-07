@@ -17,7 +17,7 @@ from typing import Dict, List
 
 import requests
 
-from src.casdoor import CasdoorSDK
+from .main import CasdoorSDK
 
 
 class User:
