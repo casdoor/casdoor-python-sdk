@@ -17,7 +17,6 @@ from typing import Dict, List
 import requests
 
 from .main import CasdoorSDK
-
 from .organization import Organization, ThemeData
 from .provider import Provider
 
