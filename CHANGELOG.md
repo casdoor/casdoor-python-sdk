@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.16.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.16.0...v1.16.1) (2023-09-06)
+
+
+### Bug Fixes
+
+* refactor file structures ([#66](https://github.com/casdoor/casdoor-python-sdk/issues/66)) ([db43b96](https://github.com/casdoor/casdoor-python-sdk/commit/db43b9650ea9b33dbc8c14e9c635d67ab7263cdb))
+
 # [1.16.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.15.0...v1.16.0) (2023-09-03)
 
 
