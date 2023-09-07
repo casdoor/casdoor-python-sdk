@@ -16,7 +16,8 @@ from unittest import TestCase, mock
 
 from requests import Response
 
-from src.casdoor.main import CasdoorSDK, User
+from src.casdoor.main import CasdoorSDK
+from src.casdoor.user import User
 
 
 class TestOAuth(TestCase):

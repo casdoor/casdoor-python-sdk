@@ -16,8 +16,7 @@ from typing import Dict, List
 
 import requests
 
-from src.casdoor import CasdoorSDK
-
+from .main import CasdoorSDK
 from .syncer import TableColumn
 
 
