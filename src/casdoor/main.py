@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
 from typing import Dict, List, Optional
 
 import jwt
 import requests
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+
+from .user import User
 
 
 class CasdoorSDK:
@@ -290,3 +292,84 @@ class CasdoorSDK:
             raise ValueError(error_str)
 
         return enforce_results
+
+    def get_users(self) -> List[Dict]:
+        """
+        Get the users from Casdoor.
+
+        :return: a list of dicts containing user info
+        """
+        url = self.endpoint + "/api/get-users"
+        params = {
+            "owner": self.org_name,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        users = r.json()
+        return users
+
+    def get_user(self, user_id: str) -> Dict:
+        """
+        Get the user from Casdoor providing the user_id.
+
+        :param user_id: the id of the user
+        :return: a dict that contains user's info
+        """
+        url = self.endpoint + "/api/get-user"
+        params = {
+            "id": f"{self.org_name}/{user_id}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        user = r.json()
+        return user
+
+    def get_user_count(self, is_online: bool = None) -> int:
+        """
+        Get the count of filtered users for an organization
+        :param is_online: True for online users, False for offline users,
+                          None for all users
+        :return: the count of filtered users for an organization
+        """
+        url = self.endpoint + "/api/get-user-count"
+        params = {
+            "owner": self.org_name,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+
+        if is_online is None:
+            params["isOnline"] = ""
+        else:
+            params["isOnline"] = "1" if is_online else "0"
+
+        r = requests.get(url, params)
+        count = r.json()
+        return count
+
+    def modify_user(self, method: str, user: User) -> Dict:
+        url = self.endpoint + f"/api/{method}"
+        user.owner = self.org_name
+        params = {
+            "id": f"{user.owner}/{user.name}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        user_info = json.dumps(user.to_dict())
+        r = requests.post(url, params=params, data=user_info)
+        response = r.json()
+        return response
+
+    def add_user(self, user: User) -> Dict:
+        response = self.modify_user("add-user", user)
+        return response
+
+    def update_user(self, user: User) -> Dict:
+        response = self.modify_user("update-user", user)
+        return response
+
+    def delete_user(self, user: User) -> Dict:
+        response = self.modify_user("delete-user", user)
+        return response
