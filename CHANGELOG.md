@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.17.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.16.2...v1.17.0) (2023-09-08)
+
+
+### Features
+
+* fix bug that functions cannot be found ([#69](https://github.com/casdoor/casdoor-python-sdk/issues/69)) ([142e317](https://github.com/casdoor/casdoor-python-sdk/commit/142e317fa2c8899780aa9da6f73996fd68dcc9ea))
+
 ## [1.16.2](https://github.com/casdoor/casdoor-python-sdk/compare/v1.16.1...v1.16.2) (2023-09-07)
 
 
