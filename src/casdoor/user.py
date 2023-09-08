@@ -11,13 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import json
 from typing import Dict, List
 
 import requests
-
-from .main import CasdoorSDK
 
 
 class User:
@@ -60,7 +57,7 @@ class User:
         return self.__dict__
 
 
-class UserSDK(CasdoorSDK):
+class _UserSDK:
     def get_users(self) -> List[Dict]:
         """
         Get the users from Casdoor.

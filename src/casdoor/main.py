@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from typing import Dict, List, Optional
 
 import jwt
@@ -19,8 +18,52 @@ import requests
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
+from .adapter import _AdapterSDK
+from .application import _ApplicationSDK
+from .cert import _CertSDK
+from .enforcer import _EnforcerSDK
+from .group import _GroupSDK
+from .model import _ModelSDK
+from .organization import _OrganizationSDK
+from .payment import _PaymentSDK
+from .permisssion import _PermissionSDK
+from .plan import _PlanSDK
+from .pricing import _PricingSDK
+from .product import _ProductSDK
+from .provider import _ProviderSDK
+from .resource import _ResourceSDK
+from .role import _RoleSDK
+from .session import _SessionSDK
+from .subscription import _SubscriptionSDK
+from .syncer import _SyncerSDK
+from .token import _TokenSDK
+from .user import _UserSDK
+from .webhook import _WebhookSDK
 
-class CasdoorSDK:
+
+class CasdoorSDK(
+    _UserSDK,
+    _AdapterSDK,
+    _OrganizationSDK,
+    _ApplicationSDK,
+    _CertSDK,
+    _ResourceSDK,
+    _RoleSDK,
+    _SessionSDK,
+    _SyncerSDK,
+    _EnforcerSDK,
+    _GroupSDK,
+    _ModelSDK,
+    _PaymentSDK,
+    _PermissionSDK,
+    _PlanSDK,
+    _PricingSDK,
+    _ProviderSDK,
+    _ProductSDK,
+    _SubscriptionSDK,
+    _TokenSDK,
+    _WebhookSDK,
+):
     def __init__(
         self,
         endpoint: str,

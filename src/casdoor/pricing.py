@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Pricing:
     def __init__(self):
@@ -42,7 +40,7 @@ class Pricing:
         return self.__dict__
 
 
-class PricingSDK(CasdoorSDK):
+class _PricingSDK:
     def get_pricings(self) -> List[Dict]:
         """
         Get the pricings from Casdoor.

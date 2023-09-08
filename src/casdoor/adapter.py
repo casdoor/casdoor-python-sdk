@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Adapter:
     def __init__(self):
@@ -42,7 +40,7 @@ class Adapter:
         return self.__dict__
 
 
-class AdapterSDK(CasdoorSDK):
+class _AdapterSDK:
     def get_adapters(self) -> List[Dict]:
         """
         Get the adapters from Casdoor.

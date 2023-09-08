@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Provider:
     def __init__(self):
@@ -68,7 +66,7 @@ class Provider:
         return self.__dict__
 
 
-class ProviderSDK(CasdoorSDK):
+class _ProviderSDK:
     def get_providers(self) -> List[Dict]:
         """
         Get the providers from Casdoor.

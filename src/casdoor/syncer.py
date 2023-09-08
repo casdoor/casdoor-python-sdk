@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class TableColumn:
     def __init__(self):
@@ -65,7 +63,7 @@ class Syncer:
         return self.__dict__
 
 
-class SyncerSDK(CasdoorSDK):
+class _SyncerSDK:
     def get_syncers(self) -> List[Dict]:
         """
         Get the syncers from Casdoor.

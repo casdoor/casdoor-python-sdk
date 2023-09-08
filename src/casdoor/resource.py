@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Resource:
     def __init__(self):
@@ -43,7 +41,7 @@ class Resource:
         return self.__dict__
 
 
-class ResourceSDK(CasdoorSDK):
+class _ResourceSDK:
     def get_resources(self, owner, user, field, value, sort_field, sort_order) -> List[Dict]:
         """
         Get the resources from Casdoor.

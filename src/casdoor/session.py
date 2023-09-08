@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Session:
     def __init__(self):
@@ -34,7 +32,7 @@ class Session:
         return self.__dict__
 
 
-class SessionSDK(CasdoorSDK):
+class _SessionSDK:
     def get_sessions(self) -> List[Dict]:
         """
         Get the sessions from Casdoor.

@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Token:
     def __init__(self):
@@ -44,7 +42,7 @@ class Token:
         return self.__dict__
 
 
-class TokenSDK(CasdoorSDK):
+class _TokenSDK:
     def get_tokens(self, p, page_size) -> List[Dict]:
         """
         Get the tokens from Casdoor.
