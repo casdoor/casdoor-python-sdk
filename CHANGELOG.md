@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.16.2](https://github.com/casdoor/casdoor-python-sdk/compare/v1.16.1...v1.16.2) (2023-09-07)
+
+
+### Bug Fixes
+
+* solve Problem when importing CasdoorSDK or AsyncCasdoorSDK ([#68](https://github.com/casdoor/casdoor-python-sdk/issues/68)) ([f60c63b](https://github.com/casdoor/casdoor-python-sdk/commit/f60c63bca5e54dd649b146bf20a6cfb99c8fed64))
+
 ## [1.16.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.16.0...v1.16.1) (2023-09-06)
 
 
