@@ -16,7 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
 from .provider import Provider
 
 
@@ -46,7 +45,7 @@ class Product:
         return self.__dict__
 
 
-class ProductSDK(CasdoorSDK):
+class _ProductSDK:
     def get_products(self) -> List[Dict]:
         """
         Get the products from Casdoor.

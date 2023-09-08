@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Role:
     def __init__(self):
@@ -38,7 +36,7 @@ class Role:
         return self.__dict__
 
 
-class RoleSDK(CasdoorSDK):
+class _RoleSDK:
     def get_roles(self) -> List[Dict]:
         """
         Get the roles from Casdoor.

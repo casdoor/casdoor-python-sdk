@@ -17,8 +17,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Cert:
     def __init__(self):
@@ -43,7 +41,7 @@ class Cert:
         return self.__dict__
 
 
-class CertSDK(CasdoorSDK):
+class _CertSDK:
     def get_certs(self) -> List[Dict]:
         """
         Get the certs from Casdoor.

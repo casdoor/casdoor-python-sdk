@@ -16,7 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
 from .user import User
 
 
@@ -45,7 +44,7 @@ class Model:
         return self.__dict__
 
 
-class ModelSDK(CasdoorSDK):
+class _ModelSDK:
     def get_models(self) -> List[Dict]:
         """
         Get the models from Casdoor.

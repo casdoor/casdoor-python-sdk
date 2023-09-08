@@ -16,7 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
 from .syncer import TableColumn
 
 
@@ -50,7 +49,7 @@ class Webhook:
         return self.__dict__
 
 
-class WebhookSDK(CasdoorSDK):
+class _WebhookSDK:
     def get_webhooks(self) -> List[Dict]:
         """
         Get the webhooks from Casdoor.

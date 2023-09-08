@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Payment:
     def __init__(self):
@@ -56,7 +54,7 @@ class Payment:
         return self.__dict__
 
 
-class PaymentSDK(CasdoorSDK):
+class _PaymentSDK:
     def get_payments(self) -> List[Dict]:
         """
         Get the payments from Casdoor.

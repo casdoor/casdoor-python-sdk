@@ -16,7 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
 from .organization import Organization, ThemeData
 from .provider import Provider
 
@@ -103,7 +102,7 @@ class Application:
         return self.__dict__
 
 
-class ApplicationSDK(CasdoorSDK):
+class _ApplicationSDK:
     def get_applications(self) -> List[Dict]:
         """
         Get the applications from Casdoor.

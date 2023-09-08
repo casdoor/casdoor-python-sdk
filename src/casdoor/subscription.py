@@ -17,8 +17,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Subscription:
     def __init__(self):
@@ -45,7 +43,7 @@ class Subscription:
         return self.__dict__
 
 
-class SubscriptionSDK(CasdoorSDK):
+class _SubscriptionSDK:
     def get_subscriptions(self) -> List[Dict]:
         """
         Get the subscriptions from Casdoor.

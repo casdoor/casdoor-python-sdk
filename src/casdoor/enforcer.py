@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Enforcer:
     def __init__(self):
@@ -38,7 +36,7 @@ class Enforcer:
         return self.__dict__
 
 
-class EnforcerSDK(CasdoorSDK):
+class _EnforcerSDK:
     def get_enforcers(self) -> List[Dict]:
         """
         Get the enforcers from Casdoor.

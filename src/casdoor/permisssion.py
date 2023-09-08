@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Permission:
     def __init__(self):
@@ -48,7 +46,7 @@ class Permission:
         return self.__dict__
 
 
-class PermissionSDK(CasdoorSDK):
+class _PermissionSDK:
     def get_permissions(self) -> List[Dict]:
         """
         Get the permissions from Casdoor.

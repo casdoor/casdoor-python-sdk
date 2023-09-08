@@ -16,7 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
 from .user import User
 
 
@@ -45,7 +44,7 @@ class Group:
         return self.__dict__
 
 
-class GroupSDK(CasdoorSDK):
+class _GroupSDK:
     def get_groups(self) -> List[Dict]:
         """
         Get the groups from Casdoor.

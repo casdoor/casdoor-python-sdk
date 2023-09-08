@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class AccountItem:
     def __init__(self):
@@ -91,7 +89,7 @@ class Organization:
         return self.__dict__
 
 
-class OrganizationSDK(CasdoorSDK):
+class _OrganizationSDK:
     def get_organizations(self) -> List[Dict]:
         """
         Get the organizations from Casdoor.

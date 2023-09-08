@@ -16,8 +16,6 @@ from typing import Dict, List
 
 import requests
 
-from .main import CasdoorSDK
-
 
 class Plan:
     def __init__(self):
@@ -40,7 +38,7 @@ class Plan:
         return self.__dict__
 
 
-class PlanSDK(CasdoorSDK):
+class _PlanSDK:
     def get_plans(self) -> List[Dict]:
         """
         Get the plans from Casdoor.
