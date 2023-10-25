@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [1.17.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.17.0...v1.17.1) (2023-10-25)
+
+
+### Bug Fixes
+
+* add [project] to pyproject.toml ([32eb294](https://github.com/casdoor/casdoor-python-sdk/commit/32eb294b7b438b66badc73a4ba7640c10efef85b))
+* add requirements.txt ([fb9d962](https://github.com/casdoor/casdoor-python-sdk/commit/fb9d9625cb15ea1f28a0dffce5259c2adb290155))
+
 # [1.17.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.16.2...v1.17.0) (2023-09-08)
 
 
