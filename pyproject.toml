@@ -1,3 +1,30 @@
+[project]
+name = "casdoor"
+version = "1.17.0"
+authors = [{name = "Casdoor", email = "admin@casdoor.org"}]
+description = "Python SDK built for Casdoor"
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["Casdoor"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
+]
+
+[project.urls]
+"Home" = "https://github.com/casdoor/casdoor-python-sdk"
+
+[project.scripts]
+test = "tests"
+
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
