@@ -38,7 +38,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
     @staticmethod
     def get_sdk():
         sdk = AsyncCasdoorSDK(
-            endpoint="http://test.casbin.com:8000",
+            endpoint="https://demo.casdoor.com",
             client_id="3267f876b11e7d1cb217",
             client_secret="3f0d1f06d28d65309c8f38b505cb9dcfa487754d",
             certificate="CasdoorSecret",
