@@ -96,6 +96,20 @@ class Application:
         self.signinHtml = ""
         self.themeData = ThemeData
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, logo, homepage_url, description, organization):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.logo = logo
+        self.homepageUrl = homepage_url
+        self.description = description
+        self.organization = organization
+        return self
+
+
     def __str__(self):
         return str(self.__dict__)
 
