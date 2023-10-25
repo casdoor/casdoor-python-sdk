@@ -81,7 +81,8 @@ class _GroupSDK:
 
     def modify_group(self, method: str, group: Group) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        group.owner = self.org_name
+        if group.owner == "":
+            group.owner = self.org_name
         params = {
             "id": f"{group.owner}/{group.name}",
             "clientId": self.client_id,

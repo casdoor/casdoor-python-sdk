@@ -81,7 +81,8 @@ class _TokenSDK:
 
     def modify_token(self, method: str, token: Token) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        token.owner = self.org_name
+        if token.owner == "":
+            token.owner = self.org_name
         params = {
             "id": f"{token.owner}/{token.name}",
             "clientId": self.client_id,

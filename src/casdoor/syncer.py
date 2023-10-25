@@ -100,7 +100,8 @@ class _SyncerSDK:
 
     def modify_syncer(self, method: str, syncer: Syncer) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        syncer.owner = self.org_name
+        if syncer.owner == "":
+            syncer.owner = self.org_name
         params = {
             "id": f"{syncer.owner}/{syncer.name}",
             "clientId": self.client_id,

@@ -82,7 +82,8 @@ class _ProductSDK:
 
     def modify_product(self, method: str, product: Product) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        product.owner = self.org_name
+        if product.owner == "":
+            product.owner = self.org_name
         params = {
             "id": f"{product.owner}/{product.name}",
             "clientId": self.client_id,

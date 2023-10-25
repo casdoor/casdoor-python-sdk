@@ -73,7 +73,8 @@ class _EnforcerSDK:
 
     def modify_enforcer(self, method: str, enforcer: Enforcer) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        enforcer.owner = self.org_name
+        if enforcer.owner == "":
+            enforcer.owner = self.org_name
         params = {
             "id": f"{enforcer.owner}/{enforcer.name}",
             "clientId": self.client_id,

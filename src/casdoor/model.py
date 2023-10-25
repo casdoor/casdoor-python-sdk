@@ -81,7 +81,8 @@ class _ModelSDK:
 
     def modify_model(self, method: str, model: Model) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        model.owner = self.org_name
+        if model.owner == "":
+            model.owner = self.org_name
         params = {
             "id": f"{model.owner}/{model.name}",
             "clientId": self.client_id,

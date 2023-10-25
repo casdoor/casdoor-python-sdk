@@ -126,7 +126,8 @@ class _OrganizationSDK:
 
     def modify_organization(self, method: str, organization: Organization) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        organization.owner = self.org_name
+        if organization.owner == "":
+            organization.owner = self.org_name
         params = {
             "id": f"{organization.owner}/{organization.name}",
             "clientId": self.client_id,

@@ -91,7 +91,8 @@ class _PaymentSDK:
 
     def modify_payment(self, method: str, payment: Payment) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        payment.owner = self.org_name
+        if payment.owner == "":
+            payment.owner = self.org_name
         params = {
             "id": f"{payment.owner}/{payment.name}",
             "clientId": self.client_id,

@@ -117,7 +117,8 @@ class _UserSDK:
 
     def modify_user(self, method: str, user: User) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        user.owner = self.org_name
+        if user.owner == "":
+            user.owner = self.org_name
         params = {
             "id": f"{user.owner}/{user.name}",
             "clientId": self.client_id,

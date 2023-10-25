@@ -77,7 +77,8 @@ class _CertSDK:
 
     def modify_cert(self, method: str, cert: Cert) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        cert.owner = self.org_name
+        if cert.owner == "":
+            cert.owner = self.org_name
         params = {
             "id": f"{cert.owner}/{cert.name}",
             "clientId": self.client_id,

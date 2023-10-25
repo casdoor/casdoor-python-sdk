@@ -77,7 +77,8 @@ class _PricingSDK:
 
     def modify_pricing(self, method: str, pricing: Pricing) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        pricing.owner = self.org_name
+        if pricing.owner == "":
+            pricing.owner = self.org_name
         params = {
             "id": f"{pricing.owner}/{pricing.name}",
             "clientId": self.client_id,

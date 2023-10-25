@@ -103,7 +103,8 @@ class _ProviderSDK:
 
     def modify_provider(self, method: str, provider: Provider) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        provider.owner = self.org_name
+        if provider.owner == "":
+            provider.owner = self.org_name
         params = {
             "id": f"{provider.owner}/{provider.name}",
             "clientId": self.client_id,

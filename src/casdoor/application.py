@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import List
 
 import requests
 
-from .organization import Organization, ThemeData
+# from .organization import Organization, ThemeData
 from .provider import Provider
 
 
@@ -76,10 +76,10 @@ class Application:
         self.enableLinkWithEmail = False
         self.orgChoiceMode = ""
         self.samlReplyUrl = ""
-        self.providers = [ProviderItem]
-        self.signupItems = [SignupItem]
+        # self.providers = [ProviderItem]
+        # self.signupItems = [SignupItem]
         self.grantTypes = [""]
-        self.organizationObj = Organization
+        # self.organizationObj = Organization
         self.tags = [""]
         self.clientId = ""
         self.clientSecret = ""
@@ -94,7 +94,31 @@ class Application:
         self.termsOfUse = ""
         self.signupHtml = ""
         self.signinHtml = ""
-        self.themeData = ThemeData
+        # self.themeData = ThemeData
+
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, logo, homepage_url, description, organization):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.logo = logo
+        self.homepageUrl = homepage_url
+        self.description = description
+        self.organization = organization
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        app = cls()
+        for key, value in data.items():
+            if hasattr(app, key):
+                setattr(app, key, value)
+        return app
 
     def __str__(self):
         return str(self.__dict__)
@@ -104,7 +128,7 @@ class Application:
 
 
 class _ApplicationSDK:
-    def get_applications(self) -> List[Dict]:
+    def get_applications(self) -> List[Application]:
         """
         Get the applications from Casdoor.
 
@@ -117,10 +141,16 @@ class _ApplicationSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        applications = r.json()
-        return applications
+        response = r.json()
+        if response["status"] != "ok":
+            raise ValueError(response.msg)
 
-    def get_application(self, application_id: str) -> Dict:
+        res = []
+        for element in response["data"]:
+            res.append(Application.from_dict(element))
+        return res
+
+    def get_application(self, application_id: str) -> Application:
         """
         Get the application from Casdoor providing the application_id.
 
@@ -129,17 +159,20 @@ class _ApplicationSDK:
         """
         url = self.endpoint + "/api/get-application"
         params = {
-            "id": f"{self.org_name}/{application_id}",
+            "id": f"admin/{application_id}",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        application = r.json()
-        return application
+        response = r.json()
+        if response["status"] != "ok":
+            raise ValueError(response.msg)
+        return Application.from_dict(response["data"])
 
-    def modify_application(self, method: str, application: Application) -> Dict:
+    def modify_application(self, method: str, application: Application) -> str:
         url = self.endpoint + f"/api/{method}"
-        application.owner = self.org_name
+        if application.owner == "":
+            application.owner = self.org_name
         params = {
             "id": f"{application.owner}/{application.name}",
             "clientId": self.client_id,
@@ -148,16 +181,21 @@ class _ApplicationSDK:
         application_info = json.dumps(application.to_dict())
         r = requests.post(url, params=params, data=application_info)
         response = r.json()
-        return response
+        if response["status"] != "ok":
+            raise ValueError(response.msg)
+        return str(response["data"])
 
-    def add_application(self, application: Application) -> Dict:
+    def add_application(self, application: Application) -> str:
+        application.owner = "admin"
         response = self.modify_application("add-application", application)
         return response
 
-    def update_application(self, application: Application) -> Dict:
+    def update_application(self, application: Application) -> str:
+        application.owner = "admin"
         response = self.modify_application("update-application", application)
         return response
 
-    def delete_application(self, application: Application) -> Dict:
+    def delete_application(self, application: Application) -> str:
+        application.owner = "admin"
         response = self.modify_application("delete-application", application)
         return response

@@ -86,7 +86,8 @@ class _WebhookSDK:
 
     def modify_webhook(self, method: str, webhook: Webhook) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        webhook.owner = self.org_name
+        if webhook.owner == "":
+            webhook.owner = self.org_name
         params = {
             "id": f"{webhook.owner}/{webhook.name}",
             "clientId": self.client_id,

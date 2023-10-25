@@ -80,7 +80,8 @@ class _SubscriptionSDK:
 
     def modify_subscription(self, method: str, subscription: Subscription) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        subscription.owner = self.org_name
+        if subscription.owner == "":
+            subscription.owner = self.org_name
         params = {
             "id": f"{subscription.owner}/{subscription.name}",
             "clientId": self.client_id,

@@ -83,7 +83,8 @@ class _PermissionSDK:
 
     def modify_permission(self, method: str, permission: Permission) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        permission.owner = self.org_name
+        if permission.owner == "":
+            permission.owner = self.org_name
         params = {
             "id": f"{permission.owner}/{permission.name}",
             "clientId": self.client_id,

@@ -75,7 +75,8 @@ class _PlanSDK:
 
     def modify_plan(self, method: str, plan: Plan) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        plan.owner = self.org_name
+        if plan.owner == "":
+            plan.owner = self.org_name
         params = {
             "id": f"{plan.owner}/{plan.name}",
             "clientId": self.client_id,

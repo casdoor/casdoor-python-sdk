@@ -77,7 +77,8 @@ class _AdapterSDK:
 
     def modify_adapter(self, method: str, adapter: Adapter) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        adapter.owner = self.org_name
+        if adapter.owner == "":
+            adapter.owner = self.org_name
         params = {
             "id": f"{adapter.owner}/{adapter.name}",
             "clientId": self.client_id,

@@ -73,7 +73,8 @@ class _RoleSDK:
 
     def modify_role(self, method: str, role: Role) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        role.owner = self.org_name
+        if role.owner == "":
+            role.owner = self.org_name
         params = {
             "id": f"{role.owner}/{role.name}",
             "clientId": self.client_id,

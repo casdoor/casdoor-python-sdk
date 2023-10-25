@@ -83,7 +83,8 @@ class _ResourceSDK:
 
     def modify_resource(self, method: str, resource: Resource) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        resource.owner = self.org_name
+        if resource.owner == "":
+            resource.owner = self.org_name
         params = {
             "id": f"{resource.owner}/{resource.name}",
             "clientId": self.client_id,

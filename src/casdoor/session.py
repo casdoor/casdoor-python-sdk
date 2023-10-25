@@ -69,7 +69,8 @@ class _SessionSDK:
 
     def modify_session(self, method: str, session: Session) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        session.owner = self.org_name
+        if session.owner == "":
+            session.owner = self.org_name
         params = {
             "id": f"{session.owner}/{session.name}",
             "clientId": self.client_id,
