@@ -20,19 +20,19 @@ import requests
 
 class Pricing:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.displayName = "string"
-        self.description = "string"
-        self.plans = ["string"]
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.displayName = ""
+        self.description = ""
+        self.plans = [""]
         self.isEnabled = False
         self.trialDuration = 0
-        self.application = "string"
-        self.submitter = "string"
-        self.approver = "string"
-        self.approveTime = "string"
-        self.state = "string"
+        self.application = ""
+        self.submitter = ""
+        self.approver = ""
+        self.approveTime = ""
+        self.state = ""
 
     def __str__(self):
         return str(self.__dict__)

@@ -21,21 +21,21 @@ import requests
 
 class Subscription:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.displayName = "string"
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.displayName = ""
         self.startDate = datetime.now()
         self.endDate = datetime.now()
         self.duration = 0
-        self.description = "string"
-        self.user = "string"
-        self.plan = "string"
-        self.isEnabled = True
-        self.submitter = "string"
-        self.approver = "string"
-        self.approveTime = "string"
-        self.state = "string"
+        self.description = ""
+        self.user = ""
+        self.plan = ""
+        self.isEnabled = False
+        self.submitter = ""
+        self.approver = ""
+        self.approveTime = ""
+        self.state = ""
 
     def __str__(self):
         return str(self.__dict__)

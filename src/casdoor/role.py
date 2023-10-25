@@ -20,15 +20,15 @@ import requests
 
 class Role:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.displayName = "string"
-        self.description = "string"
-        self.users = ["string"]
-        self.roles = ["string"]
-        self.domains = ["string"]
-        self.isEnabled = True
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.displayName = ""
+        self.description = ""
+        self.users = [""]
+        self.roles = [""]
+        self.domains = [""]
+        self.isEnabled = False
 
     def __str__(self):
         return str(self.__dict__)

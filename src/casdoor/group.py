@@ -22,21 +22,21 @@ from .user import User
 
 class Group:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.updatedTime = "string"
-        self.displayName = "string"
-        self.manager = "string"
-        self.contactEmail = "string"
-        self.type = "string"
-        self.parentId = "string"
-        self.isTopGroup = True
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.updatedTime = ""
+        self.displayName = ""
+        self.manager = ""
+        self.contactEmail = ""
+        self.type = ""
+        self.parentId = ""
+        self.isTopGroup = False
         self.users = [User]
-        self.title = "string"
-        self.key = "string"
+        self.title = ""
+        self.key = ""
         self.children = [Group]
-        self.isEnabled = True
+        self.isEnabled = False
 
     def __str__(self):
         return str(self.__dict__)

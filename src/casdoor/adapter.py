@@ -20,19 +20,19 @@ import requests
 
 class Adapter:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.type = "string"
-        self.databaseType = "string"
-        self.host = "string"
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.type = ""
+        self.databaseType = ""
+        self.host = ""
         self.port = 0
-        self.user = "string"
-        self.password = "string"
-        self.database = "string"
-        self.table = "string"
-        self.tableNamePrefix = "string"
-        self.isEnabled = True
+        self.user = ""
+        self.password = ""
+        self.database = ""
+        self.table = ""
+        self.tableNamePrefix = ""
+        self.isEnabled = False
 
     def __str__(self):
         return str(self.__dict__)

@@ -20,11 +20,11 @@ import requests
 
 class Session:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.application = "string"
-        self.createdTime = "string"
-        self.sessionId = ["string"]
+        self.owner = ""
+        self.name = ""
+        self.application = ""
+        self.createdTime = ""
+        self.sessionId = [""]
 
     def __str__(self):
         return str(self.__dict__)

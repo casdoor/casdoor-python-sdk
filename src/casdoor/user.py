@@ -20,36 +20,36 @@ import requests
 
 class User:
     def __init__(self):
-        self.address = ["string"]
-        self.affiliation = "string"
-        self.avatar = "string"
-        self.createdTime = "string"
-        self.dingtalk = "string"
-        self.displayName = "string"
-        self.email = "string"
-        self.facebook = "string"
-        self.gitee = "string"
-        self.github = "string"
-        self.google = "string"
-        self.hash = "string"
-        self.id = "string"
-        self.isAdmin = True
-        self.isForbidden = True
-        self.isGlobalAdmin = True
-        self.language = "string"
-        self.name = "string"
-        self.owner = "string"
-        self.password = "string"
-        self.phone = "string"
-        self.preHash = "string"
-        self.qq = "string"
+        self.address = [""]
+        self.affiliation = ""
+        self.avatar = ""
+        self.createdTime = ""
+        self.dingtalk = ""
+        self.displayName = ""
+        self.email = ""
+        self.facebook = ""
+        self.gitee = ""
+        self.github = ""
+        self.google = ""
+        self.hash = ""
+        self.id = ""
+        self.isAdmin = False
+        self.isForbidden = False
+        self.isGlobalAdmin = False
+        self.language = ""
+        self.name = ""
+        self.owner = ""
+        self.password = ""
+        self.phone = ""
+        self.preHash = ""
+        self.qq = ""
         self.score = 0
-        self.signupApplication = "string"
-        self.tag = "string"
-        self.type = "string"
-        self.updatedTime = "string"
-        self.wechat = "string"
-        self.weibo = "string"
+        self.signupApplication = ""
+        self.tag = ""
+        self.type = ""
+        self.updatedTime = ""
+        self.wechat = ""
+        self.weibo = ""
 
     def __str__(self):
         return str(self.__dict__)

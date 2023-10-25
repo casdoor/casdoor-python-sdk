@@ -20,10 +20,10 @@ import requests
 
 class AccountItem:
     def __init__(self):
-        self.name = "string"
+        self.name = ""
         self.visible = False
-        self.viewRule = "string"
-        self.modifyRule = "string"
+        self.viewRule = ""
+        self.modifyRule = ""
 
     def __str__(self):
         return str(self.__dict__)
@@ -34,8 +34,8 @@ class AccountItem:
 
 class ThemeData:
     def __init__(self):
-        self.themeType = "string"
-        self.colorPrimary = "string"
+        self.themeType = ""
+        self.colorPrimary = ""
         self.borderRadius = 0
         self.isCompact = False
         self.isEnabled = False
@@ -49,8 +49,8 @@ class ThemeData:
 
 class MfaItem:
     def __init__(self):
-        self.name = "string"
-        self.rule = "string"
+        self.name = ""
+        self.rule = ""
 
     def __str__(self):
         return str(self.__dict__)
@@ -61,25 +61,25 @@ class MfaItem:
 
 class Organization:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.displayName = "string"
-        self.websiteUrl = "string"
-        self.favicon = "string"
-        self.passwordType = "string"
-        self.passwordSalt = "string"
-        self.passwordOptions = ["string"]
-        self.countryCodes = ["string"]
-        self.defaultAvatar = "string"
-        self.defaultApplication = "string"
-        self.tags = ["string"]
-        self.languages = ["string"]
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.displayName = ""
+        self.websiteUrl = ""
+        self.favicon = ""
+        self.passwordType = ""
+        self.passwordSalt = ""
+        self.passwordOptions = [""]
+        self.countryCodes = [""]
+        self.defaultAvatar = ""
+        self.defaultApplication = ""
+        self.tags = [""]
+        self.languages = [""]
         self.themeData = ThemeData
-        self.masterPassword = "string"
+        self.masterPassword = ""
         self.initScore = 0
-        self.enableSoftDeletion = True
-        self.isProfilePublic = True
+        self.enableSoftDeletion = False
+        self.isProfilePublic = False
         self.mfaItems = [MfaItem]
         self.accountItems = [AccountItem]
 

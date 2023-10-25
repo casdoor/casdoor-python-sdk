@@ -20,12 +20,12 @@ import requests
 
 class TableColumn:
     def __init__(self):
-        self.name = "string"
-        self.type = "string"
-        self.casdoorName = "string"
-        self.isKey = True
-        self.isHashed = True
-        self.values = ["string"]
+        self.name = ""
+        self.type = ""
+        self.casdoorName = ""
+        self.isKey = False
+        self.isHashed = False
+        self.values = [""]
 
     def __str__(self):
         return str(self.__dict__)
@@ -36,26 +36,26 @@ class TableColumn:
 
 class Syncer:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.organization = "string"
-        self.type = "string"
-        self.host = "string"
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.organization = ""
+        self.type = ""
+        self.host = ""
         self.port = 0
-        self.user = "string"
-        self.password = "string"
-        self.databaseType = "string"
-        self.database = "string"
-        self.table = "string"
-        self.tablePrimaryKey = "string"
+        self.user = ""
+        self.password = ""
+        self.databaseType = ""
+        self.database = ""
+        self.table = ""
+        self.tablePrimaryKey = ""
         self.tableColumns = [TableColumn]
-        self.affiliationTable = "string"
-        self.avatarBaseUrl = "string"
-        self.errorText = "string"
+        self.affiliationTable = ""
+        self.avatarBaseUrl = ""
+        self.errorText = ""
         self.syncInterval = 0
-        self.isReadOnly = True
-        self.isEnabled = True
+        self.isReadOnly = False
+        self.isEnabled = False
 
     def __str__(self):
         return str(self.__dict__)

@@ -20,25 +20,25 @@ import requests
 
 class Permission:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.displayName = "string"
-        self.description = "string"
-        self.users = ["string"]
-        self.roles = ["string"]
-        self.domains = ["string"]
-        self.model = "string"
-        self.adapter = "string"
-        self.resourceType = "string"
-        self.resources = ["string"]
-        self.actions = ["string"]
-        self.effect = "string"
-        self.isEnabled = True
-        self.submitter = "string"
-        self.approver = "string"
-        self.approveTime = "string"
-        self.state = "string"
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.displayName = ""
+        self.description = ""
+        self.users = [""]
+        self.roles = [""]
+        self.domains = [""]
+        self.model = ""
+        self.adapter = ""
+        self.resourceType = ""
+        self.resources = [""]
+        self.actions = [""]
+        self.effect = ""
+        self.isEnabled = False
+        self.submitter = ""
+        self.approver = ""
+        self.approveTime = ""
+        self.state = ""
 
     def __str__(self):
         return str(self.__dict__)

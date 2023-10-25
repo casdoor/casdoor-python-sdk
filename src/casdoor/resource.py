@@ -20,20 +20,20 @@ import requests
 
 class Resource:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.user = "string"
-        self.provider = "string"
-        self.application = "string"
-        self.tag = "string"
-        self.parent = "string"
-        self.fileName = "string"
-        self.fileType = "string"
-        self.fileFormat = "string"
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.user = ""
+        self.provider = ""
+        self.application = ""
+        self.tag = ""
+        self.parent = ""
+        self.fileName = ""
+        self.fileType = ""
+        self.fileFormat = ""
         self.fileSize = 0
-        self.url = "string"
-        self.description = "string"
+        self.url = ""
+        self.description = ""
 
     def __str__(self):
         return str(self.__dict__)

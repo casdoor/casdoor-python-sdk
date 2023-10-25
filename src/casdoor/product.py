@@ -22,21 +22,21 @@ from .provider import Provider
 
 class Product:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.displayName = "string"
-        self.image = "string"
-        self.detail = "string"
-        self.description = "string"
-        self.tag = "string"
-        self.currency = "string"
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.displayName = ""
+        self.image = ""
+        self.detail = ""
+        self.description = ""
+        self.tag = ""
+        self.currency = ""
         self.price = 0.0
         self.quantity = 0
         self.sold = 0
-        self.providers = ["string"]
-        self.returnUrl = "string"
-        self.state = "string"
+        self.providers = [""]
+        self.returnUrl = ""
+        self.state = ""
         self.providerObjs = [Provider]
 
     def __str__(self):

@@ -20,15 +20,15 @@ import requests
 
 class Enforcer:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.updatedTime = "string"
-        self.displayName = "string"
-        self.description = "string"
-        self.model = "string"
-        self.adapter = "string"
-        self.isEnabled = True
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.updatedTime = ""
+        self.displayName = ""
+        self.description = ""
+        self.model = ""
+        self.adapter = ""
+        self.isEnabled = False
 
     def __str__(self):
         return str(self.__dict__)

@@ -23,14 +23,14 @@ from .provider import Provider
 
 class ProviderItem:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.canSignUp = True
-        self.canSignIn = True
-        self.canUnlink = True
-        self.prompted = True
-        self.alertType = "string"
-        self.rule = "string"
+        self.owner = ""
+        self.name = ""
+        self.canSignUp = False
+        self.canSignIn = False
+        self.canUnlink = False
+        self.prompted = False
+        self.alertType = ""
+        self.rule = ""
         self.provider = Provider
 
     def __str__(self):
@@ -42,11 +42,11 @@ class ProviderItem:
 
 class SignupItem:
     def __init__(self):
-        self.name = "string"
-        self.visible = True
-        self.required = True
-        self.prompted = True
-        self.rule = "string"
+        self.name = ""
+        self.visible = False
+        self.required = False
+        self.prompted = False
+        self.rule = ""
 
     def __str__(self):
         return str(self.__dict__)
@@ -57,43 +57,43 @@ class SignupItem:
 
 class Application:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.displayName = "string"
-        self.logo = "string"
-        self.homepageUrl = "string"
-        self.description = "string"
-        self.organization = "string"
-        self.cert = "string"
-        self.enablePassword = True
-        self.enableSignUp = True
-        self.enableSigninSession = True
-        self.enableAutoSignin = True
-        self.enableCodeSignin = True
-        self.enableSamlCompress = True
-        self.enableWebAuthn = True
-        self.enableLinkWithEmail = True
-        self.orgChoiceMode = "string"
-        self.samlReplyUrl = "string"
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.displayName = ""
+        self.logo = ""
+        self.homepageUrl = ""
+        self.description = ""
+        self.organization = ""
+        self.cert = ""
+        self.enablePassword = False
+        self.enableSignUp = False
+        self.enableSigninSession = False
+        self.enableAutoSignin = False
+        self.enableCodeSignin = False
+        self.enableSamlCompress = False
+        self.enableWebAuthn = False
+        self.enableLinkWithEmail = False
+        self.orgChoiceMode = ""
+        self.samlReplyUrl = ""
         self.providers = [ProviderItem]
         self.signupItems = [SignupItem]
-        self.grantTypes = ["string"]
+        self.grantTypes = [""]
         self.organizationObj = Organization
-        self.tags = ["string"]
-        self.clientId = "string"
-        self.clientSecret = "string"
-        self.redirectUris = ["string"]
-        self.tokenFormat = "string"
+        self.tags = [""]
+        self.clientId = ""
+        self.clientSecret = ""
+        self.redirectUris = [""]
+        self.tokenFormat = ""
         self.expireInHours = 0
         self.refreshExpireInHours = 0
-        self.signupUrl = "string"
-        self.signinUrl = "string"
-        self.forgetUrl = "string"
-        self.affiliationUrl = "string"
-        self.termsOfUse = "string"
-        self.signupHtml = "string"
-        self.signinHtml = "string"
+        self.signupUrl = ""
+        self.signinUrl = ""
+        self.forgetUrl = ""
+        self.affiliationUrl = ""
+        self.termsOfUse = ""
+        self.signupHtml = ""
+        self.signinHtml = ""
         self.themeData = ThemeData
 
     def __str__(self):

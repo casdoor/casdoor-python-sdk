@@ -20,20 +20,20 @@ import requests
 
 class Token:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.application = "string"
-        self.organization = "string"
-        self.user = "string"
-        self.code = "string"
-        self.accessToken = "string"
-        self.refreshToken = "string"
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.application = ""
+        self.organization = ""
+        self.user = ""
+        self.code = ""
+        self.accessToken = ""
+        self.refreshToken = ""
         self.expiresIn = 0
-        self.scope = "string"
-        self.tokenType = "string"
-        self.codeChallenge = "string"
-        self.codeIsUsed = True
+        self.scope = ""
+        self.tokenType = ""
+        self.codeChallenge = ""
+        self.codeIsUsed = False
         self.codeExpireIn = 0
 
     def __str__(self):

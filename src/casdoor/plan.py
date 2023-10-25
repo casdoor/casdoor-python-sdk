@@ -20,17 +20,17 @@ import requests
 
 class Plan:
     def __init__(self):
-        self.owner = "string"
-        self.name = "string"
-        self.createdTime = "string"
-        self.displayName = "string"
-        self.description = "string"
+        self.owner = ""
+        self.name = ""
+        self.createdTime = ""
+        self.displayName = ""
+        self.description = ""
         self.pricePerMonth = 0.0
         self.pricePerYear = 0.0
-        self.currency = "string"
-        self.isEnabled = True
-        self.role = "string"
-        self.options = ["string"]
+        self.currency = ""
+        self.isEnabled = False
+        self.role = ""
+        self.options = [""]
 
     def __str__(self):
         return str(self.__dict__)

@@ -20,19 +20,19 @@ import requests
 
 class Cert:
     def __init__(self):
-        self.name = "string"
-        self.owner = "string"
-        self.createdTime = "string"
-        self.displayName = "string"
-        self.type = "string"
-        self.scope = "string"
-        self.cryptoAlgorithm = "string"
+        self.name = ""
+        self.owner = ""
+        self.createdTime = ""
+        self.displayName = ""
+        self.type = ""
+        self.scope = ""
+        self.cryptoAlgorithm = ""
         self.bitSize = 0
         self.expireInYears = 0
-        self.certificate = "string"
-        self.privateKey = "string"
-        self.authorityPublicKey = "string"
-        self.authorityRootPublicKey = "string"
+        self.certificate = ""
+        self.privateKey = ""
+        self.authorityPublicKey = ""
+        self.authorityRootPublicKey = ""
 
     def __str__(self):
         return str(self.__dict__)
