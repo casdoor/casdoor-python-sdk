@@ -18,12 +18,10 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11"
 ]
+requires-python = ">=3.6"
 
 [project.urls]
 "Home" = "https://github.com/casdoor/casdoor-python-sdk"
-
-[project.scripts]
-test = "tests"
 
 [build-system]
 requires = ["setuptools", "wheel"]
