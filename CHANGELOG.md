@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+## [1.17.2](https://github.com/casdoor/casdoor-python-sdk/compare/v1.17.1...v1.17.2) (2023-11-24)
+
+
+### Bug Fixes
+
+* fix pyproject.toml to fix pip install issue ([6f0e753](https://github.com/casdoor/casdoor-python-sdk/commit/6f0e75321900a7ad9275b9a575a7f354baeda559))
+
 ## [1.17.1](https://github.com/casdoor/casdoor-python-sdk/compare/v1.17.0...v1.17.1) (2023-10-25)
 
 
