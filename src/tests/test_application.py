@@ -23,7 +23,7 @@ from src.tests.test_util import (
     TestClientSecret,
     TestEndpoint,
     TestJwtPublicKey,
-    TestOrga,
+    TestOrg,
     get_random_name,
 )
 
