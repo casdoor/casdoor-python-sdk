@@ -103,5 +103,3 @@ class TestOrganization(unittest.TestCase):
         self.assertIsNone(deleted_organization, "Failed to delete object, it's still retrievable")
         
 
-if __name__ == "__main__":
-    unittest.main()

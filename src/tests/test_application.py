@@ -95,5 +95,3 @@ class ApplicationTest(unittest.TestCase):
             self.fail(f"Failed to get object: {e}")
         self.assertIsNone(deleted_application, "Failed to delete object, it's still retrievable")
 
-if __name__ == "__main__":
-    unittest.main()

@@ -93,5 +93,3 @@ class TestGroup(unittest.TestCase):
             self.fail(f"Failed to get object: {e}")
         self.assertIsNone(deleted_group, "Failed to delete object, it's still retrievable")
         
-if __name__ == "__main__":
-    unittest.main()
