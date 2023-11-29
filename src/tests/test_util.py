@@ -17,7 +17,7 @@ import random
 TestEndpoint = "https://demo.casdoor.com"
 TestClientId = "294b09fbc17f95daf2fe"
 TestClientSecret = "dd8982f7046ccba1bbd7851d5c1ece4e52bf039d"
-TestOrganization = "casbin"
+TestOrg = "casbin"
 TestApplication = "app-vue-python-example"
 TestJwtPublicKey = """-----BEGIN CERTIFICATE-----
 MIIE+TCCAuGgAwIBAgIDAeJAMA0GCSqGSIb3DQEBCwUAMDYxHTAbBgNVBAoTFENh
@@ -58,3 +58,9 @@ def get_random_code(length):
 
 def get_random_name(prefix):
     return f"{prefix}_{get_random_code(6)}"
+
+
+
+
+
+

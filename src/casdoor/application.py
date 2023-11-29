@@ -143,7 +143,7 @@ class _ApplicationSDK:
         r = requests.get(url, params)
         response = r.json()
         if response["status"] != "ok":
-            raise ValueError(response.msg)
+            raise ValueError(response['msg'])
 
         res = []
         for element in response["data"]:
@@ -166,7 +166,7 @@ class _ApplicationSDK:
         r = requests.get(url, params)
         response = r.json()
         if response["status"] != "ok":
-            raise ValueError(response.msg)
+            raise ValueError(response['msg'])
         return Application.from_dict(response["data"])
 
     def modify_application(self, method: str, application: Application) -> str:
@@ -182,7 +182,7 @@ class _ApplicationSDK:
         r = requests.post(url, params=params, data=application_info)
         response = r.json()
         if response["status"] != "ok":
-            raise ValueError(response.msg)
+            raise ValueError(response['msg'])
         return str(response["data"])
 
     def add_application(self, application: Application) -> str:

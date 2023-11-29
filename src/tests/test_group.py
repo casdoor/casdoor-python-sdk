@@ -16,84 +16,82 @@ import datetime
 import unittest
 
 from src.casdoor import CasdoorSDK
-from src.casdoor.application import Application
+from src.casdoor.group import Group
 from src.tests.test_util import (
     TestApplication,
     TestClientId,
     TestClientSecret,
     TestEndpoint,
     TestJwtPublicKey,
-    TestOrga,
+    TestOrg,
     get_random_name,
 )
 
+class TestGroup(unittest.TestCase):
 
-class ApplicationTest(unittest.TestCase):
-    def test_application(self):
-        name = get_random_name("application")
+    def test_group(self):
+        name = get_random_name("group")
 
         # Add a new object
-        application = Application.new(
+        group = Group.new(
             owner="admin",
             name=name,
             created_time=datetime.datetime.now().isoformat(),
-            display_name=name,
-            logo="https://cdn.casbin.org/img/casdoor-logo_1185x256.png",
-            homepage_url="https://casdoor.org",
-            description="Casdoor Website",
-            organization="casbin",
+            display_name=name
         )
 
         sdk = CasdoorSDK(
             TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication
         )
+
         try:
-            sdk.add_application(application=application)
+            sdk.add_group(group)
         except Exception as e:
             self.fail(f"Failed to add object: {e}")
 
+
         # Get all objects, check if our added object is inside the list
         try:
-            applications = sdk.get_applications()
+            groups = sdk.get_groups()
         except Exception as e:
             self.fail(f"Failed to get objects: {e}")
-        names = [item.name for item in applications]
+        names = [item.name for item in groups]
         self.assertIn(name, names, "Added object not found in list")
 
         # Get the object
         try:
-            application = sdk.get_application(name)
+            retrieved_group = sdk.get_group(name)
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
-        self.assertEqual(application.name, name)
-
+        self.assertEqual(name, retrieved_group.name, "Retrieved object does not match added object")
+        
         # Update the object
-        updated_description = "Updated Casdoor Website"
-        application.description = updated_description
+        updated_display_name = "updated_display_name"
+        retrieved_group.displayName = updated_display_name
         try:
-            sdk.update_application(application)
+            updated_group = sdk.update_group(retrieved_group)
         except Exception as e:
             self.fail(f"Failed to update object: {e}")
 
         # Validate the update
         try:
-            updated_application = sdk.get_application(name)
+            updated_group = sdk.get_group(name)
         except Exception as e:
-            self.fail(f"Failed to get updated object: {e}")
-        self.assertEqual(updated_application.description, updated_description)
-
+            self.fail(f"Failed to get object: {e}")
+        self.assertEqual(updated_display_name, updated_group.displayName, "Failed to update object, display_name mismatch")
+        
         # Delete the object
         try:
-            sdk.delete_application(application)
+            sdk.delete_group(group)
         except Exception as e:
             self.fail(f"Failed to delete object: {e}")
 
         # Validate the deletion
         try:
-            deleted_application = sdk.get_application(name)
+            deleted_group = sdk.get_group(name)
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
-        self.assertIsNone(deleted_application, "Failed to delete object, it's still retrievable")
-
+        self.assertIsNone(deleted_group, "Failed to delete object, it's still retrievable")
+        
 if __name__ == "__main__":
     unittest.main()

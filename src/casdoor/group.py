@@ -32,11 +32,30 @@ class Group:
         self.type = ""
         self.parentId = ""
         self.isTopGroup = False
-        self.users = [User]
+        # self.users = [User]
         self.title = ""
         self.key = ""
-        self.children = [Group]
+        # self.children = [Group]
         self.isEnabled = False
+
+    @classmethod
+    def new(cls, owner, name, created_time, display_name):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        return self
+    
+    @classmethod
+    def from_dict(cls, data: dict):
+        if not data:
+            return None
+        group = cls()
+        for key, value in data.items():
+            if hasattr(group, key):
+                setattr(group, key, value)
+        return group
 
     def __str__(self):
         return str(self.__dict__)
@@ -59,8 +78,15 @@ class _GroupSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        groups = r.json()
-        return groups
+        response = r.json()
+        if response["status"] != "ok":
+            raise ValueError(response['msg'])
+        
+        res = []
+        for element in response["data"]:
+            res.append(Group.from_dict(element))
+        
+        return res
 
     def get_group(self, group_id: str) -> Dict:
         """
@@ -76,22 +102,30 @@ class _GroupSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        group = r.json()
-        return group
+        response = r.json()
+        if response["status"] != "ok":
+            raise ValueError(response['msg'])
+        return Group.from_dict(response["data"])
 
     def modify_group(self, method: str, group: Group) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if group.owner == "":
-            group.owner = self.org_name
+        # if group.owner == "":
+        #     group.owner = self.org_name
+        group.owner = self.org_name
         params = {
             "id": f"{group.owner}/{group.name}",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
+
         group_info = json.dumps(group.to_dict())
+        # group_info = json.dumps(group.to_dict(), default=self.custom_encoder)
         r = requests.post(url, params=params, data=group_info)
         response = r.json()
-        return response
+        if response["status"] != "ok":
+            raise ValueError(response['msg'])
+        
+        return str(response["data"])
 
     def add_group(self, group: Group) -> Dict:
         response = self.modify_group("add-group", group)
@@ -104,3 +138,7 @@ class _GroupSDK:
     def delete_group(self, group: Group) -> Dict:
         response = self.modify_group("delete-group", group)
         return response
+
+    # def custom_encoder(self, o):
+    #     if isinstance(o, (Group, User)):
+    #         return o.__dict__

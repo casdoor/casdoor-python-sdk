@@ -16,84 +16,92 @@ import datetime
 import unittest
 
 from src.casdoor import CasdoorSDK
-from src.casdoor.application import Application
+from src.casdoor.organization import Organization
 from src.tests.test_util import (
     TestApplication,
     TestClientId,
     TestClientSecret,
     TestEndpoint,
     TestJwtPublicKey,
-    TestOrga,
+    TestOrg,
     get_random_name,
 )
 
+class TestOrganization(unittest.TestCase):
 
-class ApplicationTest(unittest.TestCase):
-    def test_application(self):
-        name = get_random_name("application")
+    def test_organization(self):
+
+
+        name = get_random_name("Organization")
 
         # Add a new object
-        application = Application.new(
+        organization = Organization.new(
             owner="admin",
             name=name,
             created_time=datetime.datetime.now().isoformat(),
             display_name=name,
-            logo="https://cdn.casbin.org/img/casdoor-logo_1185x256.png",
-            homepage_url="https://casdoor.org",
-            description="Casdoor Website",
-            organization="casbin",
+            website_url="https://example.com",
+            password_type="plain",
+            password_options=["AtLeast6"],
+            country_codes=["US", "ES", "FR", "DE", "GB", "CN", "JP", "KR", "VN", "ID", "SG", "IN"],
+            tags=[],
+            languages=["en", "zh", "es", "fr", "de", "id", "ja", "ko", "ru", "vi", "pt"],
+            init_score=2000,
+            enable_soft_deletion=False,
+            is_profile_public=False
         )
 
         sdk = CasdoorSDK(
             TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication
         )
+
+
         try:
-            sdk.add_application(application=application)
+            sdk.add_organization(organization)
         except Exception as e:
             self.fail(f"Failed to add object: {e}")
 
         # Get all objects, check if our added object is inside the list
         try:
-            applications = sdk.get_applications()
+            organizations = sdk.get_organizations()
         except Exception as e:
             self.fail(f"Failed to get objects: {e}")
-        names = [item.name for item in applications]
+        names = [item.name for item in organizations]
         self.assertIn(name, names, "Added object not found in list")
 
         # Get the object
         try:
-            application = sdk.get_application(name)
+            organization = sdk.get_organization(name)
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
-        self.assertEqual(application.name, name)
-
+        self.assertEqual(organization.name, name)
+        
         # Update the object
-        updated_description = "Updated Casdoor Website"
-        application.description = updated_description
+        updated_display_name = "Updated Casdoor Website"
+        organization.displayName = updated_display_name
         try:
-            sdk.update_application(application)
+            sdk.update_organization(organization)
         except Exception as e:
             self.fail(f"Failed to update object: {e}")
 
+
         # Validate the update
         try:
-            updated_application = sdk.get_application(name)
+            updated_organization = sdk.get_organization(name)
         except Exception as e:
-            self.fail(f"Failed to get updated object: {e}")
-        self.assertEqual(updated_application.description, updated_description)
+            self.fail(f"Failed to get object: {e}")
+        self.assertEqual(updated_organization.displayName, updated_display_name)
 
         # Delete the object
-        try:
-            sdk.delete_application(application)
-        except Exception as e:
-            self.fail(f"Failed to delete object: {e}")
+        sdk.delete_organization(organization)
 
         # Validate the deletion
         try:
-            deleted_application = sdk.get_application(name)
+            deleted_organization = sdk.get_organization(name)
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
-        self.assertIsNone(deleted_application, "Failed to delete object, it's still retrievable")
+        self.assertIsNone(deleted_organization, "Failed to delete object, it's still retrievable")
+        
 
 if __name__ == "__main__":
     unittest.main()
