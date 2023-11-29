@@ -32,10 +32,10 @@ class Group:
         self.type = ""
         self.parentId = ""
         self.isTopGroup = False
-        # self.users = [User]
+        self.users = [User]
         self.title = ""
         self.key = ""
-        # self.children = [Group]
+        self.children = [Group]
         self.isEnabled = False
 
     @classmethod
@@ -118,8 +118,8 @@ class _GroupSDK:
             "clientSecret": self.client_secret,
         }
 
-        group_info = json.dumps(group.to_dict())
-        # group_info = json.dumps(group.to_dict(), default=self.custom_encoder)
+        # group_info = json.dumps(group.to_dict())
+        group_info = json.dumps(group.to_dict(), default=self.custom_encoder)
         r = requests.post(url, params=params, data=group_info)
         response = r.json()
         if response["status"] != "ok":
@@ -139,6 +139,6 @@ class _GroupSDK:
         response = self.modify_group("delete-group", group)
         return response
 
-    # def custom_encoder(self, o):
-    #     if isinstance(o, (Group, User)):
-    #         return o.__dict__
+    def custom_encoder(self, o):
+        if isinstance(o, (Group, User)):
+            return o.__dict__
