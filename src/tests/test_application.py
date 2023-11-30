@@ -23,7 +23,7 @@ from src.tests.test_util import (
     TestClientSecret,
     TestEndpoint,
     TestJwtPublicKey,
-    TestOrg,
+    TestOrganization,
     get_random_name,
 )
 
@@ -44,7 +44,9 @@ class ApplicationTest(unittest.TestCase):
             organization="casbin",
         )
 
-        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication)
+        sdk = CasdoorSDK(
+            TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication
+        )
         try:
             sdk.add_application(application=application)
         except Exception as e:

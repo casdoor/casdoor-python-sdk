@@ -23,19 +23,21 @@ from src.tests.test_util import (
     TestClientSecret,
     TestEndpoint,
     TestJwtPublicKey,
-    TestOrg,
+    TestOrganization,
     get_random_name,
 )
 
 
-class TestGroup(unittest.TestCase):
+class GroupTest(unittest.TestCase):
     def test_group(self):
         name = get_random_name("group")
 
         # Add a new object
         group = Group.new(owner="admin", name=name, created_time=datetime.datetime.now().isoformat(), display_name=name)
 
-        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication)
+        sdk = CasdoorSDK(
+            TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication
+        )
 
         try:
             sdk.add_group(group)
