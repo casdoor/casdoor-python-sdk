@@ -49,7 +49,9 @@ class OrganizationTest(unittest.TestCase):
             is_profile_public=False,
         )
 
-        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication)
+        sdk = CasdoorSDK(
+            TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication
+        )
 
         try:
             sdk.add_organization(organization)

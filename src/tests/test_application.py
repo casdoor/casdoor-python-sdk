@@ -44,7 +44,9 @@ class ApplicationTest(unittest.TestCase):
             organization="casbin",
         )
 
-        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication)
+        sdk = CasdoorSDK(
+            TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication
+        )
         try:
             sdk.add_application(application=application)
         except Exception as e:

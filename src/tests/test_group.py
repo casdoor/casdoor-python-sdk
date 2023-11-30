@@ -35,7 +35,9 @@ class GroupTest(unittest.TestCase):
         # Add a new object
         group = Group.new(owner="admin", name=name, created_time=datetime.datetime.now().isoformat(), display_name=name)
 
-        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication)
+        sdk = CasdoorSDK(
+            TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication
+        )
 
         try:
             sdk.add_group(group)
