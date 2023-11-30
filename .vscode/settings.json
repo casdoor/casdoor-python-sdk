@@ -1,7 +1,0 @@
-{
-    "python.analysis.extraPaths": ["${workspaceFolder}"],
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter",
-        "editor.formatOnSave": true
-      }
-}
