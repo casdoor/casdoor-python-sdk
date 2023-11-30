@@ -88,6 +88,7 @@ class ApplicationTest(unittest.TestCase):
         except Exception as e:
             self.fail(f"Failed to delete object: {e}")
 
+
         # Validate the deletion
         try:
             deleted_application = sdk.get_application(name)
