@@ -130,3 +130,6 @@ dmypy.json
 
 .idea
 .pytest_cache
+
+# Vscode
+.vscode

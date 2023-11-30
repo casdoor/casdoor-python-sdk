@@ -23,12 +23,12 @@ from src.tests.test_util import (
     TestClientSecret,
     TestEndpoint,
     TestJwtPublicKey,
-    TestOrg,
+    TestOrganization,
     get_random_name,
 )
 
 
-class TestOrganization(unittest.TestCase):
+class OrganizationTest(unittest.TestCase):
     def test_organization(self):
         name = get_random_name("Organization")
 
@@ -49,7 +49,7 @@ class TestOrganization(unittest.TestCase):
             is_profile_public=False,
         )
 
-        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication)
+        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication)
 
         try:
             sdk.add_organization(organization)
