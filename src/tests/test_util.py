@@ -58,9 +58,3 @@ def get_random_code(length):
 
 def get_random_name(prefix):
     return f"{prefix}_{get_random_code(6)}"
-
-
-
-
-
-

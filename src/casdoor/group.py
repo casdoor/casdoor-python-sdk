@@ -46,7 +46,7 @@ class Group:
         self.createdTime = created_time
         self.displayName = display_name
         return self
-    
+
     @classmethod
     def from_dict(cls, data: dict):
         if not data:
@@ -80,12 +80,12 @@ class _GroupSDK:
         r = requests.get(url, params)
         response = r.json()
         if response["status"] != "ok":
-            raise ValueError(response['msg'])
-        
+            raise ValueError(response["msg"])
+
         res = []
         for element in response["data"]:
             res.append(Group.from_dict(element))
-        
+
         return res
 
     def get_group(self, group_id: str) -> Dict:
@@ -104,7 +104,7 @@ class _GroupSDK:
         r = requests.get(url, params)
         response = r.json()
         if response["status"] != "ok":
-            raise ValueError(response['msg'])
+            raise ValueError(response["msg"])
         return Group.from_dict(response["data"])
 
     def modify_group(self, method: str, group: Group) -> Dict:
@@ -123,8 +123,8 @@ class _GroupSDK:
         r = requests.post(url, params=params, data=group_info)
         response = r.json()
         if response["status"] != "ok":
-            raise ValueError(response['msg'])
-        
+            raise ValueError(response["msg"])
+
         return str(response["data"])
 
     def add_group(self, group: Group) -> Dict:

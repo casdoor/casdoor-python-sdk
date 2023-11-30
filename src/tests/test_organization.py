@@ -27,11 +27,9 @@ from src.tests.test_util import (
     get_random_name,
 )
 
+
 class TestOrganization(unittest.TestCase):
-
     def test_organization(self):
-
-
         name = get_random_name("Organization")
 
         # Add a new object
@@ -48,13 +46,10 @@ class TestOrganization(unittest.TestCase):
             languages=["en", "zh", "es", "fr", "de", "id", "ja", "ko", "ru", "vi", "pt"],
             init_score=2000,
             enable_soft_deletion=False,
-            is_profile_public=False
+            is_profile_public=False,
         )
 
-        sdk = CasdoorSDK(
-            TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication
-        )
-
+        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication)
 
         try:
             sdk.add_organization(organization)
@@ -75,7 +70,7 @@ class TestOrganization(unittest.TestCase):
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
         self.assertEqual(organization.name, name)
-        
+
         # Update the object
         updated_display_name = "Updated Casdoor Website"
         organization.displayName = updated_display_name
@@ -83,7 +78,6 @@ class TestOrganization(unittest.TestCase):
             sdk.update_organization(organization)
         except Exception as e:
             self.fail(f"Failed to update object: {e}")
-
 
         # Validate the update
         try:
@@ -101,7 +95,3 @@ class TestOrganization(unittest.TestCase):
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
         self.assertIsNone(deleted_organization, "Failed to delete object, it's still retrievable")
-        
-
-if __name__ == "__main__":
-    unittest.main()
