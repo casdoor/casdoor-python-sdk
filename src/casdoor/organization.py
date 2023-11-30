@@ -75,13 +75,58 @@ class Organization:
         self.defaultApplication = ""
         self.tags = [""]
         self.languages = [""]
-        self.themeData = ThemeData
+        # self.themeData = ThemeData
         self.masterPassword = ""
         self.initScore = 0
         self.enableSoftDeletion = False
         self.isProfilePublic = False
-        self.mfaItems = [MfaItem]
-        self.accountItems = [AccountItem]
+        # self.mfaItems = [MfaItem]
+        # self.accountItems = [AccountItem]
+
+    @classmethod
+    def new(
+        cls,
+        owner,
+        name,
+        created_time,
+        display_name,
+        website_url,
+        password_type,
+        password_options,
+        country_codes,
+        tags,
+        languages,
+        init_score,
+        enable_soft_deletion,
+        is_profile_public,
+    ):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.websiteUrl = website_url
+        self.passwordType = password_type
+        self.passwordOptions = password_options
+        self.countryCodes = country_codes
+        self.tags = tags
+        self.languages = languages
+        self.initScore = init_score
+        self.enableSoftDeletion = enable_soft_deletion
+        self.isProfilePublic = is_profile_public
+
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        org = cls()
+        for key, value in data.items():
+            if hasattr(org, key):
+                setattr(org, key, value)
+        return org
 
     def __str__(self):
         return str(self.__dict__)
@@ -104,8 +149,14 @@ class _OrganizationSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        organizations = r.json()
-        return organizations
+        response = r.json()
+        if response["status"] != "ok":
+            raise ValueError(response.msg)
+
+        res = []
+        for element in response["data"]:
+            res.append(Organization.from_dict(element))
+        return res
 
     def get_organization(self, organization_id: str) -> Dict:
         """
@@ -121,13 +172,16 @@ class _OrganizationSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        organization = r.json()
-        return organization
+        response = r.json()
+        if response["status"] != "ok":
+            raise ValueError(response.msg)
+        return Organization.from_dict(response["data"])
 
     def modify_organization(self, method: str, organization: Organization) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if organization.owner == "":
-            organization.owner = self.org_name
+        # if organization.owner == "":
+        #     organization.owner = self.org_name
+        organization.owner = self.org_name
         params = {
             "id": f"{organization.owner}/{organization.name}",
             "clientId": self.client_id,
@@ -136,7 +190,9 @@ class _OrganizationSDK:
         organization_info = json.dumps(organization.to_dict())
         r = requests.post(url, params=params, data=organization_info)
         response = r.json()
-        return response
+        if response["status"] != "ok":
+            raise ValueError(response)
+        return str(response["data"])
 
     def add_organization(self, organization: Organization) -> Dict:
         response = self.modify_organization("add-organization", organization)
