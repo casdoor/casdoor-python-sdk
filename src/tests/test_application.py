@@ -44,9 +44,7 @@ class ApplicationTest(unittest.TestCase):
             organization="casbin",
         )
 
-        sdk = CasdoorSDK(
-            TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication
-        )
+        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication)
         try:
             sdk.add_application(application=application)
         except Exception as e:
@@ -88,11 +86,9 @@ class ApplicationTest(unittest.TestCase):
         except Exception as e:
             self.fail(f"Failed to delete object: {e}")
 
-
         # Validate the deletion
         try:
             deleted_application = sdk.get_application(name)
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
         self.assertIsNone(deleted_application, "Failed to delete object, it's still retrievable")
-

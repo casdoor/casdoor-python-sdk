@@ -27,28 +27,20 @@ from src.tests.test_util import (
     get_random_name,
 )
 
-class TestGroup(unittest.TestCase):
 
+class TestGroup(unittest.TestCase):
     def test_group(self):
         name = get_random_name("group")
 
         # Add a new object
-        group = Group.new(
-            owner="admin",
-            name=name,
-            created_time=datetime.datetime.now().isoformat(),
-            display_name=name
-        )
+        group = Group.new(owner="admin", name=name, created_time=datetime.datetime.now().isoformat(), display_name=name)
 
-        sdk = CasdoorSDK(
-            TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication
-        )
+        sdk = CasdoorSDK(TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrg, TestApplication)
 
         try:
             sdk.add_group(group)
         except Exception as e:
             self.fail(f"Failed to add object: {e}")
-
 
         # Get all objects, check if our added object is inside the list
         try:
@@ -64,7 +56,7 @@ class TestGroup(unittest.TestCase):
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
         self.assertEqual(name, retrieved_group.name, "Retrieved object does not match added object")
-        
+
         # Update the object
         updated_display_name = "updated_display_name"
         retrieved_group.displayName = updated_display_name
@@ -78,8 +70,10 @@ class TestGroup(unittest.TestCase):
             updated_group = sdk.get_group(name)
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
-        self.assertEqual(updated_display_name, updated_group.displayName, "Failed to update object, display_name mismatch")
-        
+        self.assertEqual(
+            updated_display_name, updated_group.displayName, "Failed to update object, display_name mismatch"
+        )
+
         # Delete the object
         try:
             sdk.delete_group(group)
@@ -92,4 +86,3 @@ class TestGroup(unittest.TestCase):
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
         self.assertIsNone(deleted_group, "Failed to delete object, it's still retrievable")
-        

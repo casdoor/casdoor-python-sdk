@@ -84,7 +84,22 @@ class Organization:
         # self.accountItems = [AccountItem]
 
     @classmethod
-    def new(cls, owner, name, created_time, display_name, website_url, password_type, password_options, country_codes, tags, languages, init_score, enable_soft_deletion, is_profile_public):
+    def new(
+        cls,
+        owner,
+        name,
+        created_time,
+        display_name,
+        website_url,
+        password_type,
+        password_options,
+        country_codes,
+        tags,
+        languages,
+        init_score,
+        enable_soft_deletion,
+        is_profile_public,
+    ):
         self = cls()
         self.owner = owner
         self.name = name
@@ -99,14 +114,14 @@ class Organization:
         self.initScore = init_score
         self.enableSoftDeletion = enable_soft_deletion
         self.isProfilePublic = is_profile_public
-        
+
         return self
-    
+
     @classmethod
     def from_dict(cls, data: dict):
         if data is None:
             return None
-        
+
         org = cls()
         for key, value in data.items():
             if hasattr(org, key):
@@ -161,7 +176,6 @@ class _OrganizationSDK:
         if response["status"] != "ok":
             raise ValueError(response.msg)
         return Organization.from_dict(response["data"])
-    
 
     def modify_organization(self, method: str, organization: Organization) -> Dict:
         url = self.endpoint + f"/api/{method}"
