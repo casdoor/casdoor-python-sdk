@@ -51,6 +51,26 @@ class User:
         self.wechat = ""
         self.weibo = ""
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name):
+        self = cls()
+        self.name = name
+        self.owner = owner
+        self.createdTime = created_time
+        self.displayName = display_name
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        user = cls()
+        for key, value in data.items():
+            if hasattr(user, key):
+                setattr(user, key, value)
+        return user
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -72,7 +92,12 @@ class _UserSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        users = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        users = []
+        for user in response["data"]:
+            users.append(User.from_dict(user))
         return users
 
     def get_user(self, user_id: str) -> Dict:
@@ -89,8 +114,10 @@ class _UserSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        user = r.json()
-        return user
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return User.from_dict(response["data"])
 
     def get_user_count(self, is_online: bool = None) -> int:
         """
@@ -117,8 +144,7 @@ class _UserSDK:
 
     def modify_user(self, method: str, user: User) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if user.owner == "":
-            user.owner = self.org_name
+        user.owner = self.org_name
         params = {
             "id": f"{user.owner}/{user.name}",
             "clientId": self.client_id,
@@ -127,6 +153,8 @@ class _UserSDK:
         user_info = json.dumps(user.to_dict())
         r = requests.post(url, params=params, data=user_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_user(self, user: User) -> Dict:

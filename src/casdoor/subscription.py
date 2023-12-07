@@ -25,8 +25,8 @@ class Subscription:
         self.name = ""
         self.createdTime = ""
         self.displayName = ""
-        self.startDate = datetime.now()
-        self.endDate = datetime.now()
+        self.startDate = datetime.now().isoformat()
+        self.endDate = datetime.now().isoformat()
         self.duration = 0
         self.description = ""
         self.user = ""
@@ -36,6 +36,27 @@ class Subscription:
         self.approver = ""
         self.approveTime = ""
         self.state = ""
+
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, description):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.description = description
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        subscription = cls()
+        for key, value in data.items():
+            if hasattr(subscription, key):
+                setattr(subscription, key, value)
+        return subscription
 
     def __str__(self):
         return str(self.__dict__)
@@ -58,7 +79,12 @@ class _SubscriptionSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        subscriptions = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        subscriptions = []
+        for subscription in response["data"]:
+            subscriptions.append(Subscription.from_dict(subscription))
         return subscriptions
 
     def get_subscription(self, subscription_id: str) -> Dict:
@@ -75,13 +101,14 @@ class _SubscriptionSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        subscription = r.json()
-        return subscription
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Subscription.from_dict(response["data"])
 
     def modify_subscription(self, method: str, subscription: Subscription) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if subscription.owner == "":
-            subscription.owner = self.org_name
+        subscription.owner = self.org_name
         params = {
             "id": f"{subscription.owner}/{subscription.name}",
             "clientId": self.client_id,
@@ -90,6 +117,8 @@ class _SubscriptionSDK:
         subscription_info = json.dumps(subscription.to_dict())
         r = requests.post(url, params=params, data=subscription_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_subscription(self, subscription: Subscription) -> Dict:

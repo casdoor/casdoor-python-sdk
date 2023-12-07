@@ -48,6 +48,26 @@ class Payment:
         self.state = ""
         self.message = ""
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, product_name):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.productName = product_name
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if not data:
+            return None
+        payment = cls()
+        for key, value in data.items():
+            if hasattr(payment, key):
+                setattr(payment, key, value)
+        return payment
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -69,7 +89,12 @@ class _PaymentSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        payments = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        payments = []
+        for payment in response["data"]:
+            payments.append(Payment.from_dict(payment))
         return payments
 
     def get_payment(self, payment_id: str) -> Dict:
@@ -86,13 +111,14 @@ class _PaymentSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        payment = r.json()
-        return payment
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Payment.from_dict(response["data"])
 
     def modify_payment(self, method: str, payment: Payment) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if payment.owner == "":
-            payment.owner = self.org_name
+        payment.owner = self.org_name
         params = {
             "id": f"{payment.owner}/{payment.name}",
             "clientId": self.client_id,

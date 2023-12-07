@@ -30,6 +30,27 @@ class Role:
         self.domains = [""]
         self.isEnabled = False
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, description):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.description = description
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        role = cls()
+        for key, value in data.items():
+            if hasattr(role, key):
+                setattr(role, key, value)
+        return role
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -51,7 +72,12 @@ class _RoleSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        roles = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        roles = []
+        for role in response["data"]:
+            roles.append(Role.from_dict(role))
         return roles
 
     def get_role(self, role_id: str) -> Dict:
@@ -68,13 +94,14 @@ class _RoleSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        role = r.json()
-        return role
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Role.from_dict(response["data"])
 
     def modify_role(self, method: str, role: Role) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if role.owner == "":
-            role.owner = self.org_name
+        role.owner = self.org_name
         params = {
             "id": f"{role.owner}/{role.name}",
             "clientId": self.client_id,
@@ -83,6 +110,8 @@ class _RoleSDK:
         role_info = json.dumps(role.to_dict())
         r = requests.post(url, params=params, data=role_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_role(self, role: Role) -> Dict:

@@ -32,6 +32,27 @@ class Plan:
         self.role = ""
         self.options = [""]
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, description):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.description = description
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        plan = cls()
+        for key, value in data.items():
+            if hasattr(plan, key):
+                setattr(plan, key, value)
+        return plan
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -53,7 +74,12 @@ class _PlanSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        plans = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        plans = []
+        for plan in response["data"]:
+            plans.append(Plan.from_dict(plan))
         return plans
 
     def get_plan(self, plan_id: str) -> Dict:
@@ -70,13 +96,15 @@ class _PlanSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        plan = r.json()
-        return plan
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+
+        return Plan.from_dict(response["data"])
 
     def modify_plan(self, method: str, plan: Plan) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if plan.owner == "":
-            plan.owner = self.org_name
+        plan.owner = self.org_name
         params = {
             "id": f"{plan.owner}/{plan.name}",
             "clientId": self.client_id,
@@ -85,6 +113,8 @@ class _PlanSDK:
         plan_info = json.dumps(plan.to_dict())
         r = requests.post(url, params=params, data=plan_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_plan(self, plan: Plan) -> Dict:

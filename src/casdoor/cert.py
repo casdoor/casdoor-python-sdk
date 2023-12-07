@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import List
 
 import requests
 
@@ -34,6 +34,31 @@ class Cert:
         self.authorityPublicKey = ""
         self.authorityRootPublicKey = ""
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, scope, type, crypto_algorithm, bit_size, expire_in_years):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.scope = scope
+        self.type = type
+        self.cryptoAlgorithm = crypto_algorithm
+        self.bitSize = bit_size
+        self.expireInYears = expire_in_years
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        cert = cls()
+        for key, value in data.items():
+            if hasattr(cert, key):
+                setattr(cert, key, value)
+        return cert
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -42,7 +67,7 @@ class Cert:
 
 
 class _CertSDK:
-    def get_certs(self) -> List[Dict]:
+    def get_certs(self) -> List[Cert]:
         """
         Get the certs from Casdoor.
 
@@ -55,10 +80,16 @@ class _CertSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        certs = r.json()
-        return certs
+        response = r.json()
+        if response["status"] != "ok":
+            raise ValueError(response["msg"])
 
-    def get_cert(self, cert_id: str) -> Dict:
+        res = []
+        for element in response["data"]:
+            res.append(Cert.from_dict(element))
+        return res
+
+    def get_cert(self, cert_id: str) -> Cert:
         """
         Get the cert from Casdoor providing the cert_id.
 
@@ -72,13 +103,15 @@ class _CertSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        cert = r.json()
-        return cert
+        response = r.json()
+        if response["status"] != "ok":
+            raise ValueError(response["msg"])
 
-    def modify_cert(self, method: str, cert: Cert) -> Dict:
+        return Cert.from_dict(response["data"])
+
+    def modify_cert(self, method: str, cert: Cert) -> str:
         url = self.endpoint + f"/api/{method}"
-        if cert.owner == "":
-            cert.owner = self.org_name
+        cert.owner = self.org_name
         params = {
             "id": f"{cert.owner}/{cert.name}",
             "clientId": self.client_id,
@@ -87,16 +120,18 @@ class _CertSDK:
         cert_info = json.dumps(cert.to_dict())
         r = requests.post(url, params=params, data=cert_info)
         response = r.json()
-        return response
+        if response["status"] != "ok":
+            raise ValueError(response["msg"])
+        return str(response["data"])
 
-    def add_cert(self, cert: Cert) -> Dict:
+    def add_cert(self, cert: Cert) -> str:
         response = self.modify_cert("add-cert", cert)
         return response
 
-    def update_cert(self, cert: Cert) -> Dict:
+    def update_cert(self, cert: Cert) -> str:
         response = self.modify_cert("update-cert", cert)
         return response
 
-    def delete_cert(self, cert: Cert) -> Dict:
+    def delete_cert(self, cert: Cert) -> str:
         response = self.modify_cert("delete-cert", cert)
         return response

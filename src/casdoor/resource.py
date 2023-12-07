@@ -35,6 +35,22 @@ class Resource:
         self.url = ""
         self.description = ""
 
+    @classmethod
+    def new(cls, owner, name):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+        resource = cls()
+        for key, value in data.items():
+            setattr(resource, key, value)
+        return resource
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -61,7 +77,12 @@ class _ResourceSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        resources = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        resources = []
+        for resource in response["data"]:
+            resources.append(Resource.from_dict(resource))
         return resources
 
     def get_resource(self, resource_id: str) -> Dict:
@@ -78,13 +99,15 @@ class _ResourceSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        resource = r.json()
-        return resource
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+
+        return Resource.from_dict(response["data"])
 
     def modify_resource(self, method: str, resource: Resource) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if resource.owner == "":
-            resource.owner = self.org_name
+        resource.owner = self.org_name
         params = {
             "id": f"{resource.owner}/{resource.name}",
             "clientId": self.client_id,
@@ -93,6 +116,8 @@ class _ResourceSDK:
         resource_info = json.dumps(resource.to_dict())
         r = requests.post(url, params=params, data=resource_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_resource(self, resource: Resource) -> Dict:

@@ -40,6 +40,51 @@ class Permission:
         self.approveTime = ""
         self.state = ""
 
+    @classmethod
+    def new(
+        cls,
+        owner,
+        name,
+        created_time,
+        display_name,
+        description,
+        users,
+        roles,
+        domains,
+        model,
+        resource_type,
+        resources,
+        actions,
+        effect,
+        is_enabled,
+    ):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.description = description
+        self.users = users
+        self.roles = roles
+        self.domains = domains
+        self.model = model
+        self.resourceType = resource_type
+        self.resources = resources
+        self.actions = actions
+        self.effect = effect
+        self.isEnabled = is_enabled
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if not data:
+            return None
+        permission = cls()
+        for key, value in data.items():
+            if hasattr(permission, key):
+                setattr(permission, key, value)
+        return permission
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -61,7 +106,12 @@ class _PermissionSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        permissions = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        permissions = []
+        for permission in response["data"]:
+            permissions.append(Permission.from_dict(permission))
         return permissions
 
     def get_permission(self, permission_id: str) -> Dict:
@@ -78,13 +128,14 @@ class _PermissionSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        permission = r.json()
-        return permission
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Permission.from_dict(response["data"])
 
     def modify_permission(self, method: str, permission: Permission) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if permission.owner == "":
-            permission.owner = self.org_name
+        permission.owner = self.org_name
         params = {
             "id": f"{permission.owner}/{permission.name}",
             "clientId": self.client_id,
@@ -93,7 +144,9 @@ class _PermissionSDK:
         permission_info = json.dumps(permission.to_dict())
         r = requests.post(url, params=params, data=permission_info)
         response = r.json()
-        return response
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return str(response["data"])
 
     def add_permission(self, permission: Permission) -> Dict:
         response = self.modify_permission("add-permission", permission)

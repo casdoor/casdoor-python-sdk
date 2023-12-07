@@ -27,7 +27,7 @@ from .group import _GroupSDK
 from .model import _ModelSDK
 from .organization import _OrganizationSDK
 from .payment import _PaymentSDK
-from .permisssion import _PermissionSDK
+from .permission import _PermissionSDK
 from .plan import _PlanSDK
 from .pricing import _PricingSDK
 from .product import _ProductSDK

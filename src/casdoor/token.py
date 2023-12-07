@@ -36,6 +36,54 @@ class Token:
         self.codeIsUsed = False
         self.codeExpireIn = 0
 
+    @classmethod
+    def new(
+        cls,
+        owner,
+        name,
+        created_time,
+        application,
+        organization,
+        user,
+        code,
+        access_token,
+        refresh_token,
+        expires_in,
+        scope,
+        token_type,
+        code_challenge,
+        code_is_used,
+        code_expire_in,
+    ):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.application = application
+        self.organization = organization
+        self.user = user
+        self.code = code
+        self.accessToken = access_token
+        self.refreshToken = refresh_token
+        self.expiresIn = expires_in
+        self.scope = scope
+        self.tokenType = token_type
+        self.codeChallenge = code_challenge
+        self.codeIsUsed = code_is_used
+        self.codeExpireIn = code_expire_in
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        token = cls()
+        for key, value in data.items():
+            if hasattr(token, key):
+                setattr(token, key, value)
+        return token
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -59,7 +107,12 @@ class _TokenSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        tokens = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        tokens = []
+        for token in response["data"]:
+            tokens.append(Token.from_dict(token))
         return tokens
 
     def get_token(self, token_id: str) -> Dict:
@@ -76,8 +129,10 @@ class _TokenSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        token = r.json()
-        return token
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Token.from_dict(response["data"])
 
     def modify_token(self, method: str, token: Token) -> Dict:
         url = self.endpoint + f"/api/{method}"
@@ -91,6 +146,8 @@ class _TokenSDK:
         token_info = json.dumps(token.to_dict())
         r = requests.post(url, params=params, data=token_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_token(self, token: Token) -> Dict:
