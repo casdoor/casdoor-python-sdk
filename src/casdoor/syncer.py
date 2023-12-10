@@ -57,6 +57,48 @@ class Syncer:
         self.isReadOnly = False
         self.isEnabled = False
 
+    @classmethod
+    def new(
+        cls,
+        owner,
+        name,
+        created_time,
+        organization,
+        host,
+        port,
+        user,
+        password,
+        database_type,
+        database,
+        table,
+        sync_interval,
+    ):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.organization = organization
+        self.host = host
+        self.port = port
+        self.user = user
+        self.password = password
+        self.databaseType = database_type
+        self.database = database
+        self.table = table
+        self.syncInterval = sync_interval
+        return self
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        if not d:
+            return None
+
+        syncer = cls()
+        for key, value in d.items():
+            if hasattr(syncer, key):
+                setattr(syncer, key, value)
+        return syncer
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -78,7 +120,12 @@ class _SyncerSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        syncers = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        syncers = []
+        for syncer in response["data"]:
+            syncers.append(Syncer.from_dict(syncer))
         return syncers
 
     def get_syncer(self, syncer_id: str) -> Dict:
@@ -95,21 +142,24 @@ class _SyncerSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        syncer = r.json()
-        return syncer
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Syncer.from_dict(response["data"])
 
     def modify_syncer(self, method: str, syncer: Syncer) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if syncer.owner == "":
-            syncer.owner = self.org_name
+        syncer.owner = self.org_name
         params = {
             "id": f"{syncer.owner}/{syncer.name}",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        syncer_info = json.dumps(syncer.to_dict())
+        syncer_info = json.dumps(syncer.to_dict(), default=self.custom_encoder)
         r = requests.post(url, params=params, data=syncer_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_syncer(self, syncer: Syncer) -> Dict:
@@ -123,3 +173,7 @@ class _SyncerSDK:
     def delete_syncer(self, syncer: Syncer) -> Dict:
         response = self.modify_syncer("delete-syncer", syncer)
         return response
+
+    def custom_encoder(self, o):
+        if isinstance(o, (TableColumn)):
+            return o.__dict__

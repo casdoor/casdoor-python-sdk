@@ -60,6 +60,27 @@ class Provider:
         self.enableSignAuthnRequest = False
         self.providerUrl = ""
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, category, type):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.category = category
+        self.type = type
+        return self
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        if not d:
+            return None
+        provider = cls()
+        for key, value in d.items():
+            if hasattr(provider, key):
+                setattr(provider, key, value)
+        return provider
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -81,7 +102,12 @@ class _ProviderSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        providers = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        providers = []
+        for provider in response["data"]:
+            providers.append(Provider.from_dict(provider))
         return providers
 
     def get_provider(self, provider_id: str) -> Dict:
@@ -98,13 +124,15 @@ class _ProviderSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        provider = r.json()
-        return provider
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+
+        return Provider.from_dict(response["data"])
 
     def modify_provider(self, method: str, provider: Provider) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if provider.owner == "":
-            provider.owner = self.org_name
+        provider.owner = self.org_name
         params = {
             "id": f"{provider.owner}/{provider.name}",
             "clientId": self.client_id,
@@ -113,6 +141,8 @@ class _ProviderSDK:
         provider_info = json.dumps(provider.to_dict())
         r = requests.post(url, params=params, data=provider_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_provider(self, provider: Provider) -> Dict:

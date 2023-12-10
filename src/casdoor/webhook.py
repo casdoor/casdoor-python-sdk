@@ -43,6 +43,25 @@ class Webhook:
         self.isReadOnly = False
         self.isEnabled = False
 
+    @classmethod
+    def new(cls, owner, name, created_time, organization):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.organization = organization
+        return self
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        if d is None:
+            return None
+        webhook = cls()
+        for key, value in d.items():
+            if hasattr(webhook, key):
+                setattr(webhook, key, value)
+        return webhook
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -64,7 +83,12 @@ class _WebhookSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        webhooks = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        webhooks = []
+        for webhook in response["data"]:
+            webhooks.append(Webhook.from_dict(webhook))
         return webhooks
 
     def get_webhook(self, webhook_id: str) -> Dict:
@@ -81,21 +105,24 @@ class _WebhookSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        webhook = r.json()
-        return webhook
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Webhook.from_dict(response["data"])
 
     def modify_webhook(self, method: str, webhook: Webhook) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if webhook.owner == "":
-            webhook.owner = self.org_name
+        webhook.owner = self.org_name
         params = {
             "id": f"{webhook.owner}/{webhook.name}",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        webhook_info = json.dumps(webhook.to_dict())
+        webhook_info = json.dumps(webhook.to_dict(), default=self.custom_encoder)
         r = requests.post(url, params=params, data=webhook_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_webhook(self, webhook: Webhook) -> Dict:
@@ -109,3 +136,7 @@ class _WebhookSDK:
     def delete_webhook(self, webhook: Webhook) -> Dict:
         response = self.modify_webhook("delete-webhook", webhook)
         return response
+
+    def custom_encoder(self, o):
+        if isinstance(o, (TableColumn)):
+            return o.__dict__

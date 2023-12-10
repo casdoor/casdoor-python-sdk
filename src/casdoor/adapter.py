@@ -34,6 +34,27 @@ class Adapter:
         self.tableNamePrefix = ""
         self.isEnabled = False
 
+    @classmethod
+    def new(cls, owner, name, created_time, host, user):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.host = host
+        self.user = user
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        adapter = cls()
+        for key, value in data.items():
+            if hasattr(adapter, key):
+                setattr(adapter, key, value)
+        return adapter
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -42,7 +63,7 @@ class Adapter:
 
 
 class _AdapterSDK:
-    def get_adapters(self) -> List[Dict]:
+    def get_adapters(self) -> List[Adapter]:
         """
         Get the adapters from Casdoor.
 
@@ -55,10 +76,15 @@ class _AdapterSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        adapters = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        adapters = []
+        for adapter in response["data"]:
+            adapters.append(Adapter.from_dict(adapter))
         return adapters
 
-    def get_adapter(self, adapter_id: str) -> Dict:
+    def get_adapter(self, adapter_id: str) -> Adapter:
         """
         Get the adapter from Casdoor providing the adapter_id.
 
@@ -72,13 +98,14 @@ class _AdapterSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        adapter = r.json()
-        return adapter
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Adapter.from_dict(response["data"])
 
-    def modify_adapter(self, method: str, adapter: Adapter) -> Dict:
+    def modify_adapter(self, method: str, adapter: Adapter) -> str:
         url = self.endpoint + f"/api/{method}"
-        if adapter.owner == "":
-            adapter.owner = self.org_name
+        adapter.owner = self.org_name
         params = {
             "id": f"{adapter.owner}/{adapter.name}",
             "clientId": self.client_id,
@@ -87,7 +114,9 @@ class _AdapterSDK:
         adapter_info = json.dumps(adapter.to_dict())
         r = requests.post(url, params=params, data=adapter_info)
         response = r.json()
-        return response
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return str(response["data"])
 
     def add_adapter(self, adapter: Adapter) -> Dict:
         response = self.modify_adapter("add-adapter", adapter)

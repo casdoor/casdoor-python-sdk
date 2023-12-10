@@ -34,6 +34,28 @@ class Pricing:
         self.approveTime = ""
         self.state = ""
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, description, application):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.description = description
+        self.application = application
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        pricing = cls()
+        for key, value in data.items():
+            if hasattr(pricing, key):
+                setattr(pricing, key, value)
+        return pricing
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -55,7 +77,12 @@ class _PricingSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        pricings = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        pricings = []
+        for pricing in response["data"]:
+            pricings.append(Pricing.from_dict(pricing))
         return pricings
 
     def get_pricing(self, pricing_id: str) -> Dict:
@@ -72,13 +99,15 @@ class _PricingSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        pricing = r.json()
-        return pricing
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+
+        return Pricing.from_dict(response["data"])
 
     def modify_pricing(self, method: str, pricing: Pricing) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if pricing.owner == "":
-            pricing.owner = self.org_name
+        pricing.owner = self.org_name
         params = {
             "id": f"{pricing.owner}/{pricing.name}",
             "clientId": self.client_id,
@@ -87,6 +116,8 @@ class _PricingSDK:
         pricing_info = json.dumps(pricing.to_dict())
         r = requests.post(url, params=params, data=pricing_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_pricing(self, pricing: Pricing) -> Dict:

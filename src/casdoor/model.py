@@ -36,7 +36,28 @@ class Model:
         self.title = ""
         self.key = ""
         self.children = [Model]
+        self.modelText = ""
         self.isEnabled = False
+
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, model_text):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.modelText = model_text
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if not data:
+            return None
+        model = cls()
+        for key, value in data.items():
+            if hasattr(model, key):
+                setattr(model, key, value)
+        return model
 
     def __str__(self):
         return str(self.__dict__)
@@ -59,7 +80,12 @@ class _ModelSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        models = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        models = []
+        for model in response["data"]:
+            models.append(Model.from_dict(model))
         return models
 
     def get_model(self, model_id: str) -> Dict:
@@ -76,19 +102,20 @@ class _ModelSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        model = r.json()
-        return model
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Model.from_dict(response["data"])
 
     def modify_model(self, method: str, model: Model) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if model.owner == "":
-            model.owner = self.org_name
+        model.owner = self.org_name
         params = {
             "id": f"{model.owner}/{model.name}",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        model_info = json.dumps(model.to_dict())
+        model_info = json.dumps(model.to_dict(), default=self.custom_encoder)
         r = requests.post(url, params=params, data=model_info)
         response = r.json()
         return response
@@ -104,3 +131,7 @@ class _ModelSDK:
     def delete_model(self, model: Model) -> Dict:
         response = self.modify_model("delete-model", model)
         return response
+
+    def custom_encoder(self, o):
+        if isinstance(o, (Model, User)):
+            return o.__dict__

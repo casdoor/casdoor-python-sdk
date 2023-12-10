@@ -30,6 +30,29 @@ class Enforcer:
         self.adapter = ""
         self.isEnabled = False
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, description, model, adapter):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.description = description
+        self.model = model
+        self.adapter = adapter
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        enforcer = cls()
+        for key, value in data.items():
+            if hasattr(enforcer, key):
+                setattr(enforcer, key, value)
+        return enforcer
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -51,7 +74,12 @@ class _EnforcerSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        enforcers = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        enforcers = []
+        for enforcer in response["data"]:
+            enforcers.append(Enforcer.from_dict(enforcer))
         return enforcers
 
     def get_enforcer(self, enforcer_id: str) -> Dict:
@@ -68,13 +96,15 @@ class _EnforcerSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        enforcer = r.json()
-        return enforcer
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+
+        return Enforcer.from_dict(response["data"])
 
     def modify_enforcer(self, method: str, enforcer: Enforcer) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if enforcer.owner == "":
-            enforcer.owner = self.org_name
+        enforcer.owner = self.org_name
         params = {
             "id": f"{enforcer.owner}/{enforcer.name}",
             "clientId": self.client_id,

@@ -26,6 +26,26 @@ class Session:
         self.createdTime = ""
         self.sessionId = [""]
 
+    @classmethod
+    def new(cls, owner, name, application, created_time, session_id):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.application = application
+        self.createdTime = created_time
+        self.sessionId = session_id
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+        session = cls()
+        for key, value in data.items():
+            if hasattr(session, key):
+                setattr(session, key, value)
+        return session
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -47,10 +67,15 @@ class _SessionSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        sessions = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        sessions = []
+        for session in response["data"]:
+            sessions.append(Session.from_dict(session))
         return sessions
 
-    def get_session(self, session_id: str) -> Dict:
+    def get_session(self, session_id: str, application: str) -> Dict:
         """
         Get the session from Casdoor providing the session_id.
 
@@ -62,15 +87,17 @@ class _SessionSDK:
             "id": f"{self.org_name}/{session_id}",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
+            "sessionPkId": f"{self.org_name}/{session_id}/{application}",
         }
         r = requests.get(url, params)
-        session = r.json()
-        return session
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return Session.from_dict(response["data"])
 
     def modify_session(self, method: str, session: Session) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if session.owner == "":
-            session.owner = self.org_name
+        session.owner = self.org_name
         params = {
             "id": f"{session.owner}/{session.name}",
             "clientId": self.client_id,
@@ -79,6 +106,8 @@ class _SessionSDK:
         session_info = json.dumps(session.to_dict())
         r = requests.post(url, params=params, data=session_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_session(self, session: Session) -> Dict:

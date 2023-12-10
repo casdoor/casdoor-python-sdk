@@ -39,6 +39,32 @@ class Product:
         self.state = ""
         self.providerObjs = [Provider]
 
+    @classmethod
+    def new(cls, owner, name, created_time, display_name, image, description, tag, quantity, sold, state):
+        self = cls()
+        self.owner = owner
+        self.name = name
+        self.createdTime = created_time
+        self.displayName = display_name
+        self.image = image
+        self.description = description
+        self.tag = tag
+        self.quantity = quantity
+        self.sold = sold
+        self.state = state
+        return self
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        if data is None:
+            return None
+
+        product = cls()
+        for key, value in data.items():
+            if hasattr(product, key):
+                setattr(product, key, value)
+        return product
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -60,7 +86,12 @@ class _ProductSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        products = r.json()
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        products = []
+        for product in response["data"]:
+            products.append(Product.from_dict(product))
         return products
 
     def get_product(self, product_id: str) -> Dict:
@@ -77,21 +108,25 @@ class _ProductSDK:
             "clientSecret": self.client_secret,
         }
         r = requests.get(url, params)
-        product = r.json()
-        return product
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+
+        return Product.from_dict(response["data"])
 
     def modify_product(self, method: str, product: Product) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        if product.owner == "":
-            product.owner = self.org_name
+        product.owner = self.org_name
         params = {
             "id": f"{product.owner}/{product.name}",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        product_info = json.dumps(product.to_dict())
+        product_info = json.dumps(product.to_dict(), default=self.custom_encoder)
         r = requests.post(url, params=params, data=product_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def add_product(self, product: Product) -> Dict:
@@ -105,3 +140,7 @@ class _ProductSDK:
     def delete_product(self, product: Product) -> Dict:
         response = self.modify_product("delete-product", product)
         return response
+
+    def custom_encoder(self, o):
+        if isinstance(o, (Provider)):
+            return o.__dict__
