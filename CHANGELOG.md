@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.19.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.18.0...v1.19.0) (2023-12-10)
+
+
+### Features
+
+* add more test cases except resource ([#77](https://github.com/casdoor/casdoor-python-sdk/issues/77)) ([e1d8a3b](https://github.com/casdoor/casdoor-python-sdk/commit/e1d8a3b691e347e76228db9e42174ce9d848ab05))
+
 # [1.18.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.17.2...v1.18.0) (2023-11-30)
 
 
