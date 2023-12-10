@@ -2,7 +2,6 @@
 
 # [1.18.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.17.2...v1.18.0) (2023-11-30)
 
-
 ### Features
 
 * add test cases for organization and group ([#76](https://github.com/casdoor/casdoor-python-sdk/issues/76)) ([4319243](https://github.com/casdoor/casdoor-python-sdk/commit/4319243429ae48feb80de0bbb05f3078e36afd54))

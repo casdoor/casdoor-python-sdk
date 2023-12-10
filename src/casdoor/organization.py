@@ -167,7 +167,7 @@ class _OrganizationSDK:
         """
         url = self.endpoint + "/api/get-organization"
         params = {
-            "id": f"{self.org_name}/{organization_id}",
+            "id": f"admin/{organization_id}",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
@@ -179,9 +179,7 @@ class _OrganizationSDK:
 
     def modify_organization(self, method: str, organization: Organization) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        # if organization.owner == "":
-        #     organization.owner = self.org_name
-        organization.owner = self.org_name
+
         params = {
             "id": f"{organization.owner}/{organization.name}",
             "clientId": self.client_id,
@@ -195,13 +193,16 @@ class _OrganizationSDK:
         return str(response["data"])
 
     def add_organization(self, organization: Organization) -> Dict:
+        organization.owner = "admin"
         response = self.modify_organization("add-organization", organization)
         return response
 
     def update_organization(self, organization: Organization) -> Dict:
+        organization.owner = "admin"
         response = self.modify_organization("update-organization", organization)
         return response
 
     def delete_organization(self, organization: Organization) -> Dict:
+        organization.owner = "admin"
         response = self.modify_organization("delete-organization", organization)
         return response

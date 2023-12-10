@@ -89,7 +89,7 @@ class Provider:
 
 
 class _ProviderSDK:
-    def get_providers(self) -> List[Dict]:
+    def get_providers(self) -> List[Provider]:
         """
         Get the providers from Casdoor.
 
@@ -110,7 +110,7 @@ class _ProviderSDK:
             providers.append(Provider.from_dict(provider))
         return providers
 
-    def get_provider(self, provider_id: str) -> Dict:
+    def get_provider(self, provider_id: str) -> Provider:
         """
         Get the provider from Casdoor providing the provider_id.
 
