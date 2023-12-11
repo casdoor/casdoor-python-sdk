@@ -128,6 +128,38 @@ class _ResourceSDK:
         response = self.modify_resource("update-resource", resource)
         return response
 
-    def delete_resource(self, resource: Resource) -> Dict:
-        response = self.modify_resource("delete-resource", resource)
+    def upload_resource(self, user, tag, parent, full_File_path, file) -> Dict:
+        url = self.endpoint + "/api/upload-resource"
+        params = {
+            "owner": self.org_name,
+            "user": user,
+            "application": self.application_name,
+            "tag": tag,
+            "parent": parent,
+            "fullFilePath": full_File_path,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+
+        files = {"file": file}
+        r = requests.post(url, params=params, files=files)
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return response
+
+    def delete_resource(self, name) -> Dict:
+        resource = Resource.new(self.org_name, name)
+        user_str = json.dumps(resource.to_dict())
+        url = self.endpoint + "/api/delete-resource"
+        params = {
+            "owner": self.org_name,
+            "name": name,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.post(url, params=params, data=user_str)
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
