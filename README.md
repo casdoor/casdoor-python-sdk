@@ -23,8 +23,9 @@ Initialization requires 5 parameters, which are all str type:
 | endpoint         | Yes  | Casdoor Server Url, such as `http://localhost:8000` |
 | client_id        | Yes  | Application.client_id                               |
 | client_secret    | Yes  | Application.client_secret                           |
-| certificate      | Yes  | Same as Casdoor   certificate                       |
+| certificate      | Yes  | Same as Casdoor certificate                         |
 | org_name         | Yes  | Organization name                                   |
+| application_name | Yes  | Application name                                    |
 
 ```python
 from casdoor import CasdoorSDK
@@ -40,6 +41,7 @@ sdk = CasdoorSDK(
     client_secret,
     certificate,
     org_name,
+    application_name,
 )
 ```
 
@@ -59,6 +61,7 @@ sdk = AsyncCasdoorSDK(
     client_secret,
     certificate,
     org_name,
+    application_name,
 )
 ```
 
