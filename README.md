@@ -40,6 +40,7 @@ sdk = CasdoorSDK(
     client_secret,
     certificate,
     org_name,
+    application_name
 )
 ```
 
@@ -59,6 +60,7 @@ sdk = AsyncCasdoorSDK(
     client_secret,
     certificate,
     org_name,
+    application_name
 )
 ```
 
