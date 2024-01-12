@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.21.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.20.0...v1.21.0) (2024-01-12)
+
+
+### Features
+
+* fix application_name in README.md ([#81](https://github.com/casdoor/casdoor-python-sdk/issues/81)) ([63338ca](https://github.com/casdoor/casdoor-python-sdk/commit/63338caeae98d4b8d494cd92f22c209a287cd124))
+
 # [1.20.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.19.0...v1.20.0) (2023-12-11)
 
 
