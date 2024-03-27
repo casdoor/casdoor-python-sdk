@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.23.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.22.0...v1.23.0) (2024-03-27)
+
+
+### Features
+
+* add dependencies in pyproject.toml ([#83](https://github.com/casdoor/casdoor-python-sdk/issues/83)) ([94b8a02](https://github.com/casdoor/casdoor-python-sdk/commit/94b8a027e11bd99e11c4517378de2ecb5a1267df))
+
 # [1.22.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.21.0...v1.22.0) (2024-03-27)
 
 
