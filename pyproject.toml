@@ -20,6 +20,10 @@ classifiers = [
 ]
 requires-python = ">=3.6"
 
+dynamic = ["dependencies"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
 [project.urls]
 "Home" = "https://github.com/casdoor/casdoor-python-sdk"
 
