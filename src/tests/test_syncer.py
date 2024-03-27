@@ -72,8 +72,8 @@ class SyncerTest(unittest.TestCase):
         self.assertEqual(syncer.name, name)
 
         # Update the object
-        updated_password = "123456"
-        syncer.password = updated_password
+        updated_host = "Updated Host"
+        syncer.host = updated_host
         try:
             sdk.update_syncer(syncer)
         except Exception as e:
@@ -84,7 +84,7 @@ class SyncerTest(unittest.TestCase):
             updated_syncer = sdk.get_syncer(name)
         except Exception as e:
             self.fail(f"Failed to get updated object: {e}")
-        self.assertEqual(updated_syncer.password, updated_password)
+        self.assertEqual(updated_syncer.host, updated_host)
 
         # Delete the object
         try:
