@@ -1,5 +1,17 @@
 # Semantic Versioning Changelog
 
+# [1.22.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.21.0...v1.22.0) (2024-03-27)
+
+
+### Bug Fixes
+
+* fix TestSyncer to avoid password test ([858850f](https://github.com/casdoor/casdoor-python-sdk/commit/858850f319ebda8120886dc9930678411f47d8d2))
+
+
+### Features
+
+* upgrade CI Node.js version to 20 ([7f9bec5](https://github.com/casdoor/casdoor-python-sdk/commit/7f9bec5a49824cb66574965d542e6d7a0ca5ef6b))
+
 # [1.21.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.20.0...v1.21.0) (2024-01-12)
 
 
