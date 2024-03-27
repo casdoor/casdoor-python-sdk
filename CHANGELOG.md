@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.24.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.23.0...v1.24.0) (2024-03-27)
+
+
+### Features
+
+* python 3.12 support ([#84](https://github.com/casdoor/casdoor-python-sdk/issues/84)) ([e83b772](https://github.com/casdoor/casdoor-python-sdk/commit/e83b7724b98fca5fe3b0458c0c4c066643cc580f))
+
 # [1.23.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.22.0...v1.23.0) (2024-03-27)
 
 
