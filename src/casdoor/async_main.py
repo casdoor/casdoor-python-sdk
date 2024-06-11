@@ -257,7 +257,7 @@ class AsyncCasdoorSDK:
             certificate.public_key(),
             algorithms=self.algorithms,
             audience=self.client_id,
-            **kwargs
+            **kwargs,
         )
         return return_json
 
