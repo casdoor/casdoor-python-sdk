@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.25.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.24.0...v1.25.0) (2024-06-11)
+
+
+### Features
+
+* add kwargs to async parse_jwt_token() API ([#85](https://github.com/casdoor/casdoor-python-sdk/issues/85)) ([3774a63](https://github.com/casdoor/casdoor-python-sdk/commit/3774a632213a45cb254568adddabb7f41198714c))
+
 # [1.24.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.23.0...v1.24.0) (2024-03-27)
 
 
