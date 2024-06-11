@@ -242,7 +242,7 @@ class AsyncCasdoorSDK:
         token = await self.refresh_token_request(refresh_token, scope)
         return token.get("access_token")
 
-    def parse_jwt_token(self, token: str) -> Dict:
+    def parse_jwt_token(self, token: str, **kwargs) -> Dict:
         """
         Converts the returned access_token to real data using
         jwt (JSON Web Token) algorithms.
@@ -257,6 +257,7 @@ class AsyncCasdoorSDK:
             certificate.public_key(),
             algorithms=self.algorithms,
             audience=self.client_id,
+            **kwargs
         )
         return return_json
 
