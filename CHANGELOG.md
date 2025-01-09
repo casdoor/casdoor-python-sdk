@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.27.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.26.0...v1.27.0) (2025-01-09)
+
+
+### Features
+
+* update cryptography and aiohttp ([#91](https://github.com/casdoor/casdoor-python-sdk/issues/91)) ([7750f5e](https://github.com/casdoor/casdoor-python-sdk/commit/7750f5ec1c67ff33d54b1dec6b4b5025a4a6994c))
+
 # [1.26.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.25.0...v1.26.0) (2024-12-09)
 
 
