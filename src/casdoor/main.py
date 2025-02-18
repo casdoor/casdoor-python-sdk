@@ -220,7 +220,7 @@ class CasdoorSDK(
         }
         return requests.post(url, params)
 
-    def refresh_oauth_token(self, refresh_token: str, scope: str = "") -> str, str:
+    def refresh_oauth_token(self, refresh_token: str, scope: str = "") -> tuple[str, str]:
         """
         Request the Casdoor server to get access_token.
 
