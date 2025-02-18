@@ -220,7 +220,7 @@ class CasdoorSDK(
         }
         return requests.post(url, params)
 
-    def refresh_oauth_token(self, refresh_token: str, scope: str = "") -> str:
+    def refresh_oauth_token(self, refresh_token: str, scope: str = "") -> str, str:
         """
         Request the Casdoor server to get access_token.
 
@@ -230,8 +230,8 @@ class CasdoorSDK(
         """
         r = self.refresh_token_request(refresh_token, scope)
         access_token = r.json().get("access_token")
-
-        return access_token
+        new_refresh_token = r.json().get("refresh_token")
+        return access_token , new_refresh_token
 
     def parse_jwt_token(self, token: str, **kwargs) -> Dict:
         """
