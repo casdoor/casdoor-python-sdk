@@ -233,6 +233,19 @@ class CasdoorSDK(
 
         return access_token
 
+    def refresh_oauth_tokens(self, refresh_token: str, scope: str = "") -> Dict:
+        """
+        Request the Casdoor server to get a refreshed Token.
+
+        :param refresh_token: refresh_token for send to Casdoor
+        :param scope: OAuth scope
+        :return: Response from Casdoor
+        """
+        r = self.refresh_token_request(refresh_token, scope)
+        refreshed_token = r.json()
+
+        return refreshed_token
+
     def parse_jwt_token(self, token: str, **kwargs) -> Dict:
         """
         Converts the returned access_token to real data using
