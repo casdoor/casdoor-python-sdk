@@ -32,10 +32,10 @@ class Group:
         self.type = ""
         self.parentId = ""
         self.isTopGroup = False
-        self.users = [User]
+        self.users: List[User] = []
         self.title = ""
         self.key = ""
-        self.children = [Group]
+        self.children: List[Group] = []
         self.isEnabled = False
 
     @classmethod
