@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [1.29.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.28.0...v1.29.0) (2025-03-30)
+
+
+### Features
+
+* fix JSON serialization error in get_groups() API ([#93](https://github.com/casdoor/casdoor-python-sdk/issues/93)) ([7bd8e34](https://github.com/casdoor/casdoor-python-sdk/commit/7bd8e34608430e5415c0988243525cc1a692c691))
+* upgrade CI version to actions/xxx v4 and Python 3.12 ([2314a0f](https://github.com/casdoor/casdoor-python-sdk/commit/2314a0fb236a916022545c558db4651e9c727c71))
+
 # [1.28.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.27.0...v1.28.0) (2025-02-20)
 
 
