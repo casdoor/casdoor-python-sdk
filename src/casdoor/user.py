@@ -50,6 +50,8 @@ class User:
         self.updatedTime = ""
         self.wechat = ""
         self.weibo = ""
+        self.invitation = ""
+        self.invitationCode = ""
 
     @classmethod
     def new(cls, owner, name, created_time, display_name):
