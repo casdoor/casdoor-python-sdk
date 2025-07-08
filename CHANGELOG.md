@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.30.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.29.0...v1.30.0) (2025-07-08)
+
+
+### Features
+
+* add invitation&invitationCode properties in User class ([#97](https://github.com/casdoor/casdoor-python-sdk/issues/97)) ([46c106e](https://github.com/casdoor/casdoor-python-sdk/commit/46c106e642e6245c13803d4d1cb423db938a6b0a))
+
 # [1.29.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.28.0...v1.29.0) (2025-03-30)
 
 
