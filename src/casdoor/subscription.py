@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import json
-from datetime import datetime
 from typing import Dict, List
 
 import requests
