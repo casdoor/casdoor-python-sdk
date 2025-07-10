@@ -25,8 +25,8 @@ class Subscription:
         self.name = ""
         self.createdTime = ""
         self.displayName = ""
-        self.startDate = datetime.now().isoformat()
-        self.endDate = datetime.now().isoformat()
+        self.startTime = datetime.now().isoformat()
+        self.endTime = datetime.now().isoformat()
         self.duration = 0
         self.description = ""
         self.user = ""
