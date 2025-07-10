@@ -61,19 +61,19 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     async def test__get_payload_for_authorization_code(self):
         sdk = self.get_sdk()
-        result = sdk._AsyncCasdoorSDK__get_payload_for_authorization_code(code=self.code)  # noqa: It's private method
+        result = sdk._AsyncCasdoorSDK__get_payload_for_authorization_code(code=self.code)
         self.assertEqual("authorization_code", result.get("grant_type"))
 
     async def test__get_payload_for_password_credentials(self):
         sdk = self.get_sdk()
-        result = sdk._AsyncCasdoorSDK__get_payload_for_password_credentials(  # noqa: It's private method
+        result = sdk._AsyncCasdoorSDK__get_payload_for_password_credentials(
             username="test", password="test"
         )
         self.assertEqual("password", result.get("grant_type"))
 
     async def test__get_payload_for_client_credentials(self):
         sdk = self.get_sdk()
-        result = sdk._AsyncCasdoorSDK__get_payload_for_client_credentials()  # noqa: It's private method
+        result = sdk._AsyncCasdoorSDK__get_payload_for_client_credentials()
         self.assertEqual("client_credentials", result.get("grant_type"))
 
     async def test__get_payload_for_access_token_request_with_code(self):
@@ -277,5 +277,5 @@ class TestOAuth(IsolatedAsyncioTestCase):
         response = await sdk.get_auth_link(redirect_uri=redirect_uri)
         self.assertEqual(
             response,
-            f"{sdk.front_endpoint}/login/oauth/authorize?client_id={sdk.client_id}&response_type=code&redirect_uri={redirect_uri}&scope=read&state={sdk.application_name}",  # noqa
+            f"{sdk.front_endpoint}/login/oauth/authorize?client_id={sdk.client_id}&response_type=code&redirect_uri={redirect_uri}&scope=read&state={sdk.application_name}",
         )

@@ -63,17 +63,17 @@ class TestOAuth(TestCase):
 
     def test__get_payload_for_authorization_code(self):
         sdk = self.get_sdk()
-        result = sdk._CasdoorSDK__get_payload_for_authorization_code(code=self.code)  # noqa: It's private method
+        result = sdk._CasdoorSDK__get_payload_for_authorization_code(code=self.code)
         self.assertEqual("authorization_code", result.get("grant_type"))
 
     def test__get_payload_for_client_credentials(self):
         sdk = self.get_sdk()
-        result = sdk._CasdoorSDK__get_payload_for_client_credentials()  # noqa: It's private method
+        result = sdk._CasdoorSDK__get_payload_for_client_credentials()
         self.assertEqual("client_credentials", result.get("grant_type"))
 
     def test__get_payload_for_password_credentials(self):
         sdk = self.get_sdk()
-        result = sdk._CasdoorSDK__get_payload_for_password_credentials(  # noqa: It's private method
+        result = sdk._CasdoorSDK__get_payload_for_password_credentials(
             username="test", password="test"
         )
         self.assertEqual("password", result.get("grant_type"))
