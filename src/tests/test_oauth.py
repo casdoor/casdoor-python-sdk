@@ -16,9 +16,9 @@ from unittest import TestCase, mock
 
 from requests import Response
 
+import src.tests.test_util as test_util
 from src.casdoor.main import CasdoorSDK
 from src.casdoor.user import User
-import src.tests.test_util as test_util
 
 
 class TestOAuth(TestCase):
@@ -73,9 +73,7 @@ class TestOAuth(TestCase):
 
     def test__get_payload_for_password_credentials(self):
         sdk = self.get_sdk()
-        result = sdk._CasdoorSDK__get_payload_for_password_credentials(
-            username="test", password="test"
-        )
+        result = sdk._CasdoorSDK__get_payload_for_password_credentials(username="test", password="test")
         self.assertEqual("password", result.get("grant_type"))
 
     def test__get_payload_for_access_token_request_with_code(self):

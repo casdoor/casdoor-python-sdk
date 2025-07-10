@@ -14,9 +14,9 @@
 
 from unittest import IsolatedAsyncioTestCase, mock
 
+import src.tests.test_util as test_util
 from src.casdoor.async_main import AsyncCasdoorSDK
 from src.casdoor.user import User
-import src.tests.test_util as test_util
 
 
 class TestOAuth(IsolatedAsyncioTestCase):
@@ -66,9 +66,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     async def test__get_payload_for_password_credentials(self):
         sdk = self.get_sdk()
-        result = sdk._AsyncCasdoorSDK__get_payload_for_password_credentials(
-            username="test", password="test"
-        )
+        result = sdk._AsyncCasdoorSDK__get_payload_for_password_credentials(username="test", password="test")
         self.assertEqual("password", result.get("grant_type"))
 
     async def test__get_payload_for_client_credentials(self):
