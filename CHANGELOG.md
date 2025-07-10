@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.32.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.31.0...v1.32.0) (2025-07-10)
+
+
+### Features
+
+* fix Subscription's startTime and endTime fields ([1f69aa9](https://github.com/casdoor/casdoor-python-sdk/commit/1f69aa93cfeeed8aa15a744aa2ded6df4e80dd35))
+
 # [1.31.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.30.0...v1.31.0) (2025-07-10)
 
 
