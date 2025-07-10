@@ -1,5 +1,14 @@
 # Semantic Versioning Changelog
 
+# [1.31.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.30.0...v1.31.0) (2025-07-10)
+
+
+### Features
+
+* fix Casdoor SDK config ([4b97504](https://github.com/casdoor/casdoor-python-sdk/commit/4b97504901b09153c94abcf1e6a97398b3d01f18))
+* fix linter errors ([8a7d691](https://github.com/casdoor/casdoor-python-sdk/commit/8a7d691a0de7267b8c688d7bfbcb38cbd1ae03a1))
+* format the code files ([d6b276c](https://github.com/casdoor/casdoor-python-sdk/commit/d6b276c26cf6c0ca82456526e89c15eebed4fc13))
+
 # [1.30.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.29.0...v1.30.0) (2025-07-08)
 
 
