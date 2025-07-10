@@ -16,6 +16,7 @@ from unittest import IsolatedAsyncioTestCase, mock
 
 from src.casdoor.async_main import AsyncCasdoorSDK
 from src.casdoor.user import User
+import src.tests.test_util as test_util
 
 
 class TestOAuth(IsolatedAsyncioTestCase):
@@ -38,12 +39,12 @@ class TestOAuth(IsolatedAsyncioTestCase):
     @staticmethod
     def get_sdk():
         sdk = AsyncCasdoorSDK(
-            endpoint="https://demo.casdoor.com",
-            client_id="3267f876b11e7d1cb217",
-            client_secret="3f0d1f06d28d65309c8f38b505cb9dcfa487754d",
-            certificate="CasdoorSecret",
-            org_name="built-in",
-            application_name="app-built-in",
+            endpoint=test_util.TestEndpoint,
+            client_id=test_util.TestClientId,
+            client_secret=test_util.TestClientSecret,
+            certificate=test_util.TestJwtPublicKey,
+            org_name=test_util.TestOrganization,
+            application_name=test_util.TestApplication,
         )
         return sdk
 
