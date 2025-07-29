@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.33.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.32.0...v1.33.0) (2025-07-29)
+
+
+### Features
+
+* adapt enforce & batch-enforce APIs to latest format ([#103](https://github.com/casdoor/casdoor-python-sdk/issues/103)) ([00bb192](https://github.com/casdoor/casdoor-python-sdk/commit/00bb1927e15a55384b56711c01f0102f683ca981))
+
 # [1.32.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.31.0...v1.32.0) (2025-07-10)
 
 
