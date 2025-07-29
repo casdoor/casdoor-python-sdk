@@ -102,7 +102,7 @@ class _UserSDK:
             users.append(User.from_dict(user))
         return users
 
-    def get_user(self, user_id: str) -> Dict:
+    def get_user(self, user_id: str) -> User:
         """
         Get the user from Casdoor providing the user_id.
 
@@ -141,7 +141,8 @@ class _UserSDK:
             params["isOnline"] = "1" if is_online else "0"
 
         r = requests.get(url, params)
-        count = r.json()
+        response = r.json()
+        count = response.get("data")
         return count
 
     def modify_user(self, method: str, user: User) -> Dict:

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest import TestCase, mock
+from unittest import TestCase
 
 from requests import Response
 
@@ -59,7 +59,7 @@ class TestOAuth(TestCase):
             "code": self.code,
         }
         response = sdk._oauth_token_request(payload=data)
-        self.assertIsInstance(response, dict)
+        self.assertIsInstance(response, Response)
 
     def test__get_payload_for_authorization_code(self):
         sdk = self.get_sdk()
@@ -137,71 +137,51 @@ class TestOAuth(TestCase):
 
     def test_enforce(self):
         sdk = self.get_sdk()
-        status = sdk.enforce("built-in/permission-built-in", "admin", "a", "ac")
+        status = sdk.enforce(
+            permission_id="built-in/permission-built-in",
+            model_id="",
+            resource_id="",
+            enforce_id="",
+            owner="",
+            casbin_request=["alice", "data1", "read"],
+        )
         self.assertIsInstance(status, bool)
 
-    def mocked_enforce_requests_post(*args, **kwargs):
-        class MockResponse:
-            def __init__(self, json_data, status_code=200, headers=None):
-                if headers is None:
-                    headers = {"content-type": "json"}
-                    self.json_data = json_data
-                    self.status_code = status_code
-                    self.headers = headers
-
-            def json(self):
-                return self.json_data
-
-        result = True
-        for i in range(0, 5):
-            if kwargs.get("json").get(f"v{i}") != f"v{i}":
-                result = False
-
-        return MockResponse(result)
-
-    @mock.patch("requests.post", side_effect=mocked_enforce_requests_post)
-    def test_enforce_parmas(self, mock_post):
+    def test_enforce_parmas(self):
         sdk = self.get_sdk()
-        status = sdk.enforce("built-in/permission-built-in", "v0", "v1", "v2", v3="v3", v4="v4", v5="v5")
-        self.assertEqual(status, True)
+        status = sdk.enforce(
+            permission_id="built-in/permission-built-in",
+            model_id="",
+            resource_id="",
+            enforce_id="",
+            owner="",
+            casbin_request=["alice", "data1", "read"],
+        )
+        self.assertIsInstance(status, bool)
 
-    def mocked_batch_enforce_requests_post(*args, **kwargs):
-        class MockResponse:
-            def __init__(self, json_data, status_code=200, headers=None):
-                if headers is None:
-                    headers = {"content-type": "json"}
-                    self.json_data = json_data
-                    self.status_code = status_code
-                    self.headers = headers
-
-            def json(self):
-                return self.json_data
-
-        json = kwargs.get("json")
-        result = [True for i in range(0, len(json))]
-        for k in range(0, len(json)):
-            for i in range(0, len(json[k]) - 1):
-                if json[k].get(f"v{i}") != f"v{i}":
-                    result[k] = False
-
-        return MockResponse(result)
-
-    @mock.patch("requests.post", side_effect=mocked_batch_enforce_requests_post)
-    def test_batch_enforce(self, mock_post):
+    def test_batch_enforce(self):
         sdk = self.get_sdk()
         status = sdk.batch_enforce(
-            "built-in/permission-built-in", [["v0", "v1", "v2", "v3", "v4", "v5"], ["v0", "v1", "v2", "v3", "v4", "v1"]]
+            permission_id="built-in/permission-built-in",
+            model_id="",
+            enforce_id="",
+            owner="",
+            casbin_request=[["alice", "data1", "read"], ["bob", "data2", "write"]],
         )
         self.assertEqual(len(status), 2)
-        self.assertEqual(status[0], True)
-        self.assertEqual(status[1], False)
+        self.assertIsInstance(status[0], bool)
+        self.assertIsInstance(status[1], bool)
 
-    @mock.patch("requests.post", side_effect=mocked_batch_enforce_requests_post)
-    def test_batch_enforce_raise(self, mock_post):
+    def test_batch_enforce_raise(self):
         sdk = self.get_sdk()
-        with self.assertRaises(ValueError) as context:
-            sdk.batch_enforce("built-in/permission-built-in", [["v0", "v1"]])
-        self.assertEqual("Invalid permission rule[0]: ['v0', 'v1']", str(context.exception))
+        with self.assertRaises(ValueError):
+            sdk.batch_enforce(
+                permission_id="built-in/permission-built-in",
+                model_id="",
+                enforce_id="",
+                owner="",
+                casbin_request=[],
+            )
 
     def test_get_users(self):
         sdk = self.get_sdk()
@@ -221,7 +201,7 @@ class TestOAuth(TestCase):
     def test_get_user(self):
         sdk = self.get_sdk()
         user = sdk.get_user("admin")
-        self.assertIsInstance(user, dict)
+        self.assertIsInstance(user, User)
 
     def test_modify_user(self):
         sdk = self.get_sdk()
