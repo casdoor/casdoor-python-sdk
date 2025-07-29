@@ -52,6 +52,7 @@ class User:
         self.weibo = ""
         self.invitation = ""
         self.invitationCode = ""
+        self.groups = []
 
     @classmethod
     def new(cls, owner, name, created_time, display_name):
@@ -71,6 +72,10 @@ class User:
         for key, value in data.items():
             if hasattr(user, key):
                 setattr(user, key, value)
+                
+        if "groups" in data:
+            user.groups = data["groups"]
+            
         return user
 
     def __str__(self):
