@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import base64
+import json
 from typing import Dict, List, Optional
 
 import aiohttp
@@ -263,73 +264,114 @@ class AsyncCasdoorSDK:
 
     async def enforce(
         self,
-        permission_model_name: str,
-        sub: str,
-        obj: str,
-        act: str,
-        v3: Optional[str] = None,
-        v4: Optional[str] = None,
-        v5: Optional[str] = None,
+        permission_id: str,
+        model_id: str,
+        resource_id: str,
+        enforce_id: str,
+        owner: str,
+        casbin_request: Optional[List[str]] = None,
     ) -> bool:
         """
-        Send data to Casdoor enforce API
-        # https://casdoor.org/docs/permission/exposed-casbin-apis#enforce
+        Send data to Casdoor enforce API asynchronously
 
-        :param permission_model_name: Name permission model
-        :param sub: sub from Casbin
-        :param obj: obj from Casbin
-        :param act: act from Casbin
-        :param v3: v3 from Casbin
-        :param v4: v4 from Casbin
-        :param v5: v5 from Casbin
+        :param permission_id: the permission id (i.e. organization name/permission name)
+        :param model_id: the model id
+        :param resource_id: the resource id
+        :param enforce_id: the enforce id
+        :param owner: the owner of the permission
+        :param casbin_request: a list containing the request data (i.e. sub, obj, act)
+        :return: a boolean value indicating whether the request is allowed
         """
-        path = "/api/enforce"
-        params = {
-            "id": permission_model_name,
-            "v0": sub,
-            "v1": obj,
-            "v2": act,
-            "v3": v3,
-            "v4": v4,
-            "v5": v5,
+        url = "/api/enforce"
+        params: Dict[str, str] = {
+            "permissionId": permission_id,
+            "modelId": model_id,
+            "resourceId": resource_id,
+            "enforceId": enforce_id,
+            "owner": owner,
         }
-        async with self._session as session:
-            has_permission = await session.post(path, headers=self.headers, json=params)
-            if not isinstance(has_permission, bool):
-                raise ValueError(f"Casdoor response error: {has_permission}")
-            return has_permission
-
-    async def batch_enforce(self, permission_model_name: str, permission_rules: List[List[str]]) -> List[bool]:
-        """
-        Send data to Casdoor enforce API
-
-        :param permission_model_name: Name permission model
-        :param permission_rules: permission rules to enforce
-                        [][0] -> sub: sub from Casbin
-                        [][1] -> obj: obj from Casbin
-                        [][2] -> act: act from Casbin
-                        [][3] -> v3: v3 from Casbin (optional)
-                        [][4] -> v4: v4 from Casbin (optional)
-                        [][5] -> v5: v5 from Casbin (optional)
-        """
-        path = "/api/batch-enforce"
-
-        def map_rule(rule: List[str], idx) -> Dict:
-            if len(rule) < 3:
-                raise ValueError(f"Invalid permission rule[{idx}]: {rule}")
-            result = {"id": permission_model_name}
-            for i in range(len(rule)):
-                result.update({f"v{i}": rule[i]})
-            return result
-
-        params = [map_rule(permission_rules[i], i) for i in range(len(permission_rules))]
 
         async with self._session as session:
-            enforce_results = await session.post(path, headers=self.headers, json=params)
-            if not isinstance(enforce_results, bool):
-                raise ValueError(f"Casdoor response error:{enforce_results}")
+            response = await session.post(
+                url,
+                params=params,
+                data=json.dumps(casbin_request),
+                auth=aiohttp.BasicAuth(self.client_id, self.client_secret),
+                headers={"Content-Type": "application/json"},
+            )
 
-            return enforce_results
+        if isinstance(response, dict):
+            data = response.get("data")
+            if isinstance(data, list) and len(data) > 0:
+                has_permission = data[0]
+            else:
+                has_permission = response
+        else:
+            has_permission = response
+
+        if not isinstance(has_permission, bool):
+            error_str = f"Casdoor response error (invalid type {type(has_permission)}):\n{json.dumps(response)}"
+            raise ValueError(error_str)
+
+        return has_permission
+
+    async def batch_enforce(
+        self,
+        permission_id: str,
+        model_id: str,
+        enforce_id: str,
+        owner: str,
+        casbin_request: Optional[List[List[str]]] = None,
+    ) -> List[bool]:
+        """
+        Send data to Casdoor batch enforce API asynchronously
+
+        :param permission_id: the permission id (i.e. organization name/permission name)
+        :param model_id: the model id
+        :param enforce_id: the enforce id
+        :param owner: the owner of the permission
+        :param casbin_request: a list of lists containing the request data
+        :return: a list of boolean values indicating whether each request is allowed
+        """
+        url = "/api/batch-enforce"
+        params = {
+            "permissionId": permission_id,
+            "modelId": model_id,
+            "enforceId": enforce_id,
+            "owner": owner,
+        }
+
+        async with self._session as session:
+            response = await session.post(
+                url,
+                params=params,
+                data=json.dumps(casbin_request),
+                auth=aiohttp.BasicAuth(self.client_id, self.client_secret),
+                headers={"Content-Type": "application/json"},
+            )
+
+        data = response.get("data")
+        if data is None:
+            error_str = "Casdoor response error: 'data' field is missing\n" + json.dumps(response)
+            raise ValueError(error_str)
+
+        if not isinstance(data, list):
+            error_str = f"Casdoor 'data' is not a list (got {type(data)}):\n{json.dumps(response)}"
+            raise ValueError(error_str)
+
+        enforce_results = data[0] if data else []
+
+        if (
+            not isinstance(enforce_results, list)
+            or len(enforce_results) > 0
+            and not isinstance(enforce_results[0], bool)
+        ):
+            error_str = (
+                f"Casdoor response contains invalid results (got {type(enforce_results)}):\n{json.dumps(response)}"
+            )
+            raise ValueError(error_str)
+
+        return enforce_results
 
     async def get_users(self) -> Dict:
         """

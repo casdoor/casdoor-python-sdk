@@ -258,7 +258,7 @@ class CasdoorSDK(
         certificate = x509.load_pem_x509_certificate(self.certification, default_backend())
 
         return_json = jwt.decode(
-            token.encode("utf-8"),
+            token,
             certificate.public_key(),
             algorithms=self.algorithms,
             audience=self.client_id,
