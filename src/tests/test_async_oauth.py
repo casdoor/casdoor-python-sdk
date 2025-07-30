@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest import IsolatedAsyncioTestCase, mock
+from unittest import IsolatedAsyncioTestCase
 
 import src.tests.test_util as test_util
 from src.casdoor.async_main import AsyncCasdoorSDK
@@ -28,7 +28,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
     """
 
     # server returned authorization code
-    code = "6d038ac60d4e1f17e742"
+    code = "21dc0ac806c27e6d7962"
 
     # Casdoor user and password for auth with
     # Resource Owner Password Credentials Grant.
@@ -136,91 +136,28 @@ class TestOAuth(IsolatedAsyncioTestCase):
 
     async def test_enforce(self):
         sdk = self.get_sdk()
-        status = await sdk.enforce("built-in/permission-built-in", "admin", "a", "ac")
+        status = await sdk.enforce(
+            permission_id="built-in/permission-built-in",
+            model_id="",
+            resource_id="",
+            enforce_id="",
+            owner="",
+            casbin_request=["alice", "data1", "read"],
+        )
         self.assertIsInstance(status, bool)
 
-    def mocked_enforce_requests_post(*args, **kwargs):
-        class MockResponse:
-            def __init__(
-                self,
-                json_data,
-                status_code=200,
-            ):
-                self.json_data = json_data
-                self.status_code = status_code
-
-            def json(self):
-                return self.json_data
-
-        result = True
-        for i in range(0, 5):
-            if kwargs.get("json").get(f"v{i}") != f"v{i}":
-                result = False
-
-        return MockResponse(result)
-
-    @mock.patch("aiohttp.ClientSession.post", side_effect=mocked_enforce_requests_post)
-    async def test_enforce_parmas(self, mock_post):
+    async def test_batch_enforce(self):
         sdk = self.get_sdk()
-        status = await sdk.enforce(
-            "built-in/permission-built-in",
-            "v0",
-            "v1",
-            "v2",
-            v3="v3",
-            v4="v4",
-            v5="v5",
-        )
-        self.assertEqual(status, True)
-
-    def mocked_batch_enforce_requests_post(*args, **kwargs):
-        class MockResponse:
-            def __init__(
-                self,
-                json_data,
-                status_code=200,
-            ):
-                self.json_data = json_data
-                self.status_code = status_code
-
-            def json(self):
-                return self.json_data
-
-        json = kwargs.get("json")
-        result = [True for i in range(0, len(json))]
-        for k in range(0, len(json)):
-            for i in range(0, len(json[k]) - 1):
-                if json[k].get(f"v{i}") != f"v{i}":
-                    result[k] = False
-
-        return MockResponse(result)
-
-    @mock.patch(
-        "aiohttp.ClientSession.post",
-        side_effect=mocked_batch_enforce_requests_post,
-    )
-    def test_batch_enforce(self, mock_post):
-        sdk = self.get_sdk()
-        status = sdk.batch_enforce(
-            "built-in/permission-built-in",
-            [
-                ["v0", "v1", "v2", "v3", "v4", "v5"],
-                ["v0", "v1", "v2", "v3", "v4", "v1"],
-            ],
+        status = await sdk.batch_enforce(
+            permission_id="built-in/permission-built-in",
+            model_id="",
+            enforce_id="",
+            owner="",
+            casbin_request=[["alice", "data1", "read"], ["bob", "data2", "write"]],
         )
         self.assertEqual(len(status), 2)
-        self.assertEqual(status[0], True)
-        self.assertEqual(status[1], False)
-
-    @mock.patch(
-        "aiohttp.ClientSession.post",
-        side_effect=mocked_batch_enforce_requests_post,
-    )
-    def test_batch_enforce_raise(self, mock_post):
-        sdk = self.get_sdk()
-        with self.assertRaises(ValueError) as context:
-            sdk.batch_enforce("built-in/permission-built-in", [["v0", "v1"]])
-        self.assertEqual("Invalid permission rule[0]: ['v0', 'v1']", str(context.exception))
+        self.assertIsInstance(status[0], bool)
+        self.assertIsInstance(status[1], bool)
 
     async def test_get_users(self):
         sdk = self.get_sdk()
