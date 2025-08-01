@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.35.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.34.0...v1.35.0) (2025-08-01)
+
+
+### Features
+
+* add new APIs: get_user_by_email, get_user_by_phone, get_user_by_user_id, etc. ([#105](https://github.com/casdoor/casdoor-python-sdk/issues/105)) ([00aafa3](https://github.com/casdoor/casdoor-python-sdk/commit/00aafa3eb9beebc684512a256f8dc4e0a6a54d96))
+
 # [1.34.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.33.0...v1.34.0) (2025-07-30)
 
 
