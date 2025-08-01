@@ -15,29 +15,40 @@
 import datetime
 import unittest
 
+import src.tests.test_util as test_util
 from src.casdoor import CasdoorSDK
 from src.casdoor.user import User
-from src.tests.test_util import (
-    TestApplication,
-    TestClientId,
-    TestClientSecret,
-    TestEndpoint,
-    TestJwtPublicKey,
-    TestOrganization,
-    get_random_name,
-)
 
 
 class UserTest(unittest.TestCase):
+    @staticmethod
+    def get_sdk():
+        sdk = CasdoorSDK(
+            endpoint=test_util.TestEndpoint,
+            client_id=test_util.TestClientId,
+            client_secret=test_util.TestClientSecret,
+            certificate=test_util.TestJwtPublicKey,
+            org_name=test_util.TestOrganization,
+            application_name=test_util.TestApplication,
+        )
+        return sdk
+
     def test_user(self):
-        name = get_random_name("User")
+        name = test_util.get_random_name("User")
+        email = f"{name}@gmail.com"
+        phone = test_util.get_random_code(11)
 
         # Add a new object
-        user = User.new(owner="admin", name=name, created_time=datetime.datetime.now().isoformat(), display_name=name)
-
-        sdk = CasdoorSDK(
-            TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication
+        user = User.new(
+            owner="admin",
+            name=name,
+            created_time=datetime.datetime.now().isoformat(),
+            display_name=name,
+            email=email,
+            phone=phone,
         )
+
+        sdk = UserTest.get_sdk()
         try:
             sdk.add_user(user=user)
         except Exception as e:
@@ -54,9 +65,16 @@ class UserTest(unittest.TestCase):
         # Get the object
         try:
             user = sdk.get_user(name)
+            user_id = user.id
+            user_by_email = sdk.get_user_by_email(email)
+            user_by_phone = sdk.get_user_by_phone(phone)
+            user_by_user_id = sdk.get_user_by_user_id(user_id)
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
         self.assertEqual(user.name, name)
+        self.assertEqual(user_by_email.name, name)
+        self.assertEqual(user_by_phone.name, name)
+        self.assertEqual(user_by_user_id.name, name)
 
         # Update the object
         updated_display_name = "Updated Casdoor Website"
@@ -85,3 +103,24 @@ class UserTest(unittest.TestCase):
         except Exception as e:
             self.fail(f"Failed to get object: {e}")
         self.assertIsNone(deleted_user, "Failed to delete object, it's still retrievable")
+
+    def test_get_global_users(self):
+        sdk = UserTest.get_sdk()
+        try:
+            users = sdk.get_global_users()
+        except Exception as e:
+            self.fail(f"Fail to get object:{e}")
+
+        self.assertIsInstance(users, list, "The returned result is not a list")
+        for user in users:
+            self.assertIsInstance(user, User, "There are non User type objects in the list")
+
+    def test_get_sort_users(self):
+        sdk = UserTest.get_sdk()
+        try:
+            users = sdk.get_sorted_users("created_time", 25)
+        except Exception as e:
+            self.fail(f"Fail to get object:{e}")
+        self.assertIsInstance(users, list, "The returned result is not a list")
+        for user in users:
+            self.assertIsInstance(user, User, "There are non User type objects in the list")
