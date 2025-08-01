@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import requests
 
@@ -54,16 +54,18 @@ class User:
         self.invitationCode = ""
 
     @classmethod
-    def new(cls, owner, name, created_time, display_name):
+    def new(cls, owner, name, created_time, display_name, email="", phone=""):
         self = cls()
         self.name = name
         self.owner = owner
         self.createdTime = created_time
         self.displayName = display_name
+        self.email = email
+        self.phone = phone
         return self
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict) -> Optional["User"]:
         if data is None:
             return None
 
@@ -79,9 +81,52 @@ class User:
     def to_dict(self) -> dict:
         return self.__dict__
 
+    def get_id(self) -> str:
+        return f"{self.owner}/{self.name}"
+
 
 class _UserSDK:
-    def get_users(self) -> List[Dict]:
+    def get_global_users(self) -> List[User]:
+        """ """
+        url = self.endpoint + "/api/get-global-users"
+        params = {
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        users = []
+        for user in response["data"]:
+            users.append(User.from_dict(user))
+        return users
+
+    def get_sorted_users(self, sorter: str, limit: str) -> List[User]:
+        """
+        Get the sorted users from Casdoor.
+
+        :param sroter: the DB column name to sort by, e.g., created_time
+        :param limiter: the count of users to return, e.g., 25
+        """
+        url = self.endpoint + "/api/get-sorted-users"
+        params = {
+            "owner": self.org_name,
+            "sorter": sorter,
+            "limit": limit,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        users = []
+        for user in response["data"]:
+            users.append(User.from_dict(user))
+        return users
+
+    def get_users(self) -> List[User]:
         """
         Get the users from Casdoor.
 
@@ -102,16 +147,73 @@ class _UserSDK:
             users.append(User.from_dict(user))
         return users
 
-    def get_user(self, user_id: str) -> User:
+    def get_user(self, name: str) -> User:
         """
-        Get the user from Casdoor providing the user_id.
+        Get the user from Casdoor providing the name.
 
-        :param user_id: the id of the user
+        :param name: the name of the user
         :return: a dict that contains user's info
         """
         url = self.endpoint + "/api/get-user"
         params = {
-            "id": f"{self.org_name}/{user_id}",
+            "id": f"{self.org_name}/{name}",
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return User.from_dict(response["data"])
+
+    def get_user_by_email(self, email: str) -> User:
+        """
+        Get the user from Casdoor providing the email.
+
+        :param email: the email of the user
+        :return: a User object that contains user's info
+        """
+        url = self.endpoint + "/api/get-user"
+        params = {
+            "email": email,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return User.from_dict(response["data"])
+
+    def get_user_by_phone(self, phone: str) -> User:
+        """
+        Get the user from Casdoor providing the phone number.
+
+        :param phone: the phone number of the user
+        :return: a User object that contains user's info
+        """
+        url = self.endpoint + "/api/get-user"
+        params = {
+            "phone": phone,
+            "clientId": self.client_id,
+            "clientSecret": self.client_secret,
+        }
+        r = requests.get(url, params)
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return User.from_dict(response["data"])
+
+    def get_user_by_user_id(self, user_id: str) -> User:
+        """
+        Get the user from Casdoor providing the user ID.
+
+        :param user_id: the user ID of the user
+        :return: a User object that contains user's info
+        """
+        url = self.endpoint + "/api/get-user"
+        params = {
+            "userId": user_id,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
@@ -146,10 +248,25 @@ class _UserSDK:
         return count
 
     def modify_user(self, method: str, user: User) -> Dict:
+        """
+        modifyUser is an encapsulation of user CUD(Create, Update, Delete) operations.
+        possible actions are `add-user`, `update-user`, `delete-user`,
+        """
+        id = user.get_id()
+        return self.modify_user_by_id(method, id, user)
+
+    def modify_user_by_id(self, method: str, id: str, user: User) -> Dict:
+        """
+        Modify the user from Casdoor providing the ID.
+
+        :param id: the id ( owner/name ) of the user
+        :param user: a User object that contains user's info
+        """
+
         url = self.endpoint + f"/api/{method}"
         user.owner = self.org_name
         params = {
-            "id": f"{user.owner}/{user.name}",
+            "id": id,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
@@ -166,6 +283,10 @@ class _UserSDK:
 
     def update_user(self, user: User) -> Dict:
         response = self.modify_user("update-user", user)
+        return response
+
+    def update_user_by_id(self, id: str, user: User) -> Dict:
+        response = self.modify_user_by_id("update-user", id, user)
         return response
 
     def delete_user(self, user: User) -> Dict:
