@@ -20,38 +20,157 @@ import requests
 
 class User:
     def __init__(self):
-        self.address = [""]
-        self.affiliation = ""
-        self.avatar = ""
+        self.owner = ""
+        self.name = ""
         self.createdTime = ""
-        self.dingtalk = ""
-        self.displayName = ""
-        self.email = ""
-        self.facebook = ""
-        self.gitee = ""
-        self.github = ""
-        self.google = ""
-        self.hash = ""
+        self.updatedTime = ""
+
         self.id = ""
+        self.externalId = ""
+        self.type = ""
+        self.password = ""
+        self.passwordSalt = ""
+        self.passwordType = ""
+
+        self.displayName = ""
+        self.firstName = ""
+        self.lastName = ""
+        self.avatar = ""
+        self.avatarType = ""
+        self.permanentAvatar = ""
+        self.email = ""
+        self.emailVerified = False
+        self.phone = ""
+        self.countryCode = ""
+        self.region = ""
+        self.location = ""
+        self.address = []
+        self.affiliation = ""
+        self.title = ""
+        self.idCardType = ""
+        self.idCard = ""
+        self.homepage = ""
+        self.bio = ""
+        self.tag = ""
+        self.language = ""
+        self.gender = ""
+        self.birthday = ""
+        self.education = ""
+
+        self.score = 0
+        self.karma = 0
+        self.ranking = 0
+        self.isDefaultAvatar = False
+        self.isOnline = False
         self.isAdmin = False
         self.isForbidden = False
-        self.isGlobalAdmin = False
-        self.language = ""
-        self.name = ""
-        self.owner = ""
-        self.password = ""
-        self.phone = ""
-        self.preHash = ""
-        self.qq = ""
-        self.score = 0
+        self.isDeleted = False
         self.signupApplication = ""
-        self.tag = ""
-        self.type = ""
-        self.updatedTime = ""
+
+        self.hash = ""
+        self.preHash = ""
+        self.accessKey = ""
+        self.accessSecret = ""
+
+        self.createdIp = ""
+        self.lastSigninTime = ""
+        self.lastSigninIp = ""
+
+        self.github = ""
+        self.google = ""
+        self.qq = ""
         self.wechat = ""
+        self.facebook = ""
+        self.dingtalk = ""
         self.weibo = ""
-        self.invitation = ""
-        self.invitationCode = ""
+        self.gitee = ""
+        self.linkedin = ""
+        self.wecom = ""
+        self.lark = ""
+        self.gitlab = ""
+        self.adfs = ""
+        self.baidu = ""
+        self.alipay = ""
+        self.casdoor = ""
+        self.infoflow = ""
+        self.apple = ""
+        self.azureAd = ""
+        self.slack = ""
+        self.steam = ""
+        self.bilibili = ""
+        self.okta = ""
+        self.douyin = ""
+        self.line = ""
+        self.amazon = ""
+        self.auth0 = ""
+        self.battleNet = ""
+        self.bitbucket = ""
+        self.box = ""
+        self.cloudFoundry = ""
+        self.dailymotion = ""
+        self.deezer = ""
+        self.digitalOcean = ""
+        self.discord = ""
+        self.dropbox = ""
+        self.eveOnline = ""
+        self.fitbit = ""
+        self.gitea = ""
+        self.heroku = ""
+        self.influxCloud = ""
+        self.instagram = ""
+        self.intercom = ""
+        self.kakao = ""
+        self.lastfm = ""
+        self.mailru = ""
+        self.meetup = ""
+        self.microsoftOnline = ""
+        self.naver = ""
+        self.nextcloud = ""
+        self.onedrive = ""
+        self.oura = ""
+        self.patreon = ""
+        self.paypal = ""
+        self.salesForce = ""
+        self.shopify = ""
+        self.soundcloud = ""
+        self.spotify = ""
+        self.strava = ""
+        self.stripe = ""
+        self.tiktok = ""
+        self.tumblr = ""
+        self.twitch = ""
+        self.twitter = ""
+        self.typetalk = ""
+        self.uber = ""
+        self.vk = ""
+        self.wepay = ""
+        self.xero = ""
+        self.yahoo = ""
+        self.yammer = ""
+        self.yandex = ""
+        self.zoom = ""
+        self.metaMask = ""
+        self.web3Onboard = ""
+        self.custom = ""
+
+        self.preferredMfaType = ""
+        self.recoveryCodes = []
+        self.totpSecret = ""
+        self.mfaPhoneEnabled = False
+        self.mfaEmailEnabled = False
+
+        self.ldap = ""
+        self.properties = {}
+
+        self.roles = []
+        self.permissions = []
+        self.groups = []
+
+        self.lastSigninWrongTime = ""
+        self.signinWrongTimes = 0
+
+        self.managedAccounts = []
+        self.needUpdatePassword = False
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, email="", phone=""):
@@ -87,7 +206,6 @@ class User:
 
 class _UserSDK:
     def get_global_users(self) -> List[User]:
-        """ """
         url = self.endpoint + "/api/get-global-users"
         params = {
             "clientId": self.client_id,
