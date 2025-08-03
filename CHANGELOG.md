@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.36.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.35.0...v1.36.0) (2025-08-03)
+
+
+### Features
+
+* sync user fields with Casdoor ([#106](https://github.com/casdoor/casdoor-python-sdk/issues/106)) ([02e76d2](https://github.com/casdoor/casdoor-python-sdk/commit/02e76d2d00756bb9c66eeeeb2eace6f9fa3e5e52))
+
 # [1.35.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.34.0...v1.35.0) (2025-08-01)
 
 
