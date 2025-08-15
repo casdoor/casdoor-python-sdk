@@ -159,6 +159,9 @@ class User:
         self.mfaPhoneEnabled = False
         self.mfaEmailEnabled = False
 
+        self.invitation = ""
+        self.invitationCode = ""
+
         self.ldap = ""
         self.properties = {}
 
