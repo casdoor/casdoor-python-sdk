@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.37.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.36.0...v1.37.0) (2025-08-15)
+
+
+### Features
+
+* add back invitation and invitationCode fields for User ([#107](https://github.com/casdoor/casdoor-python-sdk/issues/107)) ([f3964db](https://github.com/casdoor/casdoor-python-sdk/commit/f3964dbc5a7c6d9f23f1a4349a702bd85704838c))
+
 # [1.36.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.35.0...v1.36.0) (2025-08-03)
 
 
