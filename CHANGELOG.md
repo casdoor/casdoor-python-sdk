@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.38.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.37.0...v1.38.0) (2025-08-22)
+
+
+### Features
+
+* fix leniency on setup tools requirements ([#109](https://github.com/casdoor/casdoor-python-sdk/issues/109)) ([6a46d7c](https://github.com/casdoor/casdoor-python-sdk/commit/6a46d7c2e147135b6707d23b4c4456a10fd6cac9))
+
 # [1.37.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.36.0...v1.37.0) (2025-08-15)
 
 
