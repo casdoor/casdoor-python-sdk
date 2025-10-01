@@ -43,6 +43,43 @@ from .user import _UserSDK
 from .webhook import _WebhookSDK
 
 
+def _build_enforce_params(
+    permission_id: str,
+    model_id: str,
+    resource_id: str,
+    enforce_id: str,
+    owner: str,
+) -> Dict[str, str]:
+    """
+    Build and validate parameters for enforce API calls.
+
+    Exactly one of the parameters must be provided and non-empty.
+
+    :return: Dictionary with exactly one parameter set
+    :raises ValueError: If zero or multiple parameters are provided
+    """
+    params = {}
+    if permission_id:
+        params["permissionId"] = permission_id
+    if model_id:
+        params["modelId"] = model_id
+    if resource_id:
+        params["resourceId"] = resource_id
+    if enforce_id:
+        params["enforcerId"] = enforce_id
+    if owner:
+        params["owner"] = owner
+
+    if len(params) != 1:
+        raise ValueError(
+            "Exactly one of (permission_id, model_id, resource_id, enforce_id, owner) "
+            "must be provided and non-empty. "
+            f"Got {len(params)} parameters: {list(params.keys())}"
+        )
+
+    return params
+
+
 class CasdoorSDK(
     _UserSDK,
     _AdapterSDK,
@@ -287,27 +324,8 @@ class CasdoorSDK(
         :return: a boolean value indicating whether the request is allowed
         """
         url = self.endpoint + "/api/enforce"
+        params = _build_enforce_params(permission_id, model_id, resource_id, enforce_id, owner)
 
-        # Build params with only non-empty values
-        # API requires exactly one of: permissionId, modelId, resourceId, enforcerId, owner
-        params = {}
-        if permission_id:
-            params["permissionId"] = permission_id
-        if model_id:
-            params["modelId"] = model_id
-        if resource_id:
-            params["resourceId"] = resource_id
-        if enforce_id:
-            params["enforcerId"] = enforce_id  # Fixed: was "enforceId"
-        if owner:
-            params["owner"] = owner
-        # Validate exactly one parameter is provided
-        if len(params) != 1:
-            raise ValueError(
-                "Exactly one of (permission_id, model_id, resource_id, enforce_id, owner) "
-                "must be provided and non-empty. "
-                f"Got {len(params)} parameters: {list(params.keys())}"
-            )
         r = requests.post(
             url,
             params=params,
@@ -352,26 +370,8 @@ class CasdoorSDK(
         :return: a list of boolean values indicating whether each request is allowed
         """
         url = self.endpoint + "/api/batch-enforce"
+        params = _build_enforce_params(permission_id, model_id, "", enforce_id, owner)
 
-        # Build params with only non-empty values
-        # API requires exactly one of: permissionId, modelId, enforcerId, owner
-        params = {}
-        if permission_id:
-            params["permissionId"] = permission_id
-        if model_id:
-            params["modelId"] = model_id
-        if enforce_id:
-            params["enforcerId"] = enforce_id  # Fixed: was "enforceId"
-        if owner:
-            params["owner"] = owner
-
-        # Validate exactly one parameter is provided
-        if len(params) != 1:
-            raise ValueError(
-                "Exactly one of (permission_id, model_id, enforce_id, owner) "
-                "must be provided and non-empty. "
-                f"Got {len(params)} parameters: {list(params.keys())}"
-            )
         r = requests.post(
             url,
             params=params,
