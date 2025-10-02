@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.39.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.38.0...v1.39.0) (2025-10-02)
+
+
+### Features
+
+* fix enforce param name from enforceId to enforcerId ([#111](https://github.com/casdoor/casdoor-python-sdk/issues/111)) ([462aefc](https://github.com/casdoor/casdoor-python-sdk/commit/462aefce77c4d9b6cf7431b6a939ee2fff451a25))
+
 # [1.38.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.37.0...v1.38.0) (2025-08-22)
 
 
