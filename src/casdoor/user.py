@@ -368,20 +368,26 @@ class _UserSDK:
         count = response.get("data")
         return count
 
-    def modify_user(self, method: str, user: User) -> Dict:
+    def modify_user(self, method: str, user: User, columns: Optional[List[str]] = None) -> Dict:
         """
         modifyUser is an encapsulation of user CUD(Create, Update, Delete) operations.
         possible actions are `add-user`, `update-user`, `delete-user`,
+        
+        :param method: the operation method (add-user, update-user, delete-user)
+        :param user: a User object that contains user's info
+        :param columns: optional list of column names to update (e.g., ["roles", "email"])
         """
         id = user.get_id()
-        return self.modify_user_by_id(method, id, user)
+        return self.modify_user_by_id(method, id, user, columns)
 
-    def modify_user_by_id(self, method: str, id: str, user: User) -> Dict:
+    def modify_user_by_id(self, method: str, id: str, user: User, columns: Optional[List[str]] = None) -> Dict:
         """
         Modify the user from Casdoor providing the ID.
 
+        :param method: the operation method (add-user, update-user, delete-user)
         :param id: the id ( owner/name ) of the user
         :param user: a User object that contains user's info
+        :param columns: optional list of column names to update (e.g., ["roles", "email"])
         """
 
         url = self.endpoint + f"/api/{method}"
@@ -391,6 +397,11 @@ class _UserSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
+        
+        # Add columns parameter if provided (for selective field updates)
+        if columns:
+            params["columns"] = ",".join(columns)
+        
         user_info = json.dumps(user.to_dict())
         r = requests.post(url, params=params, data=user_info)
         response = r.json()
@@ -402,12 +413,27 @@ class _UserSDK:
         response = self.modify_user("add-user", user)
         return response
 
-    def update_user(self, user: User) -> Dict:
-        response = self.modify_user("update-user", user)
+    def update_user(self, user: User, columns: Optional[List[str]] = None) -> Dict:
+        """
+        Update a user in Casdoor.
+        
+        :param user: a User object that contains user's info
+        :param columns: optional list of column names to update (e.g., ["roles", "email"])
+                       If not provided, all fields will be updated
+        """
+        response = self.modify_user("update-user", user, columns)
         return response
 
-    def update_user_by_id(self, id: str, user: User) -> Dict:
-        response = self.modify_user_by_id("update-user", id, user)
+    def update_user_by_id(self, id: str, user: User, columns: Optional[List[str]] = None) -> Dict:
+        """
+        Update a user in Casdoor by ID.
+        
+        :param id: the id ( owner/name ) of the user
+        :param user: a User object that contains user's info
+        :param columns: optional list of column names to update (e.g., ["roles", "email"])
+                       If not provided, all fields will be updated
+        """
+        response = self.modify_user_by_id("update-user", id, user, columns)
         return response
 
     def delete_user(self, user: User) -> Dict:
