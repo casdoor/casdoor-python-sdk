@@ -422,20 +422,20 @@ class AsyncCasdoorSDK:
     async def modify_user(self, method: str, user: User, params=None, columns: Optional[List[str]] = None) -> Dict:
         """
         Modify user with optional columns parameter for selective field updates.
-        
+
         :param method: the operation method (add-user, update-user, delete-user)
         :param user: a User object that contains user's info
         :param params: additional parameters
         :param columns: optional list of column names to update (e.g., ["roles", "email"])
         """
         path = f"/api/{method}"
-        
+
         # Add columns to params if provided
         if columns:
             if params is None:
                 params = {}
             params["columns"] = ",".join(columns)
-        
+
         async with self._session as session:
             return await session.post(path, params=params, headers=self.headers, json=user.to_dict())
 
@@ -446,7 +446,7 @@ class AsyncCasdoorSDK:
     async def update_user(self, user: User, columns: Optional[List[str]] = None) -> Dict:
         """
         Update a user in Casdoor.
-        
+
         :param user: a User object that contains user's info
         :param columns: optional list of column names to update (e.g., ["roles", "email"])
                        If not provided, all fields will be updated
