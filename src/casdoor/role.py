@@ -125,3 +125,63 @@ class _RoleSDK:
     def delete_role(self, role: Role) -> Dict:
         response = self.modify_role("delete-role", role)
         return response
+
+    def assign_role_to_user(self, username: str, role_name: str) -> Dict:
+        """
+        Assign a role to a user by adding the user to the role's users list.
+
+        :param username: the username to assign the role to
+        :param role_name: the name of the role to assign
+        :return: response dict with status
+        """
+        user_id = f"{self.org_name}/{username}"
+
+        role = self.get_role(role_name)
+        if role is None:
+            raise Exception(f"Role {role_name} not found")
+
+        if not hasattr(role, "users") or role.users is None:
+            role.users = []
+
+        if user_id not in role.users:
+            role.users.append(user_id)
+            return self.update_role(role)
+
+        return {"status": "ok", "msg": "User already has this role"}
+
+    def remove_role_from_user(self, username: str, role_name: str) -> Dict:
+        """
+        Remove a role from a user by removing the user from the role's users list.
+
+        :param username: the username to remove the role from
+        :param role_name: the name of the role to remove
+        :return: response dict with status
+        """
+        user_id = f"{self.org_name}/{username}"
+
+        role = self.get_role(role_name)
+        if role is None:
+            raise Exception(f"Role {role_name} not found")
+
+        if hasattr(role, "users") and role.users and user_id in role.users:
+            role.users.remove(user_id)
+            return self.update_role(role)
+
+        return {"status": "ok", "msg": "User does not have this role"}
+
+    def get_user_roles(self, username: str) -> List[Role]:
+        """
+        Get all roles assigned to a user.
+
+        :param username: the username to get roles for
+        :return: list of Role objects assigned to the user
+        """
+        user_id = f"{self.org_name}/{username}"
+        all_roles = self.get_roles()
+
+        user_roles = []
+        for role in all_roles:
+            if hasattr(role, "users") and role.users and user_id in role.users:
+                user_roles.append(role)
+
+        return user_roles
