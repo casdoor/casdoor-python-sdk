@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.40.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.39.0...v1.40.0) (2025-11-04)
+
+
+### Features
+
+* add role management helper methods ([#114](https://github.com/casdoor/casdoor-python-sdk/issues/114)) ([f3873e9](https://github.com/casdoor/casdoor-python-sdk/commit/f3873e9ea2de8701c01e31c6f164d8a9b035dc23))
+
 # [1.39.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.38.0...v1.39.0) (2025-10-02)
 
 
