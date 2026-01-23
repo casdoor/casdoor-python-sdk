@@ -433,7 +433,7 @@ class CasdoorSDK(
         return secrets.token_hex(length)
 
     @staticmethod
-    def verify_state_token(received_state: str, expected_state: str) -> bool:
+    def verify_state_token(received_state: Optional[str], expected_state: Optional[str]) -> bool:
         """
         Verify that the received state token matches the expected state token.
         Uses constant-time comparison to prevent timing attacks.
