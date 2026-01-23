@@ -15,7 +15,7 @@
 import json
 import secrets
 from typing import Dict, List, Optional
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse, urlunparse
 
 import jwt
 import requests
@@ -160,7 +160,9 @@ class CasdoorSDK(
             "scope": scope,
             "state": state if state is not None else self.application_name,
         }
-        return url + "?" + urlencode(params)
+        # Parse the URL and add query parameters
+        parsed = urlparse(url)
+        return urlunparse(parsed._replace(query=urlencode(params)))
 
     def get_oauth_token(
         self, code: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None
