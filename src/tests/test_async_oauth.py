@@ -214,3 +214,56 @@ class TestOAuth(IsolatedAsyncioTestCase):
             response,
             f"{sdk.front_endpoint}/login/oauth/authorize?client_id={sdk.client_id}&response_type=code&redirect_uri={redirect_uri}&scope=read&state={sdk.application_name}",
         )
+
+    def test_generate_state_token(self):
+        sdk = self.get_sdk()
+        state1 = sdk.generate_state_token()
+        state2 = sdk.generate_state_token()
+        
+        # Check that state tokens are strings
+        self.assertIsInstance(state1, str)
+        self.assertIsInstance(state2, str)
+        
+        # Check that state tokens are not empty
+        self.assertGreater(len(state1), 0)
+        self.assertGreater(len(state2), 0)
+        
+        # Check that each generated token is unique
+        self.assertNotEqual(state1, state2)
+        
+        # Default length is 32 bytes = 64 hex characters
+        self.assertEqual(len(state1), 64)
+        
+        # Test custom length
+        state_custom = sdk.generate_state_token(length=16)
+        self.assertEqual(len(state_custom), 32)  # 16 bytes = 32 hex chars
+
+    def test_verify_state_token(self):
+        sdk = self.get_sdk()
+        state = sdk.generate_state_token()
+        
+        # Valid state should match
+        self.assertTrue(sdk.verify_state_token(state, state))
+        
+        # Different states should not match
+        state2 = sdk.generate_state_token()
+        self.assertFalse(sdk.verify_state_token(state, state2))
+        
+        # Empty or None states should not match
+        self.assertFalse(sdk.verify_state_token("", state))
+        self.assertFalse(sdk.verify_state_token(state, ""))
+        self.assertFalse(sdk.verify_state_token(None, state))
+        self.assertFalse(sdk.verify_state_token(state, None))
+
+    async def test_get_auth_link_with_custom_state(self):
+        sdk = self.get_sdk()
+        custom_state = sdk.generate_state_token()
+        redirect_uri = "http://localhost:9000/callback"
+        
+        # Test with custom state
+        auth_url = await sdk.get_auth_link(redirect_uri=redirect_uri, state=custom_state)
+        self.assertIn("state=" + custom_state, auth_url)
+        
+        # Test with default state (application_name)
+        auth_url_default = await sdk.get_auth_link(redirect_uri=redirect_uri)
+        self.assertIn("state=" + sdk.application_name, auth_url_default)

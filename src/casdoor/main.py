@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import json
+import secrets
 from typing import Dict, List, Optional
 
 import jwt
@@ -133,14 +134,30 @@ class CasdoorSDK(
             raise TypeError("certificate field must be str type")
         return self.certificate.encode("utf-8")
 
-    def get_auth_link(self, redirect_uri: str, response_type: str = "code", scope: str = "read"):
+    def get_auth_link(
+        self,
+        redirect_uri: str,
+        response_type: str = "code",
+        scope: str = "read",
+        state: Optional[str] = None,
+    ):
+        """
+        Get authorization link for OAuth flow.
+
+        :param redirect_uri: The redirect URI for the OAuth callback
+        :param response_type: OAuth response type (default: "code")
+        :param scope: OAuth scope (default: "read")
+        :param state: Custom state parameter for CSRF protection.
+                     If not provided, defaults to application_name for backward compatibility.
+        :return: Authorization URL
+        """
         url = self.front_endpoint + "/login/oauth/authorize"
         params = {
             "client_id": self.client_id,
             "response_type": response_type,
             "redirect_uri": redirect_uri,
             "scope": scope,
-            "state": self.application_name,
+            "state": state if state is not None else self.application_name,
         }
         r = requests.request("", url, params=params)
         return r.url
@@ -402,3 +419,27 @@ class CasdoorSDK(
             raise ValueError(error_str)
 
         return enforce_results
+
+    @staticmethod
+    def generate_state_token(length: int = 32) -> str:
+        """
+        Generate a cryptographically secure random state token for CSRF protection.
+
+        :param length: Length of the state token in bytes (default: 32)
+        :return: A random state token as a hex string
+        """
+        return secrets.token_hex(length)
+
+    @staticmethod
+    def verify_state_token(received_state: str, expected_state: str) -> bool:
+        """
+        Verify that the received state token matches the expected state token.
+        Uses constant-time comparison to prevent timing attacks.
+
+        :param received_state: The state parameter received from OAuth callback
+        :param expected_state: The expected state token (stored in session)
+        :return: True if states match, False otherwise
+        """
+        if not received_state or not expected_state:
+            return False
+        return secrets.compare_digest(received_state, expected_state)

@@ -109,6 +109,65 @@ decoded_msg = sdk.parse_jwt_token(access_token) # or sdk.parse_jwt_token(access_
 
 `decoded_msg` is the JSON data decoded from the `access_token`, which contains user info and other useful stuff.
 
+## CSRF Protection with State Parameter
+
+For enhanced security, you should use the `state` parameter to protect against CSRF attacks. The SDK provides helper methods for state generation and validation:
+
+### Using Custom State Parameter
+
+```python
+from casdoor import CasdoorSDK
+
+# Initialize SDK
+sdk = CasdoorSDK(
+    endpoint,
+    client_id,
+    client_secret,
+    certificate,
+    org_name,
+    application_name,
+)
+
+# Step 1: Generate a state token before redirecting to Casdoor
+state = sdk.generate_state_token()
+
+# Store the state in your session (implementation depends on your framework)
+# For example, using Flask:
+# session['oauth_state'] = state
+
+# Step 2: Generate auth URL with custom state
+auth_url = sdk.get_auth_link(redirect_uri="http://localhost:8080/callback", state=state)
+
+# Redirect user to auth_url
+# ...
+
+# Step 3: In your callback handler, verify the state
+def callback_handler():
+    # Get the state from the callback parameters
+    received_state = request.args.get('state')
+    
+    # Get the expected state from session
+    expected_state = session.get('oauth_state')
+    
+    # Verify state to prevent CSRF attacks
+    if not sdk.verify_state_token(received_state, expected_state):
+        # State validation failed - possible CSRF attack
+        raise ValueError("Invalid state parameter")
+    
+    # State is valid, proceed with token exchange
+    code = request.args.get('code')
+    token = sdk.get_oauth_token(code=code)
+    access_token = token.get("access_token")
+    decoded_msg = sdk.parse_jwt_token(access_token)
+    
+    # Clear the state from session
+    session.pop('oauth_state', None)
+    
+    return decoded_msg
+```
+
+**Note:** If you don't provide a custom `state` parameter to `get_auth_link()`, it will default to the `application_name` for backward compatibility. However, for production applications, it's strongly recommended to use a randomly generated state token for CSRF protection.
+
 ## Step4. Interact with the users
 
 casdoor-python-sdk support basic user operations, like:
