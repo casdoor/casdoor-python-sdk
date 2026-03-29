@@ -36,7 +36,7 @@ class AdapterTest(unittest.TestCase):
         adapter = Adapter.new(
             owner="admin",
             name=name,
-            created_time=datetime.datetime.now().isoformat(),
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             host=name,
             user="https://casdoor.org",
         )

@@ -36,7 +36,7 @@ class PaymentTest(unittest.TestCase):
         payment = Payment.new(
             owner="admin",
             name=name,
-            created_time=datetime.datetime.now().isoformat(),
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,
             product_name="casbin",
         )

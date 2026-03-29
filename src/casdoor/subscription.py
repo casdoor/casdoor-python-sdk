@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List
 
 import requests
@@ -25,8 +25,8 @@ class Subscription:
         self.name = ""
         self.createdTime = ""
         self.displayName = ""
-        self.startTime = datetime.now().isoformat()
-        self.endTime = datetime.now().isoformat()
+        self.startTime = datetime.now(timezone.utc).isoformat()
+        self.endTime = datetime.now(timezone.utc).isoformat()
         self.duration = 0
         self.description = ""
         self.user = ""
