@@ -33,7 +33,12 @@ class GroupTest(unittest.TestCase):
         name = get_random_name("group")
 
         # Add a new object
-        group = Group.new(owner="admin", name=name, created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(), display_name=name)
+        group = Group.new(
+            owner="admin",
+            name=name,
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            display_name=name,
+        )
 
         sdk = CasdoorSDK(
             TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication

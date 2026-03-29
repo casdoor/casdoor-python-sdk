@@ -34,7 +34,10 @@ class WebhookTest(unittest.TestCase):
 
         # Add a new object
         webhook = Webhook.new(
-            owner="casbin", name=name, created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(), organization="casbin"
+            owner="casbin",
+            name=name,
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            organization="casbin",
         )
 
         sdk = CasdoorSDK(
