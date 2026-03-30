@@ -1,5 +1,12 @@
 # Semantic Versioning Changelog
 
+# [1.41.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.40.0...v1.41.0) (2026-03-30)
+
+
+### Features
+
+* Add Python 3.13/3.14 support and bump deps ([#117](https://github.com/casdoor/casdoor-python-sdk/issues/117)) ([18a3b86](https://github.com/casdoor/casdoor-python-sdk/commit/18a3b863f31949090b5d73a8ccd4012524acad69))
+
 # [1.40.0](https://github.com/casdoor/casdoor-python-sdk/compare/v1.39.0...v1.40.0) (2025-11-04)
 
 
