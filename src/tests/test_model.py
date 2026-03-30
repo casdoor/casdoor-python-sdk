@@ -36,7 +36,7 @@ class ModelTest(unittest.TestCase):
         model = Model.new(
             owner="casbin",
             name=name,
-            created_time=datetime.datetime.now().isoformat(),
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,
             model_text="[request_definition]\n"
             + "r = sub, obj, act\n"

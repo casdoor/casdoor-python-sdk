@@ -36,7 +36,7 @@ class EnforcerTest(unittest.TestCase):
         enforcer = Enforcer.new(
             owner="admin",
             name=name,
-            created_time=datetime.datetime.now().isoformat(),
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,
             description="built-in/user-model-built-in",
             model="built-in/user-adapter-built-in",

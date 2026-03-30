@@ -36,7 +36,7 @@ class ApplicationTest(unittest.TestCase):
         application = Application.new(
             owner="admin",
             name=name,
-            created_time=datetime.datetime.now().isoformat(),
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,
             logo="https://cdn.casbin.org/img/casdoor-logo_1185x256.png",
             homepage_url="https://casdoor.org",

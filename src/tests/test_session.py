@@ -37,7 +37,7 @@ class sessionTest(unittest.TestCase):
             owner="casbin",
             name=name,
             application="app-built-in",
-            created_time=datetime.datetime.now().isoformat(),
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             session_id=[],
         )
 

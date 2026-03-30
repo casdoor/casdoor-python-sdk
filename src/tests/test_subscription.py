@@ -36,10 +36,11 @@ class SubscriptionTest(unittest.TestCase):
         subscription = Subscription.new(
             owner="admin",
             name=name,
-            created_time=datetime.datetime.now().isoformat(),
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,
             description="Casdoor Website",
         )
+        subscription.state = "Active"
 
         sdk = CasdoorSDK(
             TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication

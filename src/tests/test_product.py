@@ -36,7 +36,7 @@ class ProductTest(unittest.TestCase):
         product = Product.new(
             owner="admin",
             name=name,
-            created_time=datetime.datetime.now().isoformat(),
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,
             image="https://cdn.casbin.org/img/casdoor-logo_1185x256.png",
             description="Casdoor Website",
@@ -45,6 +45,7 @@ class ProductTest(unittest.TestCase):
             sold=0,
             state="Published",
         )
+        product.currency = "USD"
 
         sdk = CasdoorSDK(
             TestEndpoint, TestClientId, TestClientSecret, TestJwtPublicKey, TestOrganization, TestApplication

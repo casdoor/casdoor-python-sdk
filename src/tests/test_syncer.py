@@ -36,7 +36,7 @@ class SyncerTest(unittest.TestCase):
         syncer = Syncer.new(
             owner="admin",
             name=name,
-            created_time=datetime.datetime.now().isoformat(),
+            created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             organization="casbin",
             host="localhost",
             port=3306,
