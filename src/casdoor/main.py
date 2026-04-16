@@ -226,7 +226,8 @@ class CasdoorSDK(
         :param password: username password
         :return: Response from Casdoor
         """
-        params = self._get_payload_for_access_token_request(code=code, username=username, password=password)
+        params = self._get_payload_for_access_token_request(
+            code=code, username=username, password=password)
         return self._oauth_token_request(payload=params)
 
     def _oauth_token_request(self, payload: Dict) -> requests.Response:
@@ -292,7 +293,8 @@ class CasdoorSDK(
         :param token: access_token
         :return: the data in dict format
         """
-        certificate = x509.load_pem_x509_certificate(self.certification, default_backend())
+        certificate = x509.load_pem_x509_certificate(
+            self.certification, default_backend())
 
         return_json = jwt.decode(
             token,
@@ -324,7 +326,8 @@ class CasdoorSDK(
         :return: a boolean value indicating whether the request is allowed
         """
         url = self.endpoint + "/api/enforce"
-        params = _build_enforce_params(permission_id, model_id, resource_id, enforce_id, owner)
+        params = _build_enforce_params(
+            permission_id, model_id, resource_id, enforce_id, owner)
 
         r = requests.post(
             url,
@@ -340,9 +343,16 @@ class CasdoorSDK(
         if isinstance(response, dict):
             data = response.get("data")
             if isinstance(data, list) and len(data) > 0:
-                has_permission = data[0]
+                # Iterate through all results, return True if any is True
+                for result in data:
+                    if not isinstance(result, bool):
+                        error_str = "Casdoor response error:\n" + r.text
+                        raise ValueError(error_str)
+                    if result:
+                        return True
+                return False
             else:
-                has_permission = response
+                has_permission = data if data is not None else response
         else:
             has_permission = response
         if not isinstance(has_permission, bool):
@@ -370,7 +380,8 @@ class CasdoorSDK(
         :return: a list of boolean values indicating whether each request is allowed
         """
         url = self.endpoint + "/api/batch-enforce"
-        params = _build_enforce_params(permission_id, model_id, "", enforce_id, owner)
+        params = _build_enforce_params(
+            permission_id, model_id, "", enforce_id, owner)
 
         r = requests.post(
             url,
