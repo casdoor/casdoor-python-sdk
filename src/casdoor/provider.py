@@ -101,7 +101,7 @@ class _ProviderSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -123,7 +123,7 @@ class _ProviderSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -139,7 +139,7 @@ class _ProviderSDK:
             "clientSecret": self.client_secret,
         }
         provider_info = json.dumps(provider.to_dict())
-        r = requests.post(url, params=params, data=provider_info)
+        r = requests.post(url, params=params, data=provider_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import jwt
 import requests
@@ -112,7 +112,14 @@ class CasdoorSDK(
         org_name: str,
         application_name: str,
         front_endpoint: str = None,
+        verify: Union[bool, str] = True,
     ):
+        """
+        :param verify: TLS certificate verification for requests to Casdoor, same as the `verify`
+                       argument of `requests`: True (default) to verify with the system CA bundle,
+                       a path to a CA bundle file or directory (e.g. for a self-signed certificate),
+                       or False to skip verification (insecure, for testing only).
+        """
         self.endpoint = endpoint
         if front_endpoint:
             self.front_endpoint = front_endpoint
@@ -123,6 +130,7 @@ class CasdoorSDK(
         self.certificate = certificate
         self.org_name = org_name
         self.application_name = application_name
+        self.verify = verify
         self.grant_type = "authorization_code"
 
         self.algorithms = ["RS256"]
@@ -142,7 +150,7 @@ class CasdoorSDK(
             "scope": scope,
             "state": self.application_name,
         }
-        r = requests.request("", url, params=params)
+        r = requests.request("", url, params=params, verify=self.verify)
         return r.url
 
     def get_oauth_token(
@@ -237,7 +245,7 @@ class CasdoorSDK(
         :return: Response from Casdoor
         """
         url = self.endpoint + "/api/login/oauth/access_token"
-        response = requests.post(url, payload)
+        response = requests.post(url, payload, verify=self.verify)
         return response
 
     def refresh_token_request(self, refresh_token: str, scope: str = "") -> requests.Response:
@@ -256,7 +264,7 @@ class CasdoorSDK(
             "scope": scope,
             "refresh_token": refresh_token,
         }
-        return requests.post(url, params)
+        return requests.post(url, params, verify=self.verify)
 
     def refresh_oauth_token(self, refresh_token: str, scope: str = "") -> str:
         """
@@ -331,6 +339,7 @@ class CasdoorSDK(
             params=params,
             data=json.dumps(casbin_request),
             auth=(self.client_id, self.client_secret),
+            verify=self.verify,
         )
         if r.status_code != 200 or "json" not in r.headers["content-type"]:
             error_str = "Casdoor response error:\n" + str(r.text)
@@ -377,6 +386,7 @@ class CasdoorSDK(
             params=params,
             data=json.dumps(casbin_request),
             auth=(self.client_id, self.client_secret),
+            verify=self.verify,
         )
 
         if r.status_code != 200 or "json" not in r.headers["content-type"]:

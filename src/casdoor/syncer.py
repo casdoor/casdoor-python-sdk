@@ -119,7 +119,7 @@ class _SyncerSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -141,7 +141,7 @@ class _SyncerSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -156,7 +156,7 @@ class _SyncerSDK:
             "clientSecret": self.client_secret,
         }
         syncer_info = json.dumps(syncer.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=syncer_info)
+        r = requests.post(url, params=params, data=syncer_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

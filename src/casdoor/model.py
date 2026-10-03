@@ -79,7 +79,7 @@ class _ModelSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -101,7 +101,7 @@ class _ModelSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -116,7 +116,7 @@ class _ModelSDK:
             "clientSecret": self.client_secret,
         }
         model_info = json.dumps(model.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=model_info)
+        r = requests.post(url, params=params, data=model_info, verify=self.verify)
         response = r.json()
         return response
 

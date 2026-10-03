@@ -140,7 +140,7 @@ class _ApplicationSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
@@ -163,7 +163,7 @@ class _ApplicationSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
@@ -179,7 +179,7 @@ class _ApplicationSDK:
             "clientSecret": self.client_secret,
         }
         application_info = json.dumps(application.to_dict())
-        r = requests.post(url, params=params, data=application_info)
+        r = requests.post(url, params=params, data=application_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])

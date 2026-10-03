@@ -85,7 +85,7 @@ class _ProductSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -107,7 +107,7 @@ class _ProductSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -123,7 +123,7 @@ class _ProductSDK:
             "clientSecret": self.client_secret,
         }
         product_info = json.dumps(product.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=product_info)
+        r = requests.post(url, params=params, data=product_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

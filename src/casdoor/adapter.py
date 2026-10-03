@@ -75,7 +75,7 @@ class _AdapterSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -97,7 +97,7 @@ class _AdapterSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -112,7 +112,7 @@ class _AdapterSDK:
             "clientSecret": self.client_secret,
         }
         adapter_info = json.dumps(adapter.to_dict())
-        r = requests.post(url, params=params, data=adapter_info)
+        r = requests.post(url, params=params, data=adapter_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

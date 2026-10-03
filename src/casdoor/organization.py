@@ -148,7 +148,7 @@ class _OrganizationSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response.msg)
@@ -171,7 +171,7 @@ class _OrganizationSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response.msg)
@@ -186,7 +186,7 @@ class _OrganizationSDK:
             "clientSecret": self.client_secret,
         }
         organization_info = json.dumps(organization.to_dict())
-        r = requests.post(url, params=params, data=organization_info)
+        r = requests.post(url, params=params, data=organization_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response)

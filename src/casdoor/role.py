@@ -71,7 +71,7 @@ class _RoleSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -93,7 +93,7 @@ class _RoleSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -108,7 +108,7 @@ class _RoleSDK:
             "clientSecret": self.client_secret,
         }
         role_info = json.dumps(role.to_dict())
-        r = requests.post(url, params=params, data=role_info)
+        r = requests.post(url, params=params, data=role_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

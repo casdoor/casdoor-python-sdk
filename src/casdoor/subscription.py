@@ -78,7 +78,7 @@ class _SubscriptionSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -100,7 +100,7 @@ class _SubscriptionSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -115,7 +115,7 @@ class _SubscriptionSDK:
             "clientSecret": self.client_secret,
         }
         subscription_info = json.dumps(subscription.to_dict())
-        r = requests.post(url, params=params, data=subscription_info)
+        r = requests.post(url, params=params, data=subscription_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

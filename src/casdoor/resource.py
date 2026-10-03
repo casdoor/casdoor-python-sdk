@@ -76,7 +76,7 @@ class _ResourceSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -98,7 +98,7 @@ class _ResourceSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -114,7 +114,7 @@ class _ResourceSDK:
             "clientSecret": self.client_secret,
         }
         resource_info = json.dumps(resource.to_dict())
-        r = requests.post(url, params=params, data=resource_info)
+        r = requests.post(url, params=params, data=resource_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -142,7 +142,7 @@ class _ResourceSDK:
         }
 
         files = {"file": file}
-        r = requests.post(url, params=params, files=files)
+        r = requests.post(url, params=params, files=files, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -158,7 +158,7 @@ class _ResourceSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.post(url, params=params, data=user_str)
+        r = requests.post(url, params=params, data=user_str, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

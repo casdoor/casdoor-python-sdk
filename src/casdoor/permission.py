@@ -105,7 +105,7 @@ class _PermissionSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -127,7 +127,7 @@ class _PermissionSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -142,7 +142,7 @@ class _PermissionSDK:
             "clientSecret": self.client_secret,
         }
         permission_info = json.dumps(permission.to_dict())
-        r = requests.post(url, params=params, data=permission_info)
+        r = requests.post(url, params=params, data=permission_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

@@ -77,7 +77,7 @@ class _GroupSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
@@ -101,7 +101,7 @@ class _GroupSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
@@ -120,7 +120,7 @@ class _GroupSDK:
 
         # group_info = json.dumps(group.to_dict())
         group_info = json.dumps(group.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=group_info)
+        r = requests.post(url, params=params, data=group_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])

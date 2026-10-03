@@ -73,7 +73,7 @@ class _PlanSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -95,7 +95,7 @@ class _PlanSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -111,7 +111,7 @@ class _PlanSDK:
             "clientSecret": self.client_secret,
         }
         plan_info = json.dumps(plan.to_dict())
-        r = requests.post(url, params=params, data=plan_info)
+        r = requests.post(url, params=params, data=plan_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

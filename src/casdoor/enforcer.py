@@ -73,7 +73,7 @@ class _EnforcerSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -95,7 +95,7 @@ class _EnforcerSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -111,7 +111,7 @@ class _EnforcerSDK:
             "clientSecret": self.client_secret,
         }
         enforcer_info = json.dumps(enforcer.to_dict())
-        r = requests.post(url, params=params, data=enforcer_info)
+        r = requests.post(url, params=params, data=enforcer_info, verify=self.verify)
         response = r.json()
         return response
 

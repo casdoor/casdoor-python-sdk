@@ -14,7 +14,9 @@
 
 import base64
 import json
-from typing import Dict, List, Optional
+import os
+import ssl
+from typing import Dict, List, Optional, Union
 
 import aiohttp
 import jwt
@@ -62,9 +64,21 @@ def _build_enforce_params(
     return params
 
 
+def _build_ssl_option(verify: Union[bool, str]) -> Union[bool, ssl.SSLContext]:
+    """
+    Convert a requests-style `verify` value to the `ssl` option of aiohttp.
+    """
+    if isinstance(verify, str):
+        if os.path.isdir(verify):
+            return ssl.create_default_context(capath=verify)
+        return ssl.create_default_context(cafile=verify)
+    return bool(verify)
+
+
 class AioHttpClient:
-    def __init__(self, base_url):
+    def __init__(self, base_url, verify: Union[bool, str] = True):
         self.base_url = base_url
+        self.ssl = _build_ssl_option(verify)
         self.session = None
 
     async def fetch(self, path, method="GET", **kwargs):
@@ -81,7 +95,8 @@ class AioHttpClient:
         return await self.fetch(path, method="POST", **kwargs)
 
     async def __aenter__(self):
-        self.session = await aiohttp.ClientSession().__aenter__()
+        connector = aiohttp.TCPConnector(ssl=self.ssl)
+        self.session = await aiohttp.ClientSession(connector=connector).__aenter__()
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -102,7 +117,14 @@ class AsyncCasdoorSDK:
         org_name: str,
         application_name: str,
         front_endpoint: str = None,
+        verify: Union[bool, str] = True,
     ):
+        """
+        :param verify: TLS certificate verification for requests to Casdoor, same as the `verify`
+                       argument of `requests`: True (default) to verify with the system CA bundle,
+                       a path to a CA bundle file or directory (e.g. for a self-signed certificate),
+                       or False to skip verification (insecure, for testing only).
+        """
         self.endpoint = endpoint
         if front_endpoint:
             self.front_endpoint = front_endpoint
@@ -116,7 +138,8 @@ class AsyncCasdoorSDK:
         self.grant_type = "authorization_code"
 
         self.algorithms = ["RS256"]
-        self._session = AioHttpClient(base_url=self.endpoint)
+        self.verify = verify
+        self._session = AioHttpClient(base_url=self.endpoint, verify=verify)
 
     @property
     def headers(self) -> Dict:

@@ -66,7 +66,7 @@ class _SessionSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -89,7 +89,7 @@ class _SessionSDK:
             "clientSecret": self.client_secret,
             "sessionPkId": f"{self.org_name}/{session_id}/{application}",
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -104,7 +104,7 @@ class _SessionSDK:
             "clientSecret": self.client_secret,
         }
         session_info = json.dumps(session.to_dict())
-        r = requests.post(url, params=params, data=session_info)
+        r = requests.post(url, params=params, data=session_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

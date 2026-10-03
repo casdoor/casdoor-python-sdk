@@ -106,7 +106,7 @@ class _TokenSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -128,7 +128,7 @@ class _TokenSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -144,7 +144,7 @@ class _TokenSDK:
             "clientSecret": self.client_secret,
         }
         token_info = json.dumps(token.to_dict())
-        r = requests.post(url, params=params, data=token_info)
+        r = requests.post(url, params=params, data=token_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

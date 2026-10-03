@@ -82,7 +82,7 @@ class _WebhookSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -104,7 +104,7 @@ class _WebhookSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -119,7 +119,7 @@ class _WebhookSDK:
             "clientSecret": self.client_secret,
         }
         webhook_info = json.dumps(webhook.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=webhook_info)
+        r = requests.post(url, params=params, data=webhook_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

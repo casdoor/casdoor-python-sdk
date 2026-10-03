@@ -79,7 +79,7 @@ class _CertSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
@@ -102,7 +102,7 @@ class _CertSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params)
+        r = requests.get(url, params, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
@@ -118,7 +118,7 @@ class _CertSDK:
             "clientSecret": self.client_secret,
         }
         cert_info = json.dumps(cert.to_dict())
-        r = requests.post(url, params=params, data=cert_info)
+        r = requests.post(url, params=params, data=cert_info, verify=self.verify)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])

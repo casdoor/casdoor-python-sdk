@@ -65,6 +65,20 @@ sdk = AsyncCasdoorSDK(
 )
 ```
 
+If your Casdoor server uses a self-signed certificate (or one issued by a private CA), pass `verify` to either SDK. It works like the `verify` argument of `requests`:
+
+```python
+sdk = CasdoorSDK(
+    endpoint,
+    client_id,
+    client_secret,
+    certificate,
+    org_name,
+    application_name,
+    verify="/path/to/ca.pem",  # trust this CA bundle; True (default) uses the system CAs, False skips verification (insecure)
+)
+```
+
 
 ## Step2. Authorize with the Casdoor server
 At this point, we should use some ways to verify with the Casdoor server.  
