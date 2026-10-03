@@ -103,7 +103,7 @@ Hints:
 1. `redirect_uri` is the URL that your `APP` is configured to
 listen to the response from `Casdoor`. For example, if your `redirect_uri` is `https://forum.casbin.com/callback`, then Casdoor will send a request to this URL along with two parameters `code` and `state`, which will be used in later steps for authentication.   
 
-2. `state` is usually your Application's name, you can find it under the `Applications` tab in `Casdoor`, and the leftmost `Name` column gives each application's name. 
+2. `state` protects the login against CSRF. If you build the URL with `sdk.get_auth_link(redirect_uri, state=state)`, generate a random `state` (e.g. `secrets.token_urlsafe()`) on your backend, save it in the user's session, and on the callback reject the request unless the returned `state` equals the saved one. If you omit it, `get_auth_link` uses your Application's name, which gives no CSRF protection. If you use [casdoor-js-sdk](https://github.com/casdoor/casdoor-js-sdk), it already generates and checks `state` in the browser (`sessionStorage`) before calling your backend's `signinPath`, so the backend only needs to exchange the `code`. 
 
 3. Of course you want your `APP` to be able to send the URL. For example you should have something like a button, and it carries this URL. So when you click the button, you should be redirected to `Casdoor` for verification. For now you are typing it in the browser simply for testing.
    

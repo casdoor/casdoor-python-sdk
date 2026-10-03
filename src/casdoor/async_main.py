@@ -161,14 +161,22 @@ class AsyncCasdoorSDK:
         redirect_uri: str,
         response_type: str = "code",
         scope: str = "read",
+        state: Optional[str] = None,
     ) -> str:
+        """
+        Return the Casdoor authorization URL.
+
+        :param state: an unguessable value (e.g. secrets.token_urlsafe()) saved in the user's
+                      session and compared with the state returned to redirect_uri to prevent
+                      CSRF; defaults to the application name, which gives no CSRF protection
+        """
         url = self.front_endpoint + "/login/oauth/authorize"
         params = {
             "client_id": self.client_id,
             "response_type": response_type,
             "redirect_uri": redirect_uri,
             "scope": scope,
-            "state": self.application_name,
+            "state": state or self.application_name,
         }
         return str(URL(url).with_query(params))
 
