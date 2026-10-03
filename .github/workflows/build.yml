@@ -41,8 +41,32 @@ jobs:
       - name: Run linter
         run: git diff --name-only HEAD~10 HEAD | xargs pre-commit run --files
 
+      - name: Start local Casdoor
+        run: |
+          docker run -d --name casdoor \
+            -p 8000:8000 \
+            -e driverName=sqlite \
+            -e dataSourceName='file:casdoor.db?cache=shared' \
+            -e initDataFile=/init_data.json \
+            -v "$PWD/.ci/casdoor/init_data.json:/init_data.json:ro" \
+            casbin/casdoor-all-in-one
+
+          for i in {1..60}; do
+            if curl -fsS http://localhost:8000 >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker logs casdoor
+          exit 1
+
       - name: Run tests
         run: python -m unittest  src/tests/load_tests.py -v
+
+      - name: Dump Casdoor logs
+        if: failure()
+        run: docker logs casdoor
 
       - name: Release
         env:

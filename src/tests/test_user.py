@@ -36,7 +36,7 @@ class UserTest(unittest.TestCase):
     def test_user(self):
         name = test_util.get_random_name("User")
         email = f"{name}@gmail.com"
-        phone = test_util.get_random_code(11)
+        phone = "138" + test_util.get_random_code(8)
 
         # Add a new object
         user = User.new(
@@ -47,6 +47,7 @@ class UserTest(unittest.TestCase):
             email=email,
             phone=phone,
         )
+        user.countryCode = "CN"
 
         sdk = UserTest.get_sdk()
         try:

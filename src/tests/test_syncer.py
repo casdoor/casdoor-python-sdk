@@ -44,7 +44,7 @@ class SyncerTest(unittest.TestCase):
             password="123",
             database_type="mysql",
             database="syncer_db",
-            table="user-table",
+            table="user_table",
             sync_interval=1,
         )
 

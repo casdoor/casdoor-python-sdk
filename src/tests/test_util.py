@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import random
 
-TestEndpoint = "https://demo.casdoor.com"
-TestClientId = "294b09fbc17f95daf2fe"
-TestClientSecret = "dd8982f7046ccba1bbd7851d5c1ece4e52bf039d"
-TestOrganization = "casbin"
-TestApplication = "app-vue-python-example"
+TestEndpoint = os.getenv("CASDOOR_TEST_ENDPOINT", "http://localhost:8000")
+TestClientId = os.getenv("CASDOOR_TEST_CLIENT_ID", "casdoor-python-sdk-ci-client")
+TestClientSecret = os.getenv("CASDOOR_TEST_CLIENT_SECRET", "casdoor-python-sdk-ci-secret")
+TestOrganization = os.getenv("CASDOOR_TEST_ORGANIZATION", "casbin")
+TestApplication = os.getenv("CASDOOR_TEST_APPLICATION", "app-vue-python-example")
 TestJwtPublicKey = """-----BEGIN CERTIFICATE-----
 MIIE+TCCAuGgAwIBAgIDAeJAMA0GCSqGSIb3DQEBCwUAMDYxHTAbBgNVBAoTFENh
 c2Rvb3IgT3JnYW5pemF0aW9uMRUwEwYDVQQDEwxDYXNkb29yIENlcnQwHhcNMjEx
