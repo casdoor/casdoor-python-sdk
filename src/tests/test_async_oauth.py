@@ -183,7 +183,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
     async def test_modify_user(self):
         sdk = self.get_sdk()
         user = User()
-        user.name = "test_ffyuanda"
+        user.name = "test_user"
         user.owner = sdk.org_name
         await sdk.delete_user(user)
 
@@ -197,7 +197,7 @@ class TestOAuth(IsolatedAsyncioTestCase):
         self.assertEqual(response["data"], "Affected")
 
         # Fetch user from server to get the server-assigned id
-        fetched_user = await sdk.get_user("test_ffyuanda")
+        fetched_user = await sdk.get_user("test_user")
         self.assertIsNotNone(fetched_user)
         fetched_user["phone"] = "phone"
         updated_user = User.from_dict(fetched_user)

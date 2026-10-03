@@ -1,6 +1,6 @@
 [project]
 name = "casdoor"
-version = "1.17.0"
+version = "0.0.0"
 authors = [{name = "Casdoor", email = "admin@casdoor.org"}]
 description = "Python SDK built for Casdoor"
 readme = "README.md"

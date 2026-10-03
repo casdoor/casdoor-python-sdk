@@ -22,7 +22,7 @@ jobs:
           node-version: '20'
 
       - name: Setup
-        run: npm install -g semantic-release @semantic-release/github @semantic-release/changelog @semantic-release/commit-analyzer @semantic-release/git @semantic-release/release-notes-generator semantic-release-pypi
+        run: npm install -g semantic-release @semantic-release/github @semantic-release/commit-analyzer @semantic-release/release-notes-generator semantic-release-pypi
 
       - name: Set up python
         uses: actions/setup-python@v5

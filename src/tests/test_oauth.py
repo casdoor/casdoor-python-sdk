@@ -206,7 +206,7 @@ class TestOAuth(TestCase):
     def test_modify_user(self):
         sdk = self.get_sdk()
         user = User()
-        user.name = "test_ffyuanda"
+        user.name = "test_user"
         sdk.delete_user(user)
 
         response = sdk.add_user(user)
@@ -219,7 +219,7 @@ class TestOAuth(TestCase):
         self.assertEqual(response["data"], "Affected")
 
         # Fetch user from server to get the server-assigned id
-        fetched_user = sdk.get_user("test_ffyuanda")
+        fetched_user = sdk.get_user("test_user")
         self.assertIsNotNone(fetched_user)
         fetched_user.phone = "phone"
         response = sdk.update_user(fetched_user)
