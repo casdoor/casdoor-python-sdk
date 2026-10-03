@@ -141,14 +141,23 @@ class CasdoorSDK(
             raise TypeError("certificate field must be str type")
         return self.certificate.encode("utf-8")
 
-    def get_auth_link(self, redirect_uri: str, response_type: str = "code", scope: str = "read"):
+    def get_auth_link(
+        self, redirect_uri: str, response_type: str = "code", scope: str = "read", state: Optional[str] = None
+    ):
+        """
+        Return the Casdoor authorization URL.
+
+        :param state: an unguessable value (e.g. secrets.token_urlsafe()) saved in the user's
+                      session and compared with the state returned to redirect_uri to prevent
+                      CSRF; defaults to the application name, which gives no CSRF protection
+        """
         url = self.front_endpoint + "/login/oauth/authorize"
         params = {
             "client_id": self.client_id,
             "response_type": response_type,
             "redirect_uri": redirect_uri,
             "scope": scope,
-            "state": self.application_name,
+            "state": state or self.application_name,
         }
         r = requests.request("", url, params=params, verify=self.verify)
         return r.url

@@ -218,3 +218,12 @@ class TestOAuth(IsolatedAsyncioTestCase):
             response,
             f"{sdk.front_endpoint}/login/oauth/authorize?client_id={sdk.client_id}&response_type=code&redirect_uri={redirect_uri}&scope=read&state={sdk.application_name}",
         )
+
+    async def test_auth_link_with_state(self):
+        sdk = self.get_sdk()
+        redirect_uri = "http://localhost:9000/callback"
+        response = await sdk.get_auth_link(redirect_uri=redirect_uri, state="random-state")
+        self.assertEqual(
+            response,
+            f"{sdk.front_endpoint}/login/oauth/authorize?client_id={sdk.client_id}&response_type=code&redirect_uri={redirect_uri}&scope=read&state=random-state",
+        )
