@@ -14,7 +14,7 @@
 
 from typing import Dict, List, Optional
 
-from .util import get_admin_id, get_id, get_owner
+from .util import get_id, get_owner
 
 
 class Ldap:
@@ -63,14 +63,14 @@ class _LdapSDK:
         """
         Get all the ldaps from Casdoor.
         """
-        data = self.do_get("get-ldaps", {"owner": "admin"})
+        data = self.do_get("get-ldaps", {"owner": self.org_name})
         return [Ldap.from_dict(item) for item in data or []]
 
     def get_ldap(self, id: str) -> Optional[Ldap]:
         """
         Get the ldap by name, or by "owner/name" ID.
         """
-        return Ldap.from_dict(self.do_get("get-ldap", {"id": get_admin_id(id)}))
+        return Ldap.from_dict(self.do_get("get-ldap", {"id": get_id(id, self.org_name)}))
 
     def get_ldap_users(self, id: str) -> Dict:
         """
@@ -94,7 +94,7 @@ class _LdapSDK:
     def modify_ldap(
         self, method: str, ldap: Ldap, columns: Optional[List[str]] = None, params: Optional[Dict] = None
     ) -> Dict:
-        ldap.owner = get_owner(ldap.owner, "admin")
+        ldap.owner = get_owner(ldap.owner, self.org_name)
         query = dict(params or {})
         query["id"] = f"{ldap.owner}/{ldap.id}"
         if columns:

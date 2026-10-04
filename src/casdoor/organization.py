@@ -191,14 +191,14 @@ class _OrganizationSDK:
         """
         url = self.endpoint + "/api/get-organizations"
         params = {
-            "owner": self.org_name,
+            "owner": "admin",
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
-            raise ValueError(response.msg)
+            raise ValueError(response["msg"])
 
         res = []
         for element in response["data"]:
@@ -221,7 +221,7 @@ class _OrganizationSDK:
         r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
-            raise ValueError(response.msg)
+            raise ValueError(response["msg"])
         return Organization.from_dict(response["data"])
 
     def modify_organization(self, method: str, organization: Organization, columns: Optional[List[str]] = None) -> Dict:

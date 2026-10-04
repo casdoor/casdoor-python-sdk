@@ -221,7 +221,7 @@ sdk.logout_current_session(access_token)  # only sign out the session of this ac
 
 ### Object Owner
 
-Every object in Casdoor is identified by an ID of the form `owner/name`, where the owner is an organization (`role`, `group`, `user`, `product`, ...) or the built-in `admin` owner (`organization`, `application`, `token`, `ldap`).
+Every object in Casdoor is identified by an ID of the form `owner/name`, where the owner is an organization (`role`, `group`, `user`, `product`, `ldap`, ...) or the built-in `admin` owner (`organization`, `application`, `token`).
 
 By default the SDK fills in the owner for you: the `org_name` of the SDK, or `admin` for the object types listed above. You can address an object in another organization by passing a qualified `owner/name` ID instead of a plain name, and by setting the `owner` field explicitly when creating or updating an object:
 
