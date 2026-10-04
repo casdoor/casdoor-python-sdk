@@ -201,8 +201,7 @@ class CasdoorSDK(
             "scope": scope,
             "state": state or self.application_name,
         }
-        r = requests.request("", url, params=params, verify=self.verify)
-        return r.url
+        return requests.Request("GET", url, params=params).prepare().url
 
     def get_oauth_token(
         self, code: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None

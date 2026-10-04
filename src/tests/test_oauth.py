@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from requests import Response
 
@@ -49,6 +49,30 @@ class TestOAuth(TestCase):
             application_name=test_util.TestApplication,
         )
         return sdk
+
+    def test_get_auth_link(self):
+        sdk = self.get_sdk()
+        with mock.patch("requests.Session.send") as send:
+            response = sdk.get_auth_link(redirect_uri="http://localhost:9000/callback")
+            send.assert_not_called()
+        self.assertEqual(
+            response,
+            f"{sdk.front_endpoint}/login/oauth/authorize?client_id={sdk.client_id}&response_type=code"
+            f"&redirect_uri=http%3A%2F%2Flocalhost%3A9000%2Fcallback&scope=read&state={sdk.application_name}",
+        )
+
+    def test_get_auth_link_with_state(self):
+        sdk = self.get_sdk()
+        with mock.patch("requests.Session.send") as send:
+            response = sdk.get_auth_link(
+                redirect_uri="https://example.com/cb?x=1", scope="openid profile", state="s t/+=&"
+            )
+            send.assert_not_called()
+        self.assertEqual(
+            response,
+            f"{sdk.front_endpoint}/login/oauth/authorize?client_id={sdk.client_id}&response_type=code"
+            "&redirect_uri=https%3A%2F%2Fexample.com%2Fcb%3Fx%3D1&scope=openid+profile&state=s+t%2F%2B%3D%26",
+        )
 
     def test__oauth_token_request(self):
         sdk = self.get_sdk()
