@@ -14,8 +14,6 @@
 
 from typing import Dict, List, Optional
 
-from .util import get_id
-
 
 class Record:
     def __init__(self):
@@ -63,7 +61,15 @@ class _RecordSDK:
         return [Record.from_dict(item) for item in data or []], total
 
     def get_record(self, name: str) -> Optional[Record]:
-        return Record.from_dict(self.do_get("get-record", {"id": get_id(name, self.org_name)}))
+        """
+        Get the record by name, or None if it doesn't exist. Casdoor has no API to get a single record,
+        so it searches the records by name. Like the other APIs that read records, it needs the access
+        token of an admin user, see with_access_token().
+        """
+        name = name.split("/")[-1]
+        # the name filter matches the records whose names contain the given name
+        records, _ = self.get_pagination_records(1, 100, {"field": "name", "value": name})
+        return next((record for record in records if record.name == name), None)
 
     def add_record(self, record: Record) -> Dict:
         record.owner = record.owner or self.org_name

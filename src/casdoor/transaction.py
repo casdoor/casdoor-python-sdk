@@ -75,7 +75,8 @@ class _TransactionSDK:
         return Transaction.from_dict(self.do_get("get-transaction", {"id": get_id(name, self.org_name)}))
 
     def get_user_transactions(self, user_name: str) -> List[Transaction]:
-        data = self.do_get("get-user-transactions", {"owner": self.org_name, "user": user_name})
+        # Casdoor has no get-user-transactions API, get-transactions filters the transactions by user
+        data = self.do_get("get-transactions", {"owner": self.org_name, "field": "user", "value": user_name})
         return [Transaction.from_dict(item) for item in data or []]
 
     def add_transaction_with_dry_run(self, transaction: Transaction, dry_run: bool) -> Dict:

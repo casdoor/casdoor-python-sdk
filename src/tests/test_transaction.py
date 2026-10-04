@@ -50,6 +50,7 @@ class TransactionTest(unittest.TestCase):
         transaction.tag = "Organization"
         transaction.amount = 100
         transaction.currency = "USD"
+        transaction.user = "admin"
         transaction.state = "Paid"
 
         response = sdk.add_transaction_with_dry_run(transaction, True)
@@ -61,6 +62,8 @@ class TransactionTest(unittest.TestCase):
         self.assertIn(name, [item.name for item in sdk.get_transactions()])
         _, total = sdk.get_pagination_transactions(1, 10)
         self.assertGreater(total, 0)
+
+        self.assertIn(name, [item.name for item in sdk.get_user_transactions("admin")])
 
         transaction = sdk.get_transaction(name)
         self.assertEqual(transaction.name, name)
