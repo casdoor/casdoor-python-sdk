@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Payment:
@@ -47,6 +47,11 @@ class Payment:
         self.payUrl = ""
         self.state = ""
         self.message = ""
+        self.products = []
+        self.productsDisplayName = ""
+        self.order = ""
+        self.orderObj = None
+        self.successUrl = ""
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, product_name):
@@ -88,7 +93,7 @@ class _PaymentSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -106,28 +111,56 @@ class _PaymentSDK:
         """
         url = self.endpoint + "/api/get-payment"
         params = {
-            "id": f"{self.org_name}/{payment_id}",
+            "id": get_id(payment_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return Payment.from_dict(response["data"])
 
-    def modify_payment(self, method: str, payment: Payment) -> Dict:
+    def modify_payment(self, method: str, payment: Payment, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        payment.owner = self.org_name
+        payment.owner = get_owner(payment.owner, self.org_name)
         params = {
             "id": f"{payment.owner}/{payment.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         payment_info = json.dumps(payment.to_dict())
-        r = requests.post(url, params=params, data=payment_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=payment_info)
         response = r.json()
         return response
+
+    def get_pagination_payments(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the payments from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of payments in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Payment objects and the total count
+        """
+        data, total = self.get_pagination("get-payments", p, page_size, query_map, owner=self.org_name)
+        return [Payment.from_dict(item) for item in data or []], total
+
+    def get_user_payments(self, user_name: str) -> List[Payment]:
+        """
+        Get the payments of the user.
+        """
+        data = self.do_get(
+            "get-user-payments", {"owner": self.org_name, "organization": self.org_name, "user": user_name}
+        )
+        return [Payment.from_dict(item) for item in data or []]
+
+    def notify_payment(self, payment: Payment) -> Dict:
+        return self.modify_payment("notify-payment", payment)
+
+    def invoice_payment(self, payment: Payment) -> Dict:
+        return self.modify_payment("invoice-payment", payment)
 
     def add_payment(self, payment: Payment) -> Dict:
         response = self.modify_payment("add-payment", payment)

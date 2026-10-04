@@ -14,9 +14,9 @@
 
 import json
 from datetime import datetime, timezone
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Subscription:
@@ -36,6 +36,10 @@ class Subscription:
         self.approver = ""
         self.approveTime = ""
         self.state = ""
+        self.group = ""
+        self.pricing = ""
+        self.payment = ""
+        self.period = ""
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, description):
@@ -78,7 +82,7 @@ class _SubscriptionSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -96,30 +100,43 @@ class _SubscriptionSDK:
         """
         url = self.endpoint + "/api/get-subscription"
         params = {
-            "id": f"{self.org_name}/{subscription_id}",
+            "id": get_id(subscription_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return Subscription.from_dict(response["data"])
 
-    def modify_subscription(self, method: str, subscription: Subscription) -> Dict:
+    def modify_subscription(self, method: str, subscription: Subscription, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        subscription.owner = self.org_name
+        subscription.owner = get_owner(subscription.owner, self.org_name)
         params = {
             "id": f"{subscription.owner}/{subscription.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         subscription_info = json.dumps(subscription.to_dict())
-        r = requests.post(url, params=params, data=subscription_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=subscription_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return response
+
+    def get_pagination_subscriptions(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the subscriptions from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of subscriptions in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Subscription objects and the total count
+        """
+        data, total = self.get_pagination("get-subscriptions", p, page_size, query_map, owner=self.org_name)
+        return [Subscription.from_dict(item) for item in data or []], total
 
     def add_subscription(self, subscription: Subscription) -> Dict:
         response = self.modify_subscription("add-subscription", subscription)

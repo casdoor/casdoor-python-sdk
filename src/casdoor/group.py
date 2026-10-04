@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
-
-import requests
+from typing import Dict, List, Optional
 
 from .user import User
+from .util import get_id, get_owner
 
 
 class Group:
@@ -37,6 +36,12 @@ class Group:
         self.key = ""
         self.children: List[Group] = []
         self.isEnabled = False
+        self.parentName = ""
+        self.users = []
+        self.haveChildren = False
+        self.children = []
+        self.gidNumber = 0
+        self.properties = {}
 
     @classmethod
     def new(cls, owner, name, created_time, display_name):
@@ -77,7 +82,7 @@ class _GroupSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
@@ -97,35 +102,48 @@ class _GroupSDK:
         """
         url = self.endpoint + "/api/get-group"
         params = {
-            "id": f"{self.org_name}/{group_id}",
+            "id": get_id(group_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
         return Group.from_dict(response["data"])
 
-    def modify_group(self, method: str, group: Group) -> Dict:
+    def modify_group(self, method: str, group: Group, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
         # if group.owner == "":
-        #     group.owner = self.org_name
-        group.owner = self.org_name
+        #     group.owner = get_owner(group.owner, self.org_name)
+        group.owner = get_owner(group.owner, self.org_name)
         params = {
             "id": f"{group.owner}/{group.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
 
         # group_info = json.dumps(group.to_dict())
         group_info = json.dumps(group.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=group_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=group_info)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
 
         return str(response["data"])
+
+    def get_pagination_groups(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the groups from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of groups in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Group objects and the total count
+        """
+        data, total = self.get_pagination("get-groups", p, page_size, query_map, owner=self.org_name)
+        return [Group.from_dict(item) for item in data or []], total
 
     def add_group(self, group: Group) -> Dict:
         response = self.modify_group("add-group", group)

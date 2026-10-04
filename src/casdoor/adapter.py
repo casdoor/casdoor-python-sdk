@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Adapter:
@@ -33,6 +33,7 @@ class Adapter:
         self.table = ""
         self.tableNamePrefix = ""
         self.isEnabled = False
+        self.useSameDb = False
 
     @classmethod
     def new(cls, owner, name, created_time, host, user):
@@ -75,7 +76,7 @@ class _AdapterSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -93,30 +94,43 @@ class _AdapterSDK:
         """
         url = self.endpoint + "/api/get-adapter"
         params = {
-            "id": f"{self.org_name}/{adapter_id}",
+            "id": get_id(adapter_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return Adapter.from_dict(response["data"])
 
-    def modify_adapter(self, method: str, adapter: Adapter) -> str:
+    def modify_adapter(self, method: str, adapter: Adapter, columns: Optional[List[str]] = None) -> str:
         url = self.endpoint + f"/api/{method}"
-        adapter.owner = self.org_name
+        adapter.owner = get_owner(adapter.owner, self.org_name)
         params = {
             "id": f"{adapter.owner}/{adapter.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         adapter_info = json.dumps(adapter.to_dict())
-        r = requests.post(url, params=params, data=adapter_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=adapter_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return str(response["data"])
+
+    def get_pagination_adapters(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the adapters from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of adapters in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Adapter objects and the total count
+        """
+        data, total = self.get_pagination("get-adapters", p, page_size, query_map, owner=self.org_name)
+        return [Adapter.from_dict(item) for item in data or []], total
 
     def add_adapter(self, adapter: Adapter) -> Dict:
         response = self.modify_adapter("add-adapter", adapter)

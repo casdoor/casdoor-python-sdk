@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import json
 from typing import Dict, List, Optional, Union
+from urllib.parse import quote
 
 import jwt
 import requests
@@ -25,21 +27,30 @@ from .application import _ApplicationSDK
 from .cert import _CertSDK
 from .enforcer import _EnforcerSDK
 from .group import _GroupSDK
+from .invitation import _InvitationSDK
+from .ldap import _LdapSDK
+from .message import _MessageSDK
+from .mfa import _MfaSDK
 from .model import _ModelSDK
+from .order import _OrderSDK
 from .organization import _OrganizationSDK
 from .payment import _PaymentSDK
 from .permission import _PermissionSDK
 from .plan import _PlanSDK
+from .policy import _PolicySDK
 from .pricing import _PricingSDK
 from .product import _ProductSDK
 from .provider import _ProviderSDK
+from .record import _RecordSDK
 from .resource import _ResourceSDK
 from .role import _RoleSDK
 from .session import _SessionSDK
 from .subscription import _SubscriptionSDK
 from .syncer import _SyncerSDK
 from .token import _TokenSDK
+from .transaction import _TransactionSDK
 from .user import _UserSDK
+from .util import _HttpSDK, get_id
 from .webhook import _WebhookSDK
 
 
@@ -102,6 +113,15 @@ class CasdoorSDK(
     _SubscriptionSDK,
     _TokenSDK,
     _WebhookSDK,
+    _InvitationSDK,
+    _LdapSDK,
+    _OrderSDK,
+    _TransactionSDK,
+    _RecordSDK,
+    _PolicySDK,
+    _MessageSDK,
+    _MfaSDK,
+    _HttpSDK,
 ):
     def __init__(
         self,
@@ -113,12 +133,14 @@ class CasdoorSDK(
         application_name: str,
         front_endpoint: str = None,
         verify: Union[bool, str] = True,
+        custom_headers: Optional[Dict[str, str]] = None,
     ):
         """
         :param verify: TLS certificate verification for requests to Casdoor, same as the `verify`
                        argument of `requests`: True (default) to verify with the system CA bundle,
                        a path to a CA bundle file or directory (e.g. for a self-signed certificate),
                        or False to skip verification (insecure, for testing only).
+        :param custom_headers: the HTTP headers added to all the API requests, e.g. {"Accept-Language": "de"}
         """
         self.endpoint = endpoint
         if front_endpoint:
@@ -133,7 +155,27 @@ class CasdoorSDK(
         self.verify = verify
         self.grant_type = "authorization_code"
 
-        self.algorithms = ["RS256"]
+        # all the algorithms Casdoor can sign JWT with, see the cert's Crypto Algorithm in Casdoor
+        self.algorithms = ["RS256", "RS512", "ES256", "ES384", "ES512"]
+        self.custom_headers = dict(custom_headers or {})
+        self.access_token = ""
+
+    def with_access_token(self, access_token: str) -> "CasdoorSDK":
+        """
+        Return a new SDK that calls the APIs as the user who owns the access token
+        (Authorization: Bearer <access_token>) instead of as the application.
+        The current SDK is not changed, so it's safe to create one per request.
+        """
+        sdk = copy.copy(self)
+        sdk.custom_headers = dict(self.custom_headers)
+        sdk.access_token = access_token
+        return sdk
+
+    def get_id(self, name: str) -> str:
+        """
+        Return the "owner/name" ID of an object of the SDK's organization.
+        """
+        return get_id(name, self.org_name)
 
     @property
     def certification(self) -> bytes:
@@ -180,6 +222,75 @@ class CasdoorSDK(
         token = response.json()
 
         return token
+
+    def get_oauth_token_by_password(self, username: str, password: str) -> Dict:
+        """
+        Get the OAuth token with the Resource Owner Password Credentials grant.
+        Raise an Exception when the username or the password is wrong.
+        """
+        token = self.oauth_token_request(username=username, password=password).json()
+        if "error" in token:
+            raise Exception(token.get("error_description") or token["error"])
+        return token
+
+    def impersonate_user(self, username: str, master_password: str) -> Dict:
+        """
+        Sign in as any user of the organization with the organization's master password.
+        """
+        return self.get_oauth_token_by_password(username, master_password)
+
+    def logout(self, access_token: str) -> Dict:
+        """
+        Sign the user out of all the applications and devices (SSO logout).
+        """
+        return self._sso_logout(access_token, True)
+
+    def logout_current_session(self, access_token: str) -> Dict:
+        """
+        Only sign the user out of the session of the access token.
+        """
+        return self._sso_logout(access_token, False)
+
+    def _sso_logout(self, access_token: str, logout_all: bool) -> Dict:
+        if not access_token:
+            raise ValueError("logout() error: the access_token should not be empty")
+        headers = dict(self.custom_headers)
+        headers["Authorization"] = f"Bearer {access_token}"
+        r = requests.post(
+            self.endpoint + "/api/sso-logout",
+            params={"logoutAll": "true" if logout_all else "false"},
+            headers=headers,
+            verify=self.verify,
+        )
+        response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return response
+
+    def get_signin_url(self, redirect_uri: str) -> str:
+        """
+        Return the URL of the Casdoor sign-in page of the application.
+        """
+        return (
+            f"{self.endpoint}/login/oauth/authorize?client_id={self.client_id}&response_type=code"
+            f"&redirect_uri={quote(redirect_uri, safe='')}&scope=read&state={self.application_name}"
+        )
+
+    def get_signup_url(self, enable_password: bool = True, redirect_uri: str = "") -> str:
+        """
+        Return the URL of the Casdoor sign-up page of the application.
+        """
+        if enable_password:
+            return f"{self.endpoint}/signup/{self.application_name}"
+        return self.get_signin_url(redirect_uri).replace("/login/oauth/authorize", "/signup/oauth/authorize")
+
+    def get_user_profile_url(self, user_name: str, access_token: str = "") -> str:
+        param = f"?access_token={access_token}" if access_token else ""
+        return f"{self.endpoint}/users/{self.org_name}/{user_name}{param}"
+
+    def get_my_profile_url(self, access_token: str = "") -> str:
+        param = f"?access_token={access_token}" if access_token else ""
+        return f"{self.endpoint}/account{param}"
 
     def _get_payload_for_access_token_request(
         self, code: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None
@@ -348,6 +459,7 @@ class CasdoorSDK(
             params=params,
             data=json.dumps(casbin_request),
             auth=(self.client_id, self.client_secret),
+            headers=self.custom_headers,
             verify=self.verify,
         )
         if r.status_code != 200 or "json" not in r.headers["content-type"]:
@@ -357,8 +469,9 @@ class CasdoorSDK(
         response = r.json()
         if isinstance(response, dict):
             data = response.get("data")
-            if isinstance(data, list) and len(data) > 0:
-                has_permission = data[0]
+            if isinstance(data, list) and len(data) > 0 and all(isinstance(item, bool) for item in data):
+                # one result per matched permission, the request is allowed if any of them allows it
+                has_permission = any(data)
             else:
                 has_permission = response
         else:
@@ -395,6 +508,7 @@ class CasdoorSDK(
             params=params,
             data=json.dumps(casbin_request),
             auth=(self.client_id, self.client_secret),
+            headers=self.custom_headers,
             verify=self.verify,
         )
 

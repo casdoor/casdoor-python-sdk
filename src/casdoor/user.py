@@ -15,7 +15,7 @@
 import json
 from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class User:
@@ -174,6 +174,60 @@ class User:
 
         self.managedAccounts = []
         self.needUpdatePassword = False
+        self.deletedTime = ""
+        self.addresses = []
+        self.realName = ""
+        self.isVerified = False
+        self.balance = 0.0
+        self.balanceCredit = 0.0
+        self.currency = ""
+        self.balanceCurrency = ""
+        self.registerType = ""
+        self.registerSource = ""
+        self.accessToken = ""
+        self.originalToken = ""
+        self.originalRefreshToken = ""
+        self.azuread = ""
+        self.azureadb2c = ""
+        self.kwai = ""
+        self.battlenet = ""
+        self.cloudfoundry = ""
+        self.digitalocean = ""
+        self.eveonline = ""
+        self.influxcloud = ""
+        self.microsoftonline = ""
+        self.salesforce = ""
+        self.telegram = ""
+        self.metamask = ""
+        self.web3onboard = ""
+        self.oidc = ""
+        self.custom2 = ""
+        self.custom3 = ""
+        self.custom4 = ""
+        self.custom5 = ""
+        self.custom6 = ""
+        self.custom7 = ""
+        self.custom8 = ""
+        self.custom9 = ""
+        self.custom10 = ""
+        self.webauthnCredentials = None
+        self.mfaRadiusEnabled = False
+        self.mfaRadiusUsername = ""
+        self.mfaRadiusProvider = ""
+        self.mfaPushEnabled = False
+        self.mfaPushReceiver = ""
+        self.mfaPushProvider = ""
+        self.multiFactorAuths = []
+        self.faceIds = []
+        self.cart = []
+        self.uidNumber = 0
+        self.thirdPartyLinks = []
+        self.lastChangePasswordTime = ""
+        self.mfaAccounts = []
+        self.mfaItems = []
+        self.mfaRememberDeadline = ""
+        self.ipWhitelist = ""
+        self.applicationScopes = []
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, email="", phone=""):
@@ -214,7 +268,7 @@ class _UserSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -238,7 +292,7 @@ class _UserSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -246,6 +300,12 @@ class _UserSDK:
         for user in response["data"]:
             users.append(User.from_dict(user))
         return users
+
+    def get_account(self) -> Optional[User]:
+        """
+        Get the user of the access token, i.e. "who am I", the SDK must be created by with_access_token().
+        """
+        return User.from_dict(self.do_get("get-account"))
 
     def get_users(self) -> List[User]:
         """
@@ -259,7 +319,7 @@ class _UserSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -277,11 +337,11 @@ class _UserSDK:
         """
         url = self.endpoint + "/api/get-user"
         params = {
-            "id": f"{self.org_name}/{name}",
+            "id": get_id(name, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -296,11 +356,12 @@ class _UserSDK:
         """
         url = self.endpoint + "/api/get-user"
         params = {
+            "owner": self.org_name,
             "email": email,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -315,11 +376,12 @@ class _UserSDK:
         """
         url = self.endpoint + "/api/get-user"
         params = {
+            "owner": self.org_name,
             "phone": phone,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -334,11 +396,12 @@ class _UserSDK:
         """
         url = self.endpoint + "/api/get-user"
         params = {
+            "owner": self.org_name,
             "userId": user_id,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -363,20 +426,20 @@ class _UserSDK:
         else:
             params["isOnline"] = "1" if is_online else "0"
 
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         count = response.get("data")
         return count
 
-    def modify_user(self, method: str, user: User) -> Dict:
+    def modify_user(self, method: str, user: User, columns: Optional[List[str]] = None) -> Dict:
         """
         modifyUser is an encapsulation of user CUD(Create, Update, Delete) operations.
         possible actions are `add-user`, `update-user`, `delete-user`,
         """
-        id = user.get_id()
-        return self.modify_user_by_id(method, id, user)
+        user.owner = get_owner(user.owner, self.org_name)
+        return self.modify_user_by_id(method, user.get_id(), user, columns)
 
-    def modify_user_by_id(self, method: str, id: str, user: User) -> Dict:
+    def modify_user_by_id(self, method: str, id: str, user: User, columns: Optional[List[str]] = None) -> Dict:
         """
         Modify the user from Casdoor providing the ID.
 
@@ -385,18 +448,31 @@ class _UserSDK:
         """
 
         url = self.endpoint + f"/api/{method}"
-        user.owner = self.org_name
+        user.owner = get_owner(user.owner, self.org_name)
         params = {
             "id": id,
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         user_info = json.dumps(user.to_dict())
-        r = requests.post(url, params=params, data=user_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=user_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return response
+
+    def get_pagination_users(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the users from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of users in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of User objects and the total count
+        """
+        data, total = self.get_pagination("get-users", p, page_size, query_map, owner=self.org_name)
+        return [User.from_dict(item) for item in data or []], total
 
     def add_user(self, user: User) -> Dict:
         response = self.modify_user("add-user", user)
@@ -410,6 +486,37 @@ class _UserSDK:
         response = self.modify_user_by_id("update-user", id, user)
         return response
 
+    def update_user_for_columns(self, user: User, columns: List[str]) -> Dict:
+        """
+        Only update the given columns of the user, e.g. ["displayName", "email"].
+        """
+        return self.modify_user("update-user", user, columns)
+
+    def update_user_by_user_id(self, owner: str, user_id: str, user: User) -> Dict:
+        """
+        Update the user identified by its user ID (the "id" field of the user).
+        """
+        return self.do_post("update-user", {"owner": owner, "userId": user_id}, user.to_dict())
+
     def delete_user(self, user: User) -> Dict:
         response = self.modify_user("delete-user", user)
         return response
+
+    def check_user_password(self, user: User) -> bool:
+        """
+        Check if user.password is the password of the user.
+        """
+        user.owner = get_owner(user.owner, self.org_name)
+        r = self._http_post(
+            self.endpoint + "/api/check-user-password",
+            params={"id": user.get_id()},
+            data=json.dumps(user.to_dict()),
+        )
+        return r.json()["status"] == "ok"
+
+    def set_password(self, owner: str, name: str, old_password: str, new_password: str) -> bool:
+        """
+        Change the password of the user, old_password can be empty for the admin.
+        """
+        form = {"userOwner": owner, "userName": name, "oldPassword": old_password, "newPassword": new_password}
+        return self.do_post("set-password", None, form=form)["status"] == "ok"

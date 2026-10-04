@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
-
-import requests
+from typing import Dict, List, Optional
 
 from .syncer import TableColumn
+from .util import get_id, get_owner
 
 
 class Webhook:
@@ -42,6 +41,18 @@ class Webhook:
         self.syncInterval = 0
         self.isReadOnly = False
         self.isEnabled = False
+        self.url = ""
+        self.method = ""
+        self.contentType = ""
+        self.headers = []
+        self.events = []
+        self.tokenFields = []
+        self.objectFields = []
+        self.isUserExtended = False
+        self.singleOrgOnly = False
+        self.maxRetries = 0
+        self.retryInterval = 0
+        self.useExponentialBackoff = False
 
     @classmethod
     def new(cls, owner, name, created_time, organization):
@@ -82,7 +93,7 @@ class _WebhookSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -100,30 +111,43 @@ class _WebhookSDK:
         """
         url = self.endpoint + "/api/get-webhook"
         params = {
-            "id": f"{self.org_name}/{webhook_id}",
+            "id": get_id(webhook_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return Webhook.from_dict(response["data"])
 
-    def modify_webhook(self, method: str, webhook: Webhook) -> Dict:
+    def modify_webhook(self, method: str, webhook: Webhook, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        webhook.owner = self.org_name
+        webhook.owner = get_owner(webhook.owner, self.org_name)
         params = {
             "id": f"{webhook.owner}/{webhook.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         webhook_info = json.dumps(webhook.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=webhook_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=webhook_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return response
+
+    def get_pagination_webhooks(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the webhooks from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of webhooks in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Webhook objects and the total count
+        """
+        data, total = self.get_pagination("get-webhooks", p, page_size, query_map, owner=self.org_name)
+        return [Webhook.from_dict(item) for item in data or []], total
 
     def add_webhook(self, webhook: Webhook) -> Dict:
         response = self.modify_webhook("add-webhook", webhook)

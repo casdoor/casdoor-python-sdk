@@ -40,7 +40,7 @@ class UserTest(unittest.TestCase):
 
         # Add a new object
         user = User.new(
-            owner="admin",
+            owner=test_util.TestOrganization,
             name=name,
             created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,

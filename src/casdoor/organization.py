@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_admin_id, get_owner
 
 
 class AccountItem:
@@ -24,6 +24,8 @@ class AccountItem:
         self.visible = False
         self.viewRule = ""
         self.modifyRule = ""
+        self.regex = ""
+        self.tab = ""
 
     def __str__(self):
         return str(self.__dict__)
@@ -82,6 +84,44 @@ class Organization:
         self.isProfilePublic = False
         # self.mfaItems = [MfaItem]
         # self.accountItems = [AccountItem]
+        self.logo = ""
+        self.logoDark = ""
+        self.hasPrivilegeConsent = False
+        self.passwordObfuscatorType = ""
+        self.passwordObfuscatorKey = ""
+        self.passwordExpireDays = 0
+        self.passwordHistoryCount = 0
+        self.tokenRetentionDays = 0
+        self.recordRetentionDays = 0
+        self.usePermanentAvatar = False
+        self.defaultTokenFormat = ""
+        self.defaultTokenFields = []
+        self.userTypes = []
+        self.defaultPassword = ""
+        self.masterVerificationCode = ""
+        self.ipWhitelist = ""
+        self.useEmailAsUsername = False
+        self.enableTour = False
+        self.disableSignin = False
+        self.enableExclusiveSignin = False
+        self.maxSessions = 0
+        self.disableConsole = False
+        self.ipRestriction = ""
+        self.navItems = []
+        self.userNavItems = []
+        self.widgetItems = []
+        self.mfaRememberInHours = 0
+        self.accountMenu = ""
+        self.dcrPolicy = ""
+        self.ldapAttributes = []
+        self.kerberosRealm = ""
+        self.kerberosKdcHost = ""
+        self.kerberosKeytab = ""
+        self.kerberosServiceName = ""
+        self.orgBalance = 0.0
+        self.userBalance = 0.0
+        self.balanceCredit = 0.0
+        self.balanceCurrency = ""
 
     @classmethod
     def new(
@@ -136,6 +176,13 @@ class Organization:
 
 
 class _OrganizationSDK:
+    def get_organization_names(self) -> List[Organization]:
+        """
+        Get the names and the display names of the organizations.
+        """
+        data = self.do_get("get-organization-names", {"owner": "admin"})
+        return [Organization.from_dict(item) for item in data or []]
+
     def get_organizations(self) -> List[Dict]:
         """
         Get the organizations from Casdoor.
@@ -148,7 +195,7 @@ class _OrganizationSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response.msg)
@@ -167,42 +214,43 @@ class _OrganizationSDK:
         """
         url = self.endpoint + "/api/get-organization"
         params = {
-            "id": f"admin/{organization_id}",
+            "id": get_admin_id(organization_id),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response.msg)
         return Organization.from_dict(response["data"])
 
-    def modify_organization(self, method: str, organization: Organization) -> Dict:
+    def modify_organization(self, method: str, organization: Organization, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
 
         params = {
             "id": f"{organization.owner}/{organization.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         organization_info = json.dumps(organization.to_dict())
-        r = requests.post(url, params=params, data=organization_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=organization_info)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response)
         return str(response["data"])
 
     def add_organization(self, organization: Organization) -> Dict:
-        organization.owner = "admin"
+        organization.owner = get_owner(organization.owner, "admin")
         response = self.modify_organization("add-organization", organization)
         return response
 
     def update_organization(self, organization: Organization) -> Dict:
-        organization.owner = "admin"
+        organization.owner = get_owner(organization.owner, "admin")
         response = self.modify_organization("update-organization", organization)
         return response
 
     def delete_organization(self, organization: Organization) -> Dict:
-        organization.owner = "admin"
+        organization.owner = get_owner(organization.owner, "admin")
         response = self.modify_organization("delete-organization", organization)
         return response

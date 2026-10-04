@@ -34,7 +34,7 @@ class ProductTest(unittest.TestCase):
 
         # Add a new object
         product = Product.new(
-            owner="admin",
+            owner=TestOrganization,
             name=name,
             created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,

@@ -25,6 +25,7 @@ from cryptography.hazmat.backends import default_backend
 from yarl import URL
 
 from .user import User
+from .util import get_id
 
 
 def _build_enforce_params(
@@ -137,7 +138,7 @@ class AsyncCasdoorSDK:
         self.application_name = application_name
         self.grant_type = "authorization_code"
 
-        self.algorithms = ["RS256"]
+        self.algorithms = ["RS256", "RS512", "ES256", "ES384", "ES512"]
         self.verify = verify
         self._session = AioHttpClient(base_url=self.endpoint, verify=verify)
 
@@ -450,7 +451,7 @@ class AsyncCasdoorSDK:
         :return: a dict that contains user's info
         """
         path = "/api/get-user"
-        params = {"id": f"{self.org_name}/{user_id}"}
+        params = {"id": get_id(user_id, self.org_name)}
         async with self._session as session:
             user = await session.get(path, headers=self.headers, params=params)
             return user["data"]
@@ -516,7 +517,7 @@ class AsyncCasdoorSDK:
         :return: role dict
         """
         path = "/api/get-role"
-        params = {"id": f"{self.org_name}/{role_name}"}
+        params = {"id": get_id(role_name, self.org_name)}
         async with self._session as session:
             response = await session.get(path, headers=self.headers, params=params)
             if response.get("status") != "ok":
@@ -546,7 +547,7 @@ class AsyncCasdoorSDK:
         :param role_name: the name of the role to assign
         :return: response dict with status
         """
-        user_id = f"{self.org_name}/{username}"
+        user_id = get_id(username, self.org_name)
 
         role = await self.get_role(role_name)
         if not role:
@@ -569,7 +570,7 @@ class AsyncCasdoorSDK:
         :param role_name: the name of the role to remove
         :return: response dict with status
         """
-        user_id = f"{self.org_name}/{username}"
+        user_id = get_id(username, self.org_name)
 
         role = await self.get_role(role_name)
         if not role:
@@ -588,7 +589,7 @@ class AsyncCasdoorSDK:
         :param username: the username to get roles for
         :return: list of role dicts assigned to the user
         """
-        user_id = f"{self.org_name}/{username}"
+        user_id = get_id(username, self.org_name)
         all_roles = await self.get_roles()
 
         user_roles = []

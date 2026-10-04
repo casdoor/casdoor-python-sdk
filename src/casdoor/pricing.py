@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Pricing:
@@ -33,6 +33,8 @@ class Pricing:
         self.approver = ""
         self.approveTime = ""
         self.state = ""
+        self.isInviteOnly = False
+        self.users = []
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, description, application):
@@ -76,7 +78,7 @@ class _PricingSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -94,31 +96,44 @@ class _PricingSDK:
         """
         url = self.endpoint + "/api/get-pricing"
         params = {
-            "id": f"{self.org_name}/{pricing_id}",
+            "id": get_id(pricing_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
 
         return Pricing.from_dict(response["data"])
 
-    def modify_pricing(self, method: str, pricing: Pricing) -> Dict:
+    def modify_pricing(self, method: str, pricing: Pricing, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        pricing.owner = self.org_name
+        pricing.owner = get_owner(pricing.owner, self.org_name)
         params = {
             "id": f"{pricing.owner}/{pricing.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         pricing_info = json.dumps(pricing.to_dict())
-        r = requests.post(url, params=params, data=pricing_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=pricing_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return response
+
+    def get_pagination_pricings(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the pricings from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of pricings in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Pricing objects and the total count
+        """
+        data, total = self.get_pagination("get-pricings", p, page_size, query_map, owner=self.org_name)
+        return [Pricing.from_dict(item) for item in data or []], total
 
     def add_pricing(self, pricing: Pricing) -> Dict:
         response = self.modify_pricing("add-pricing", pricing)

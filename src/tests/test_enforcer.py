@@ -34,7 +34,7 @@ class EnforcerTest(unittest.TestCase):
 
         # Add a new object
         enforcer = Enforcer.new(
-            owner="admin",
+            owner=TestOrganization,
             name=name,
             created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,

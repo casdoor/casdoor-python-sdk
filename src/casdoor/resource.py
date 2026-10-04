@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Resource:
@@ -76,7 +76,7 @@ class _ResourceSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -84,6 +84,28 @@ class _ResourceSDK:
         for resource in response["data"]:
             resources.append(Resource.from_dict(resource))
         return resources
+
+    def get_pagination_resources(
+        self, owner, user, field, value, page_size: int, page: int, sort_field="", sort_order=""
+    ) -> List[Resource]:
+        """
+        Get a page of the resources of the user.
+        """
+        params = {
+            "owner": owner,
+            "user": user,
+            "field": field,
+            "value": value,
+            "p": str(page),
+            "pageSize": str(page_size),
+            "sortField": sort_field,
+            "sortOrder": sort_order,
+        }
+        data = self.do_get("get-resources", params)
+        return [Resource.from_dict(item) for item in data or []]
+
+    def get_resource_ex(self, owner: str, name: str):
+        return self.get_resource(f"{owner}/{name}")
 
     def get_resource(self, resource_id: str) -> Dict:
         """
@@ -94,27 +116,28 @@ class _ResourceSDK:
         """
         url = self.endpoint + "/api/get-resource"
         params = {
-            "id": f"{self.org_name}/{resource_id}",
+            "id": get_id(resource_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
 
         return Resource.from_dict(response["data"])
 
-    def modify_resource(self, method: str, resource: Resource) -> Dict:
+    def modify_resource(self, method: str, resource: Resource, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        resource.owner = self.org_name
+        resource.owner = get_owner(resource.owner, self.org_name)
         params = {
             "id": f"{resource.owner}/{resource.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         resource_info = json.dumps(resource.to_dict())
-        r = requests.post(url, params=params, data=resource_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=resource_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -142,11 +165,36 @@ class _ResourceSDK:
         }
 
         files = {"file": file}
-        r = requests.post(url, params=params, files=files, verify=self.verify)
+        r = self._http_post(url, params=params, files=files)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return response
+
+    def upload_resource_ex(
+        self, user, tag, parent, full_file_path, file, created_time: str = "", description: str = ""
+    ) -> Dict:
+        """
+        Upload a file, the data of the response is the file URL and data2 is the resource name.
+        """
+        params = {
+            "owner": self.org_name,
+            "user": user,
+            "application": self.application_name,
+            "tag": tag,
+            "parent": parent,
+            "fullFilePath": full_file_path,
+            "createdTime": created_time,
+            "description": description,
+        }
+        return self.do_post("upload-resource", params, files={"file": file})
+
+    def delete_resource_with_tag(self, resource: Resource, tag: str = "") -> Dict:
+        """
+        Delete the resource, the "Direct" tag also deletes the file from the storage provider.
+        """
+        resource.owner = get_owner(resource.owner, self.org_name)
+        return self.do_post("delete-resource", {"tag": tag}, resource.to_dict())
 
     def delete_resource(self, name) -> Dict:
         resource = Resource.new(self.org_name, name)
@@ -158,7 +206,7 @@ class _ResourceSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.post(url, params=params, data=user_str, verify=self.verify)
+        r = self._http_post(url, params=params, data=user_str)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])

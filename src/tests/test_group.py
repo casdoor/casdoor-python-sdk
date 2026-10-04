@@ -34,7 +34,7 @@ class GroupTest(unittest.TestCase):
 
         # Add a new object
         group = Group.new(
-            owner="admin",
+            owner=TestOrganization,
             name=name,
             created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             display_name=name,

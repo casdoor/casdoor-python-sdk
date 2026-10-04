@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Permission:
@@ -39,6 +39,10 @@ class Permission:
         self.approver = ""
         self.approveTime = ""
         self.state = ""
+        self.groups = []
+        self.sourceGroups = []
+        self.sourceRoles = []
+        self.expireTime = ""
 
     @classmethod
     def new(
@@ -93,6 +97,13 @@ class Permission:
 
 
 class _PermissionSDK:
+    def get_permissions_by_role(self, name: str) -> List[Permission]:
+        """
+        Get the permissions of the role.
+        """
+        data = self.do_get("get-permissions-by-role", {"id": get_id(name, self.org_name)})
+        return [Permission.from_dict(item) for item in data or []]
+
     def get_permissions(self) -> List[Dict]:
         """
         Get the permissions from Casdoor.
@@ -105,7 +116,7 @@ class _PermissionSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -123,30 +134,49 @@ class _PermissionSDK:
         """
         url = self.endpoint + "/api/get-permission"
         params = {
-            "id": f"{self.org_name}/{permission_id}",
+            "id": get_id(permission_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return Permission.from_dict(response["data"])
 
-    def modify_permission(self, method: str, permission: Permission) -> Dict:
+    def modify_permission(self, method: str, permission: Permission, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        permission.owner = self.org_name
+        permission.owner = get_owner(permission.owner, self.org_name)
         params = {
             "id": f"{permission.owner}/{permission.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         permission_info = json.dumps(permission.to_dict())
-        r = requests.post(url, params=params, data=permission_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=permission_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return str(response["data"])
+
+    def get_pagination_permissions(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the permissions from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of permissions in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Permission objects and the total count
+        """
+        data, total = self.get_pagination("get-permissions", p, page_size, query_map, owner=self.org_name)
+        return [Permission.from_dict(item) for item in data or []], total
+
+    def update_permission_for_columns(self, permission: Permission, columns: List[str]) -> Dict:
+        """
+        Only update the given columns of the permission, e.g. ["display_name"].
+        """
+        return self.modify_permission("update-permission", permission, columns)
 
     def add_permission(self, permission: Permission) -> Dict:
         response = self.modify_permission("add-permission", permission)

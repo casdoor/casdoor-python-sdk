@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Enforcer:
@@ -29,6 +29,7 @@ class Enforcer:
         self.model = ""
         self.adapter = ""
         self.isEnabled = False
+        self.modelCfg = {}
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, description, model, adapter):
@@ -73,7 +74,7 @@ class _EnforcerSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -91,29 +92,42 @@ class _EnforcerSDK:
         """
         url = self.endpoint + "/api/get-enforcer"
         params = {
-            "id": f"{self.org_name}/{enforcer_id}",
+            "id": get_id(enforcer_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
 
         return Enforcer.from_dict(response["data"])
 
-    def modify_enforcer(self, method: str, enforcer: Enforcer) -> Dict:
+    def modify_enforcer(self, method: str, enforcer: Enforcer, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        enforcer.owner = self.org_name
+        enforcer.owner = get_owner(enforcer.owner, self.org_name)
         params = {
             "id": f"{enforcer.owner}/{enforcer.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         enforcer_info = json.dumps(enforcer.to_dict())
-        r = requests.post(url, params=params, data=enforcer_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=enforcer_info)
         response = r.json()
         return response
+
+    def get_pagination_enforcers(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the enforcers from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of enforcers in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Enforcer objects and the total count
+        """
+        data, total = self.get_pagination("get-enforcers", p, page_size, query_map, owner=self.org_name)
+        return [Enforcer.from_dict(item) for item in data or []], total
 
     def add_enforcer(self, enforcer: Enforcer) -> Dict:
         response = self.modify_enforcer("add-enforcer", enforcer)

@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
-
-import requests
+from typing import Dict, List, Optional
 
 from .user import User
+from .util import get_id, get_owner
 
 
 class Model:
@@ -38,6 +37,7 @@ class Model:
         self.children = [Model]
         self.modelText = ""
         self.isEnabled = False
+        self.description = ""
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, model_text):
@@ -79,7 +79,7 @@ class _ModelSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -97,28 +97,41 @@ class _ModelSDK:
         """
         url = self.endpoint + "/api/get-model"
         params = {
-            "id": f"{self.org_name}/{model_id}",
+            "id": get_id(model_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return Model.from_dict(response["data"])
 
-    def modify_model(self, method: str, model: Model) -> Dict:
+    def modify_model(self, method: str, model: Model, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        model.owner = self.org_name
+        model.owner = get_owner(model.owner, self.org_name)
         params = {
             "id": f"{model.owner}/{model.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         model_info = json.dumps(model.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=model_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=model_info)
         response = r.json()
         return response
+
+    def get_pagination_models(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the models from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of models in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Model objects and the total count
+        """
+        data, total = self.get_pagination("get-models", p, page_size, query_map, owner=self.org_name)
+        return [Model.from_dict(item) for item in data or []], total
 
     def add_model(self, model: Model) -> Dict:
         response = self.modify_model("add-model", model)

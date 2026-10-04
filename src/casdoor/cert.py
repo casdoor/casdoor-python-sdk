@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import List
+from typing import List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Cert:
@@ -33,6 +33,12 @@ class Cert:
         self.privateKey = ""
         self.authorityPublicKey = ""
         self.authorityRootPublicKey = ""
+        self.expireTime = ""
+        self.domainExpireTime = ""
+        self.provider = ""
+        self.account = ""
+        self.accessKey = ""
+        self.accessSecret = ""
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, scope, type, crypto_algorithm, bit_size, expire_in_years):
@@ -67,6 +73,13 @@ class Cert:
 
 
 class _CertSDK:
+    def get_global_certs(self) -> List[Cert]:
+        """
+        Get the certs of all the organizations.
+        """
+        data = self.do_get("get-global-certs", None)
+        return [Cert.from_dict(item) for item in data or []]
+
     def get_certs(self) -> List[Cert]:
         """
         Get the certs from Casdoor.
@@ -79,7 +92,7 @@ class _CertSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
@@ -98,27 +111,28 @@ class _CertSDK:
         """
         url = self.endpoint + "/api/get-cert"
         params = {
-            "id": f"{self.org_name}/{cert_id}",
+            "id": get_id(cert_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
 
         return Cert.from_dict(response["data"])
 
-    def modify_cert(self, method: str, cert: Cert) -> str:
+    def modify_cert(self, method: str, cert: Cert, columns: Optional[List[str]] = None) -> str:
         url = self.endpoint + f"/api/{method}"
-        cert.owner = self.org_name
+        cert.owner = get_owner(cert.owner, self.org_name)
         params = {
             "id": f"{cert.owner}/{cert.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         cert_info = json.dumps(cert.to_dict())
-        r = requests.post(url, params=params, data=cert_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=cert_info)
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])

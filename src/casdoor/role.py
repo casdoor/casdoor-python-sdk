@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Role:
@@ -29,6 +29,8 @@ class Role:
         self.roles = [""]
         self.domains = [""]
         self.isEnabled = False
+        self.groups = []
+        self.sourceGroups = []
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, description):
@@ -71,7 +73,7 @@ class _RoleSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -89,30 +91,49 @@ class _RoleSDK:
         """
         url = self.endpoint + "/api/get-role"
         params = {
-            "id": f"{self.org_name}/{role_id}",
+            "id": get_id(role_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return Role.from_dict(response["data"])
 
-    def modify_role(self, method: str, role: Role) -> Dict:
+    def modify_role(self, method: str, role: Role, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        role.owner = self.org_name
+        role.owner = get_owner(role.owner, self.org_name)
         params = {
             "id": f"{role.owner}/{role.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         role_info = json.dumps(role.to_dict())
-        r = requests.post(url, params=params, data=role_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=role_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return response
+
+    def get_pagination_roles(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the roles from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of roles in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Role objects and the total count
+        """
+        data, total = self.get_pagination("get-roles", p, page_size, query_map, owner=self.org_name)
+        return [Role.from_dict(item) for item in data or []], total
+
+    def update_role_for_columns(self, role: Role, columns: List[str]) -> Dict:
+        """
+        Only update the given columns of the role, e.g. ["display_name"].
+        """
+        return self.modify_role("update-role", role, columns)
 
     def add_role(self, role: Role) -> Dict:
         response = self.modify_role("add-role", role)
@@ -134,7 +155,7 @@ class _RoleSDK:
         :param role_name: the name of the role to assign
         :return: response dict with status
         """
-        user_id = f"{self.org_name}/{username}"
+        user_id = get_id(username, self.org_name)
 
         role = self.get_role(role_name)
         if role is None:
@@ -157,7 +178,7 @@ class _RoleSDK:
         :param role_name: the name of the role to remove
         :return: response dict with status
         """
-        user_id = f"{self.org_name}/{username}"
+        user_id = get_id(username, self.org_name)
 
         role = self.get_role(role_name)
         if role is None:
@@ -176,7 +197,7 @@ class _RoleSDK:
         :param username: the username to get roles for
         :return: list of Role objects assigned to the user
         """
-        user_id = f"{self.org_name}/{username}"
+        user_id = get_id(username, self.org_name)
         all_roles = self.get_roles()
 
         user_roles = []

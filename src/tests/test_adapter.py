@@ -34,7 +34,7 @@ class AdapterTest(unittest.TestCase):
 
         # Add a new object
         adapter = Adapter.new(
-            owner="admin",
+            owner=TestOrganization,
             name=name,
             created_time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             host=name,

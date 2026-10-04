@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class Session:
@@ -25,6 +25,8 @@ class Session:
         self.application = ""
         self.createdTime = ""
         self.sessionId = [""]
+        self.sessionInfos = []
+        self.ExclusiveSignin = False
 
     @classmethod
     def new(cls, owner, name, application, created_time, session_id):
@@ -66,7 +68,7 @@ class _SessionSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -84,31 +86,50 @@ class _SessionSDK:
         """
         url = self.endpoint + "/api/get-session"
         params = {
-            "id": f"{self.org_name}/{session_id}",
+            "id": get_id(session_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
             "sessionPkId": f"{self.org_name}/{session_id}/{application}",
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return Session.from_dict(response["data"])
 
-    def modify_session(self, method: str, session: Session) -> Dict:
+    def modify_session(self, method: str, session: Session, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        session.owner = self.org_name
+        session.owner = get_owner(session.owner, self.org_name)
         params = {
             "id": f"{session.owner}/{session.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         session_info = json.dumps(session.to_dict())
-        r = requests.post(url, params=params, data=session_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=session_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return response
+
+    def get_pagination_sessions(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the sessions from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of sessions in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Session objects and the total count
+        """
+        data, total = self.get_pagination("get-sessions", p, page_size, query_map, owner=self.org_name)
+        return [Session.from_dict(item) for item in data or []], total
+
+    def update_session_for_columns(self, session: Session, columns: List[str]) -> Dict:
+        """
+        Only update the given columns of the session, e.g. ["display_name"].
+        """
+        return self.modify_session("update-session", session, columns)
 
     def add_session(self, session: Session) -> Dict:
         response = self.modify_session("add-session", session)

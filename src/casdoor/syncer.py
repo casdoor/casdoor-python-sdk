@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import requests
+from .util import get_id, get_owner
 
 
 class TableColumn:
@@ -56,6 +56,13 @@ class Syncer:
         self.syncInterval = 0
         self.isReadOnly = False
         self.isEnabled = False
+        self.sslMode = ""
+        self.sshType = ""
+        self.sshHost = ""
+        self.sshPort = 0
+        self.sshUser = ""
+        self.sshPassword = ""
+        self.cert = ""
 
     @classmethod
     def new(
@@ -119,7 +126,7 @@ class _SyncerSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -137,30 +144,43 @@ class _SyncerSDK:
         """
         url = self.endpoint + "/api/get-syncer"
         params = {
-            "id": f"{self.org_name}/{syncer_id}",
+            "id": get_id(syncer_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return Syncer.from_dict(response["data"])
 
-    def modify_syncer(self, method: str, syncer: Syncer) -> Dict:
+    def modify_syncer(self, method: str, syncer: Syncer, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        syncer.owner = self.org_name
+        syncer.owner = get_owner(syncer.owner, self.org_name)
         params = {
             "id": f"{syncer.owner}/{syncer.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         syncer_info = json.dumps(syncer.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=syncer_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=syncer_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return response
+
+    def get_pagination_syncers(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the syncers from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of syncers in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Syncer objects and the total count
+        """
+        data, total = self.get_pagination("get-syncers", p, page_size, query_map, owner=self.org_name)
+        return [Syncer.from_dict(item) for item in data or []], total
 
     def add_syncer(self, syncer: Syncer) -> Dict:
         response = self.modify_syncer("add-syncer", syncer)

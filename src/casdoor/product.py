@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import json
-from typing import Dict, List
-
-import requests
+from typing import Dict, List, Optional
 
 from .provider import Provider
+from .util import get_id, get_owner
 
 
 class Product:
@@ -38,6 +37,11 @@ class Product:
         self.returnUrl = ""
         self.state = ""
         self.providerObjs = [Provider]
+        self.isRecharge = False
+        self.rechargeOptions = []
+        self.disableCustomRecharge = False
+        self.successUrl = ""
+        self.properties = {}
 
     @classmethod
     def new(cls, owner, name, created_time, display_name, image, description, tag, quantity, sold, state):
@@ -85,7 +89,7 @@ class _ProductSDK:
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
@@ -103,31 +107,44 @@ class _ProductSDK:
         """
         url = self.endpoint + "/api/get-product"
         params = {
-            "id": f"{self.org_name}/{product_id}",
+            "id": get_id(product_id, self.org_name),
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
-        r = requests.get(url, params, verify=self.verify)
+        r = self._http_get(url, params)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
 
         return Product.from_dict(response["data"])
 
-    def modify_product(self, method: str, product: Product) -> Dict:
+    def modify_product(self, method: str, product: Product, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
-        product.owner = self.org_name
+        product.owner = get_owner(product.owner, self.org_name)
         params = {
             "id": f"{product.owner}/{product.name}",
+            "columns": ",".join(columns) if columns else None,
             "clientId": self.client_id,
             "clientSecret": self.client_secret,
         }
         product_info = json.dumps(product.to_dict(), default=self.custom_encoder)
-        r = requests.post(url, params=params, data=product_info, verify=self.verify)
+        r = self._http_post(url, params=params, data=product_info)
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
         return response
+
+    def get_pagination_products(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
+        """
+        Get a page of the products from Casdoor.
+
+        :param p: the page number, starting from 1
+        :param page_size: the count of products in a page
+        :param query_map: the filters, e.g. {"field": "name", "value": "abc", "sortOrder": "descend"}
+        :return: a tuple of the list of Product objects and the total count
+        """
+        data, total = self.get_pagination("get-products", p, page_size, query_map, owner=self.org_name)
+        return [Product.from_dict(item) for item in data or []], total
 
     def add_product(self, product: Product) -> Dict:
         response = self.modify_product("add-product", product)
