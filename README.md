@@ -65,7 +65,8 @@ The SDK has the same features as [casdoor-go-sdk](https://github.com/casdoor/cas
 - **Billing**: products, orders, payments, plans, pricings, subscriptions and transactions
 - **Messaging**: send emails, SMS and notifications
 - **Multi-Factor Authentication (MFA)**: TOTP, email and SMS MFA setup
-- **Other Objects**: sessions, tokens, webhooks, syncers, invitations, resources (file upload) and records
+- **Other Objects**: sessions, tokens, webhooks, syncers, invitations, keys, tickets, resources (file upload) and records
+- **Excel Import**: `upload_users()`, `upload_groups()`, `upload_roles()` and `upload_permissions()` import objects from .xlsx files
 
 ## 📦 Installation
 
@@ -391,14 +392,14 @@ sdk.mfa_delete("my-organization", "alice")
 |------------------|------------------------------------------------------------------------------------------------------------------------------------|
 | **Auth**         | `get_auth_link`, `get_oauth_token`, `get_oauth_token_by_password`, `impersonate_user`, `refresh_oauth_token(s)`, `introspect_token`, `parse_jwt_token`, `logout`, `logout_current_session`, `with_access_token`, `get_account` |
 | **URL**          | `get_signin_url`, `get_signup_url`, `get_user_profile_url`, `get_my_profile_url`                                                   |
-| **User**         | CRUD + pagination, `get_user_by_email`, `get_user_by_phone`, `get_user_by_user_id`, `get_sorted_users`, `get_global_users`, `get_user_count`, `update_user_for_columns`, `update_user_by_id`, `update_user_by_user_id`, `check_user_password`, `set_password`, `assign_role_to_user`, `remove_role_from_user`, `get_user_roles` |
+| **User**         | CRUD + pagination, `get_user_by_email`, `get_user_by_phone`, `get_user_by_user_id`, `get_sorted_users`, `get_global_users`, `get_user_count`, `update_user_for_columns`, `update_user_by_id`, `update_user_by_user_id`, `check_user_password`, `set_password`, `upload_users`, `remove_user_from_group`, `assign_role_to_user`, `remove_role_from_user`, `get_user_roles` |
 | **Organization** | CRUD, `get_organization_names`                                                                                                     |
 | **Application**  | CRUD, `get_organization_applications`                                                                                              |
-| **Group**        | CRUD + pagination                                                                                                                  |
+| **Group**        | CRUD + pagination, `upload_groups`                                                                                                 |
 | **Cert**         | CRUD, `get_global_certs`                                                                                                           |
 | **Provider**     | CRUD + pagination                                                                                                                  |
-| **Role**         | CRUD + pagination, `update_role_for_columns`                                                                                       |
-| **Permission**   | CRUD + pagination, `update_permission_for_columns`, `get_permissions_by_role`                                                      |
+| **Role**         | CRUD + pagination, `update_role_for_columns`, `upload_roles`                                                                       |
+| **Permission**   | CRUD + pagination, `update_permission_for_columns`, `get_permissions_by_role`, `upload_permissions`                                 |
 | **Model / Adapter / Enforcer** | CRUD + pagination                                                                                                    |
 | **Policy**       | `get_policies`, `get_filtered_policies`, `add_policy`, `update_policy`, `remove_policy`                                            |
 | **Enforce**      | `enforce`, `batch_enforce`                                                                                                         |
@@ -409,9 +410,11 @@ sdk.mfa_delete("my-organization", "alice")
 | **Payment**      | CRUD + pagination, `get_user_payments`, `notify_payment`, `invoice_payment`                                                        |
 | **Plan / Pricing / Subscription** | CRUD + pagination                                                                                                 |
 | **Transaction**  | CRUD + pagination, `get_user_transactions`, `add_transaction_with_dry_run`                                                         |
-| **Invitation**   | CRUD + pagination, `update_invitation_for_columns`, `get_invitation_info`                                                          |
+| **Invitation**   | CRUD + pagination, `update_invitation_for_columns`, `get_invitation_info`, `send_invitation`                                       |
 | **LDAP**         | CRUD, `get_ldap_users`, `sync_ldap_users`, `sync_ldap_users_from_server`                                                           |
 | **Syncer / Webhook** | CRUD + pagination                                                                                                              |
+| **Key**          | CRUD + pagination, `get_global_keys`                                                                                               |
+| **Ticket**       | CRUD + pagination, `add_ticket_message` (call them on an SDK from `with_access_token()`)                                           |
 | **Resource**     | `get_resources`, `get_pagination_resources`, `get_resource`, `get_resource_ex`, `add_resource`, `update_resource`, `upload_resource`, `upload_resource_ex`, `delete_resource`, `delete_resource_with_tag` |
 | **Record**       | `get_records`, `get_pagination_records`, `get_record`, `add_record`                                                                |
 | **Email / SMS / Notification** | `send_email`, `send_email_by_provider`, `send_sms`, `send_sms_by_provider`, `send_notification`                      |

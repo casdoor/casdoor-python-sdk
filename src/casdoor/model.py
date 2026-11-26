@@ -24,19 +24,8 @@ class Model:
         self.owner = ""
         self.name = ""
         self.createdTime = ""
-        self.updatedTime = ""
         self.displayName = ""
-        self.manager = ""
-        self.contactEmail = ""
-        self.type = ""
-        self.parentId = ""
-        self.isTopModel = False
-        self.users = [User]
-        self.title = ""
-        self.key = ""
-        self.children = [Model]
         self.modelText = ""
-        self.isEnabled = False
         self.description = ""
 
     @classmethod
@@ -119,6 +108,8 @@ class _ModelSDK:
         model_info = json.dumps(model.to_dict(), default=self.custom_encoder)
         r = self._http_post(url, params=params, data=model_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def get_pagination_models(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):

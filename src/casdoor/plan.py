@@ -25,12 +25,10 @@ class Plan:
         self.createdTime = ""
         self.displayName = ""
         self.description = ""
-        self.pricePerMonth = 0.0
-        self.pricePerYear = 0.0
         self.currency = ""
         self.isEnabled = False
         self.role = ""
-        self.options = [""]
+        self.options = []
         self.price = 0.0
         self.period = ""
         self.product = ""

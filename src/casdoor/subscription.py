@@ -27,14 +27,9 @@ class Subscription:
         self.displayName = ""
         self.startTime = datetime.now(timezone.utc).isoformat()
         self.endTime = datetime.now(timezone.utc).isoformat()
-        self.duration = 0
         self.description = ""
         self.user = ""
         self.plan = ""
-        self.isEnabled = False
-        self.submitter = ""
-        self.approver = ""
-        self.approveTime = ""
         self.state = ""
         self.group = ""
         self.pricing = ""

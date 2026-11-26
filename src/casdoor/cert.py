@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from .util import get_id, get_owner
 
@@ -31,8 +31,6 @@ class Cert:
         self.expireInYears = 0
         self.certificate = ""
         self.privateKey = ""
-        self.authorityPublicKey = ""
-        self.authorityRootPublicKey = ""
         self.expireTime = ""
         self.domainExpireTime = ""
         self.provider = ""
@@ -122,7 +120,7 @@ class _CertSDK:
 
         return Cert.from_dict(response["data"])
 
-    def modify_cert(self, method: str, cert: Cert, columns: Optional[List[str]] = None) -> str:
+    def modify_cert(self, method: str, cert: Cert, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
         cert.owner = get_owner(cert.owner, self.org_name)
         params = {
@@ -136,16 +134,16 @@ class _CertSDK:
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
-        return str(response["data"])
+        return response
 
-    def add_cert(self, cert: Cert) -> str:
+    def add_cert(self, cert: Cert) -> Dict:
         response = self.modify_cert("add-cert", cert)
         return response
 
-    def update_cert(self, cert: Cert) -> str:
+    def update_cert(self, cert: Cert) -> Dict:
         response = self.modify_cert("update-cert", cert)
         return response
 
-    def delete_cert(self, cert: Cert) -> str:
+    def delete_cert(self, cert: Cert) -> Dict:
         response = self.modify_cert("delete-cert", cert)
         return response

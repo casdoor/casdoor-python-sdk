@@ -24,9 +24,8 @@ class Session:
         self.name = ""
         self.application = ""
         self.createdTime = ""
-        self.sessionId = [""]
+        self.sessionId = []
         self.sessionInfos = []
-        self.ExclusiveSignin = False
 
     @classmethod
     def new(cls, owner, name, application, created_time, session_id):

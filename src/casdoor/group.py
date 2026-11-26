@@ -131,7 +131,7 @@ class _GroupSDK:
         if response["status"] != "ok":
             raise ValueError(response["msg"])
 
-        return str(response["data"])
+        return response
 
     def get_pagination_groups(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
         """
@@ -156,6 +156,17 @@ class _GroupSDK:
     def delete_group(self, group: Group) -> Dict:
         response = self.modify_group("delete-group", group)
         return response
+
+    def upload_groups(self, file) -> Dict:
+        """
+        Import groups from an Excel (.xlsx) file. The first row of the first sheet is the header, each
+        column is named after a field of the Group, e.g. "Owner", "Name", "DisplayName" and "ParentId".
+        A boolean cell is true when it's "1", and a list cell is a JSON array. The groups that already
+        exist are skipped.
+
+        :param file: the content of the file in bytes, or a file object opened in binary mode
+        """
+        return self.do_post("upload-groups", None, files={"file": ("file.xlsx", file)})
 
     def custom_encoder(self, o):
         if isinstance(o, (Group, User)):

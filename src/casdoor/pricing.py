@@ -25,14 +25,10 @@ class Pricing:
         self.createdTime = ""
         self.displayName = ""
         self.description = ""
-        self.plans = [""]
+        self.plans = []
         self.isEnabled = False
         self.trialDuration = 0
         self.application = ""
-        self.submitter = ""
-        self.approver = ""
-        self.approveTime = ""
-        self.state = ""
         self.isInviteOnly = False
         self.users = []
 

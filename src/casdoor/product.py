@@ -33,8 +33,7 @@ class Product:
         self.price = 0.0
         self.quantity = 0
         self.sold = 0
-        self.providers = [""]
-        self.returnUrl = ""
+        self.providers = []
         self.state = ""
         self.providerObjs = [Provider]
         self.isRecharge = False

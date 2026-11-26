@@ -480,7 +480,10 @@ class AsyncCasdoorSDK:
     async def modify_user(self, method: str, user: User, params=None) -> Dict:
         path = f"/api/{method}"
         async with self._session as session:
-            return await session.post(path, params=params, headers=self.headers, json=user.to_dict())
+            response = await session.post(path, params=params, headers=self.headers, json=user.to_dict())
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
+        return response
 
     async def add_user(self, user: User) -> Dict:
         response = await self.modify_user("add-user", user)

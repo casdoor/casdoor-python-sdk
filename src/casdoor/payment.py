@@ -29,10 +29,8 @@ class Payment:
         self.productName = ""
         self.productDisplayName = ""
         self.detail = ""
-        self.tag = ""
         self.currency = ""
         self.price = 0.0
-        self.returnUrl = ""
         self.user = ""
         self.personName = ""
         self.personIdCard = ""
@@ -133,6 +131,8 @@ class _PaymentSDK:
         payment_info = json.dumps(payment.to_dict())
         r = self._http_post(url, params=params, data=payment_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def get_pagination_payments(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):

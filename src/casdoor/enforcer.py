@@ -28,7 +28,6 @@ class Enforcer:
         self.description = ""
         self.model = ""
         self.adapter = ""
-        self.isEnabled = False
         self.modelCfg = {}
 
     @classmethod
@@ -115,6 +114,8 @@ class _EnforcerSDK:
         enforcer_info = json.dumps(enforcer.to_dict())
         r = self._http_post(url, params=params, data=enforcer_info)
         response = r.json()
+        if response["status"] != "ok":
+            raise Exception(response["msg"])
         return response
 
     def get_pagination_enforcers(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):

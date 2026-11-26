@@ -17,6 +17,7 @@ import unittest
 
 import src.tests.test_util as test_util
 from src.casdoor import CasdoorSDK
+from src.casdoor.group import Group
 from src.casdoor.user import User
 
 
@@ -125,3 +126,33 @@ class UserTest(unittest.TestCase):
         self.assertIsInstance(users, list, "The returned result is not a list")
         for user in users:
             self.assertIsInstance(user, User, "There are non User type objects in the list")
+
+    def test_remove_user_from_group(self):
+        sdk = UserTest.get_sdk()
+        org = test_util.TestOrganization
+        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        group_name = test_util.get_random_name("RemoveGroup")
+        other_group_name = test_util.get_random_name("RemoveOtherGroup")
+        user_name = test_util.get_random_name("RemoveUser")
+
+        for name in [group_name, other_group_name]:
+            group = Group.new(org, name, now, name)
+            sdk.add_group(group)
+            self.addCleanup(sdk.delete_group, group)
+
+        # Add a user that belongs to two groups
+        user = User.new(org, user_name, now, user_name, f"{user_name}@example.com", "")
+        user.groups = [f"{org}/{group_name}", f"{org}/{other_group_name}"]
+        sdk.add_user(user)
+        self.addCleanup(sdk.delete_user, user)
+        self.assertEqual(len(sdk.get_user(user_name).groups), 2)
+
+        # The owner defaults to the organization of the SDK
+        self.assertTrue(sdk.remove_user_from_group("", user_name, group_name))
+        self.assertEqual(sdk.get_user(user_name).groups, [f"{org}/{other_group_name}"])
+
+        # Removing the user from a group that it is not in changes nothing
+        self.assertFalse(sdk.remove_user_from_group("", user_name, group_name))
+
+        self.assertTrue(sdk.remove_user_from_group(org, user_name, other_group_name))
+        self.assertEqual(sdk.get_user(user_name).groups or [], [])

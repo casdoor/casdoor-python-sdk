@@ -69,8 +69,6 @@ class User:
 
         self.hash = ""
         self.preHash = ""
-        self.accessKey = ""
-        self.accessSecret = ""
 
         self.createdIp = ""
         self.lastSigninTime = ""
@@ -94,7 +92,6 @@ class User:
         self.casdoor = ""
         self.infoflow = ""
         self.apple = ""
-        self.azureAd = ""
         self.slack = ""
         self.steam = ""
         self.bilibili = ""
@@ -103,34 +100,27 @@ class User:
         self.line = ""
         self.amazon = ""
         self.auth0 = ""
-        self.battleNet = ""
         self.bitbucket = ""
         self.box = ""
-        self.cloudFoundry = ""
         self.dailymotion = ""
         self.deezer = ""
-        self.digitalOcean = ""
         self.discord = ""
         self.dropbox = ""
-        self.eveOnline = ""
         self.fitbit = ""
         self.gitea = ""
         self.heroku = ""
-        self.influxCloud = ""
         self.instagram = ""
         self.intercom = ""
         self.kakao = ""
         self.lastfm = ""
         self.mailru = ""
         self.meetup = ""
-        self.microsoftOnline = ""
         self.naver = ""
         self.nextcloud = ""
         self.onedrive = ""
         self.oura = ""
         self.patreon = ""
         self.paypal = ""
-        self.salesForce = ""
         self.shopify = ""
         self.soundcloud = ""
         self.spotify = ""
@@ -149,8 +139,6 @@ class User:
         self.yammer = ""
         self.yandex = ""
         self.zoom = ""
-        self.metaMask = ""
-        self.web3Onboard = ""
         self.custom = ""
 
         self.preferredMfaType = ""
@@ -501,6 +489,28 @@ class _UserSDK:
     def delete_user(self, user: User) -> Dict:
         response = self.modify_user("delete-user", user)
         return response
+
+    def upload_users(self, file) -> Dict:
+        """
+        Import users from an Excel (.xlsx) file. The first row of the first sheet is the header, each
+        column is named after a field of the User, e.g. "Owner", "Name", "Password", "DisplayName" and
+        "Email". A boolean cell is true when it's "1", and a list cell is a JSON array. The users that
+        already exist are skipped.
+
+        The API acts on behalf of the signed-in admin user, so call it on an SDK from with_access_token(),
+        the application's client ID and client secret are rejected.
+
+        :param file: the content of the file in bytes, or a file object opened in binary mode
+        """
+        return self.do_post("upload-users", None, files={"file": ("file.xlsx", file)})
+
+    def remove_user_from_group(self, owner: str, name: str, group_name: str) -> bool:
+        """
+        Remove the user from the group, both in the owner organization (the SDK's one when empty).
+        Return False if the user was not in the group.
+        """
+        params = {"owner": get_owner(owner, self.org_name), "name": name, "groupName": group_name}
+        return self.do_post("remove-user-from-group", params)["data"] is True
 
     def check_user_password(self, user: User) -> bool:
         """

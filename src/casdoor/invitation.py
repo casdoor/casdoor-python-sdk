@@ -102,3 +102,9 @@ class _InvitationSDK:
 
     def delete_invitation(self, invitation: Invitation) -> Dict:
         return self.modify_invitation("delete-invitation", invitation)
+
+    def send_invitation(self, name: str, *destinations: str) -> Dict:
+        """
+        Send the invitation code to the email addresses or phone numbers.
+        """
+        return self.do_post("send-invitation", {"id": get_id(name, self.org_name)}, list(destinations))

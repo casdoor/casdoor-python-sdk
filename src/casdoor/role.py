@@ -25,9 +25,9 @@ class Role:
         self.createdTime = ""
         self.displayName = ""
         self.description = ""
-        self.users = [""]
-        self.roles = [""]
-        self.domains = [""]
+        self.users = []
+        self.roles = []
+        self.domains = []
         self.isEnabled = False
         self.groups = []
         self.sourceGroups = []
@@ -146,6 +146,17 @@ class _RoleSDK:
     def delete_role(self, role: Role) -> Dict:
         response = self.modify_role("delete-role", role)
         return response
+
+    def upload_roles(self, file) -> Dict:
+        """
+        Import roles from an Excel (.xlsx) file. The first row of the first sheet is the header, each
+        column is named after a field of the Role, e.g. "Owner", "Name", "Users" and "Roles". A boolean
+        cell is true when it's "1", and a list cell is a JSON array. The roles that already exist are
+        skipped.
+
+        :param file: the content of the file in bytes, or a file object opened in binary mode
+        """
+        return self.do_post("upload-roles", None, files={"file": ("file.xlsx", file)})
 
     def assign_role_to_user(self, username: str, role_name: str) -> Dict:
         """

@@ -28,6 +28,7 @@ from .cert import _CertSDK
 from .enforcer import _EnforcerSDK
 from .group import _GroupSDK
 from .invitation import _InvitationSDK
+from .key import _KeySDK
 from .ldap import _LdapSDK
 from .message import _MessageSDK
 from .mfa import _MfaSDK
@@ -47,6 +48,7 @@ from .role import _RoleSDK
 from .session import _SessionSDK
 from .subscription import _SubscriptionSDK
 from .syncer import _SyncerSDK
+from .ticket import _TicketSDK
 from .token import _TokenSDK
 from .transaction import _TransactionSDK
 from .user import _UserSDK
@@ -114,6 +116,8 @@ class CasdoorSDK(
     _TokenSDK,
     _WebhookSDK,
     _InvitationSDK,
+    _KeySDK,
+    _TicketSDK,
     _LdapSDK,
     _OrderSDK,
     _TransactionSDK,

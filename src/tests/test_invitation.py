@@ -78,5 +78,11 @@ class InvitationTest(unittest.TestCase):
         info = sdk.get_invitation_info(code, "app-casbin")
         self.assertEqual(info.name, name)
 
+        # Casdoor tries to send the email, but the test application has no working Email provider
+        with self.assertRaisesRegex(Exception, "Email provider|refused"):
+            sdk.send_invitation(name, "test@example.com")
+        with self.assertRaisesRegex(Exception, "does not exist"):
+            sdk.send_invitation(f"{name}_missing", "test@example.com")
+
         sdk.delete_invitation(invitation)
         self.assertIsNone(sdk.get_invitation(name))

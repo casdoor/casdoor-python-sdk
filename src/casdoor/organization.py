@@ -71,19 +71,19 @@ class Organization:
         self.favicon = ""
         self.passwordType = ""
         self.passwordSalt = ""
-        self.passwordOptions = [""]
-        self.countryCodes = [""]
+        self.passwordOptions = []
+        self.countryCodes = []
         self.defaultAvatar = ""
         self.defaultApplication = ""
-        self.tags = [""]
-        self.languages = [""]
-        # self.themeData = ThemeData
+        self.tags = []
+        self.languages = []
+        self.themeData = None
         self.masterPassword = ""
         self.initScore = 0
         self.enableSoftDeletion = False
         self.isProfilePublic = False
-        # self.mfaItems = [MfaItem]
-        # self.accountItems = [AccountItem]
+        self.mfaItems = []
+        self.accountItems = []
         self.logo = ""
         self.logoDark = ""
         self.hasPrivilegeConsent = False
@@ -237,8 +237,8 @@ class _OrganizationSDK:
         r = self._http_post(url, params=params, data=organization_info)
         response = r.json()
         if response["status"] != "ok":
-            raise ValueError(response)
-        return str(response["data"])
+            raise ValueError(response["msg"])
+        return response
 
     def add_organization(self, organization: Organization) -> Dict:
         organization.owner = get_owner(organization.owner, "admin")

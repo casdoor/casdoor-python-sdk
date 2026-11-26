@@ -25,14 +25,14 @@ class Permission:
         self.createdTime = ""
         self.displayName = ""
         self.description = ""
-        self.users = [""]
-        self.roles = [""]
-        self.domains = [""]
+        self.users = []
+        self.roles = []
+        self.domains = []
         self.model = ""
         self.adapter = ""
         self.resourceType = ""
-        self.resources = [""]
-        self.actions = [""]
+        self.resources = []
+        self.actions = []
         self.effect = ""
         self.isEnabled = False
         self.submitter = ""
@@ -158,7 +158,7 @@ class _PermissionSDK:
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
-        return str(response["data"])
+        return response
 
     def get_pagination_permissions(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
         """
@@ -189,3 +189,14 @@ class _PermissionSDK:
     def delete_permission(self, permission: Permission) -> Dict:
         response = self.modify_permission("delete-permission", permission)
         return response
+
+    def upload_permissions(self, file) -> Dict:
+        """
+        Import permissions from an Excel (.xlsx) file. The first row of the first sheet is the header, each
+        column is named after a field of the Permission, e.g. "Owner", "Name", "Users", "Roles",
+        "Resources", "Actions" and "Effect". A boolean cell is true when it's "1", and a list cell is a
+        JSON array. The permissions that already exist are skipped.
+
+        :param file: the content of the file in bytes, or a file object opened in binary mode
+        """
+        return self.do_post("upload-permissions", None, files={"file": ("file.xlsx", file)})

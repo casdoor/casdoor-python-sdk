@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 # from .organization import Organization, ThemeData
 from .provider import Provider
@@ -28,7 +28,6 @@ class ProviderItem:
         self.canSignIn = False
         self.canUnlink = False
         self.prompted = False
-        self.alertType = ""
         self.rule = ""
         self.provider = Provider
         self.bindingRule = []
@@ -84,14 +83,14 @@ class Application:
         self.enableLinkWithEmail = False
         self.orgChoiceMode = ""
         self.samlReplyUrl = ""
-        # self.providers = [ProviderItem]
-        # self.signupItems = [SignupItem]
-        self.grantTypes = [""]
-        # self.organizationObj = Organization
-        self.tags = [""]
+        self.providers = []
+        self.signupItems = []
+        self.grantTypes = []
+        self.organizationObj = None
+        self.tags = []
         self.clientId = ""
         self.clientSecret = ""
-        self.redirectUris = [""]
+        self.redirectUris = []
         self.tokenFormat = ""
         self.expireInHours = 0
         self.refreshExpireInHours = 0
@@ -102,7 +101,7 @@ class Application:
         self.termsOfUse = ""
         self.signupHtml = ""
         self.signinHtml = ""
-        # self.themeData = ThemeData
+        self.themeData = None
         self.category = ""
         self.type = ""
         self.scopes = []
@@ -157,7 +156,6 @@ class Application:
         self.upstreamHost = ""
         self.sslMode = ""
         self.sslCert = ""
-        self.CertObj = None
         self.registrationAccessToken = ""
 
     @classmethod
@@ -240,7 +238,7 @@ class _ApplicationSDK:
             raise ValueError(response["msg"])
         return Application.from_dict(response["data"])
 
-    def modify_application(self, method: str, application: Application, columns: Optional[List[str]] = None) -> str:
+    def modify_application(self, method: str, application: Application, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
         if application.owner == "":
             application.owner = get_owner(application.owner, self.org_name)
@@ -255,19 +253,19 @@ class _ApplicationSDK:
         response = r.json()
         if response["status"] != "ok":
             raise ValueError(response["msg"])
-        return str(response["data"])
+        return response
 
-    def add_application(self, application: Application) -> str:
+    def add_application(self, application: Application) -> Dict:
         application.owner = get_owner(application.owner, "admin")
         response = self.modify_application("add-application", application)
         return response
 
-    def update_application(self, application: Application) -> str:
+    def update_application(self, application: Application) -> Dict:
         application.owner = get_owner(application.owner, "admin")
         response = self.modify_application("update-application", application)
         return response
 
-    def delete_application(self, application: Application) -> str:
+    def delete_application(self, application: Application) -> Dict:
         application.owner = get_owner(application.owner, "admin")
         response = self.modify_application("delete-application", application)
         return response

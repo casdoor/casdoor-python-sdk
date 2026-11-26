@@ -31,8 +31,6 @@ class Adapter:
         self.password = ""
         self.database = ""
         self.table = ""
-        self.tableNamePrefix = ""
-        self.isEnabled = False
         self.useSameDb = False
 
     @classmethod
@@ -104,7 +102,7 @@ class _AdapterSDK:
             raise Exception(response["msg"])
         return Adapter.from_dict(response["data"])
 
-    def modify_adapter(self, method: str, adapter: Adapter, columns: Optional[List[str]] = None) -> str:
+    def modify_adapter(self, method: str, adapter: Adapter, columns: Optional[List[str]] = None) -> Dict:
         url = self.endpoint + f"/api/{method}"
         adapter.owner = get_owner(adapter.owner, self.org_name)
         params = {
@@ -118,7 +116,7 @@ class _AdapterSDK:
         response = r.json()
         if response["status"] != "ok":
             raise Exception(response["msg"])
-        return str(response["data"])
+        return response
 
     def get_pagination_adapters(self, p: int, page_size: int, query_map: Optional[Dict[str, str]] = None):
         """
